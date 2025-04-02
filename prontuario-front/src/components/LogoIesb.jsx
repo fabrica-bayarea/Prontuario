@@ -1,5 +1,5 @@
 import iesbLogo from "../assets/Images/LogoIesb.png";
-import "../App.css";
+import "../styles/prelogin.css";
 
 const Logo = () => {
   return <img src={iesbLogo} alt="Iesb Logo" className="logoIesb" />;
