@@ -1,12 +1,12 @@
-import Footer from "../components/Footer";
+import LogoBayArea from "../components/LogoBayArea";
 import Logo from "../components/LogoIesb";
+import "../styles/background.css";
 import "../styles/prelogin.css";
 
 const Home = () => {
   return (
-    <div className="container"> 
+    <div className="container">
       <Logo /> {/* Logo Iesb */}
-
       <div className="box">
         <h2>ESCOLHA UMA OPÇÃO</h2>
         <button className="btn">SOU BENEFICIÁRIO</button>
@@ -15,7 +15,7 @@ const Home = () => {
       <div className="teamButton">
         <button className="but">EQUIPE IESB</button>
       </div>
-      <Footer />
+      <LogoBayArea />
     </div>
   );
 };
