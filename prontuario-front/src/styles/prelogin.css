@@ -1,16 +1,16 @@
 @import "./global.css";
 
 .logoIesb {
-  position: absolute;
-  top: 40px; /* Coloca a imagem no meio da tela verticalmente */
-  left: 45%; /* Coloca a imagem no meio da tela horizontalmente */
-  transform: translateX(-50%); /* Ajusta a posição para o centro exato */
-  transform: scale(0.7);
-  height: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.logoIesb img {
+  margin-top: 100px;
 }
 
 .box {
-  background-color: #d92f35;
+  background-color: var(--red-color1);
   width: 700px;
   height: 170px;
   padding: 20px;
@@ -28,7 +28,7 @@
 }
 
 .btn {
-  color: #d92f35;
+  color: var(--red-color1);
   background-color: #ffff;
   border: 2px solid #ffa4a4;
   font-family: var(--primary-font);
@@ -40,7 +40,7 @@
 }
 
 .but {
-  color: #d92f35;
+  color: var(--red-color1);
   background-color: #ffff;
   border: 2px solid #ffa4a4;
   font-family: var(--primary-font);
@@ -61,7 +61,7 @@
   bottom: 20px; /* Coloca a imagem no meio da tela verticalmente */
   left: 40%; /* Coloca a imagem no meio da tela horizontalmente */
   transform: translateX(-50%); /* Ajusta a posição para o centro exato */
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   transform: scale(0.7);
   height: auto;
 }
