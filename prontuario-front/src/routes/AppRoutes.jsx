@@ -1,16 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import PreLogin from "../pages/PreLogin";
-import Login from "../pages/Login";
-import Cadastro1 from "../pages/Cadastro1"
+import Login from "../pages/auth/login/Login";
+import ForgotPassword from "../pages/auth/forgot-password/page";
+import Register from "../pages/auth/register/cadastro";
 
 function AppRoutes() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<PreLogin />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/cadastro1" element={<Cadastro1/>}/>
-        {/* Caminho para a tela de login */}
+        <Route path="/" element={<Login />} />
+        <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+        <Route path="/auth/register" element={<Register />} />
       </Routes>
     </Router>
   );
