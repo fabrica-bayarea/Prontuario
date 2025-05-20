@@ -1,0 +1,219 @@
+/* =========================================
+   ESTRUTURA GERAL
+========================================= */
+@import url(./global.css);
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  min-width: 99vw;
+  overflow: hidden;
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+  background-color: var(--fundo-painel);
+}
+
+/* =========================================
+   SIDEBAR
+========================================= */
+.dashboard-sidebar {
+  background-color: var(--fundo-menu);
+  padding: 2rem 1rem;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-sidebar {
+  width: 100px;
+  margin-bottom: 2rem;
+}
+
+.dashboard-sidebar nav ul {
+  list-style: none;
+  width: 100%;
+}
+
+.dashboard-sidebar nav ul li {
+  margin-bottom: 1.2rem;
+}
+
+.dashboard-sidebar nav ul li a {
+  color: var(--cinza-texto);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  display: block;
+  border-radius: 8px;
+}
+
+.dashboard-sidebar nav ul li a:hover {
+  background-color: #fff;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--cinza-texto);
+}
+
+.update-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.update-info button,
+.quick-access button {
+  background-color: var(--vermelho-principal);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.update-info button:hover,
+.quick-access button:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+/* =========================================
+   INDICADORES (KPI)
+========================================= */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.kpi-box {
+  background-color: var(--vermelho-claro);
+  padding: 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* =========================================
+   GRÁFICOS
+========================================= */
+.charts-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.chart-container {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  flex: 1 1 45%;
+  min-width: 300px;
+}
+
+.chart-container h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--cinza-texto);
+}
+
+/* =========================================
+   AÇÕES RÁPIDAS
+========================================= */
+.quick-access {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+/* =========================================
+   ALERTAS E NOTIFICAÇÕES
+========================================= */
+.dashboard-alerts,
+.dashboard-notificacoes {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.dashboard-alerts h3,
+.dashboard-notificacoes h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.dashboard-alerts ul,
+.dashboard-notificacoes ul {
+  padding-left: 1.5rem;
+}
+
+.dashboard-alerts li::before {
+  content: "⚠️ ";
+}
+.dashboard-notificacoes li::before {
+  content: "🔔 ";
+}
+
+/* =========================================
+   MODAIS (GENÉRICOS)
+========================================= */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 550px;
+  max-height: 90vh; /* Limite de altura */
+  overflow-y: auto; /* Permite rolagem */
+  position: relative;
+  font-family: var(--fonte-principal);
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  font-size: 1.4rem;
+  color: var(--vermelho-secundario);
+  cursor: pointer;
+}
