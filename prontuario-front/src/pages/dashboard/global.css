@@ -22,7 +22,6 @@
 
 body {
   font-family: var(--fonte-principal);
-  background-image: none;
   background-color: #f8f8f8;
   color: var(--cinza-texto);
   min-height: 100vh;

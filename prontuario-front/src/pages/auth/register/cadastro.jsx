@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
-import { register } from "../../../../actions/auth";
 import "./style.modules.css";
 
 export default function Register() {
@@ -29,9 +28,22 @@ export default function Register() {
     }
 
     try {
-      const result = await register(fullname, userName, email, password);
+      const response = await fetch("http://localhost:3000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullname,
+          userName,
+          email,
+          password,
+        }),
+      });
 
-      if (result.success) {
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         setIsSuccess(true);
         setTimeout(() => {
           navigate("/dashboard");

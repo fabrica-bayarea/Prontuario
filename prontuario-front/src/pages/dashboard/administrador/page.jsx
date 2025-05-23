@@ -122,8 +122,10 @@ const MenuAdmin = () => {
         </section>
       </div>
 
-      {/* Toast */}
       <div id="toast" className="toast hidden"></div>
+
+      <script src="js/utils.js"></script>
+      <script src="js/dashboard.js"></script>
     </div>
   );
 };

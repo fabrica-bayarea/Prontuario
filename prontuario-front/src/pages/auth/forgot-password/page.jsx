@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../forgot-password/password.css";
 import "../../auth/style.modules.css";
-import { forgotPassword } from "../../../../actions/auth";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -12,13 +11,28 @@ export default function ForgotPassword() {
     e.preventDefault();
 
     try {
-      const result = await forgotPassword(email);
-      console.log(result);
-      if (result.success) {
-        navigate("/auth/login");
+      const response = await fetch(
+        "http://localhost:3000/api/auth/forgot-password",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        alert(data.error || "Erro ao enviar e-mail de redefinição de senha.");
+        return;
       }
+
+      alert("E-mail de redefinição de senha enviado com sucesso!");
+      navigate("/login");
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      alert("Erro de conexão com o servidor.");
     }
   }
 
