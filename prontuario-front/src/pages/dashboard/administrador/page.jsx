@@ -1,49 +1,45 @@
 // Importa hooks do React e a biblioteca Chart.js para gráficos
 import { useEffect, useRef, useState } from "react";
-import Chart from "chart.js/auto"; // Biblioteca para renderizar gráficos
-import LogoIESB from "../../../assets/Images/LogoIesb.png"; // Logo da instituição
-import "../../dashboard/styledash.css"; // Estilos do dashboard
-
-// Dados para exibição nos gráficos do dashboard
-const status = {
-  cursos: 12,
-  programas: 32,
-  usuarios: 158,
-  atendimentosMes: 276,
-  pendencias: ["5 alunos aguardando aprovação", "12 beneficiários pendentes"],
-  notificacoes: [
-    "Novo curso adicionado por Maria Souza",
-    "Sistema em manutenção dia 05/05 às 20h",
-  ],
-  graficoCursos: {
-    labels: ["Psicologia", "Nutrição", "Direito", "Odontologia"],
-    values: [78, 65, 52, 40],
-  },
-  graficoBeneficiarios: {
-    labels: ["Aprovados", "Pendentes"],
-    values: [160, 40],
-  },
-};
+import Chart from "chart.js/auto";
+import LogoIESB from "../../../assets/Images/LogoIesb.png";
+import "../../dashboard/styledash.css";
 
 const MenuAdmin = () => {
-  // Estado para data/hora da última atualização
-  const [lastUpdated, setLastUpdated] = useState(
-    "Atualizado em 30/04/2025 às 14h15"
-  );
-  // Estado para exibir ou ocultar o toast de sucesso
-  const [showToast, setShowToast] = useState(false);
-  const [toastMsg, setToastMsg] = useState("");
-  // Estado de loading ao atualizar dados
-  const [loading, setLoading] = useState(false);
+  const [dashboardData, setDashboardData] = useState({
+    cursos: 0,
+    usuarios: 0,
+    programas: 0,
+    atendimentosMes: 0,
+    pendencias: [],
+    notificacoes: [],
+    graficoCursos: { labels: [], values: [] },
+    graficoBeneficiarios: { labels: [], values: [] },
+  });
+  const [lastUpdated, setLastUpdated] = useState("Carregando..."); // Estado para data/hora da última atualização
+  const [showToast, setShowToast] = useState(false); // Estado para exibir ou ocultar o toast de sucesso
+  const [toastMsg, setToastMsg] = useState(""); // Mensagem do toast
+  const [loading, setLoading] = useState(false); // Estado de loading ao atualizar dados
 
   const cursosRef = useRef(null);
   const beneficiariosRef = useRef(null);
-
   const chartCursos = useRef(null);
   const chartBeneficiarios = useRef(null);
 
-  // useEffect para inicializar/destruir os gráficos ao montar o componente
-  useEffect(() => {
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/dashboard/administrador"
+      );
+      const data = await response.json();
+      setDashboardData(data);
+      setLastUpdated("Atualizado em: " + new Date().toLocaleString("pt-BR"));
+      renderCharts(data);
+    } catch (error) {
+      console.error("Erro ao buscar dados do dashboard:", error);
+    }
+  };
+
+  const renderCharts = (data) => {
     // Destroi gráficos antigos se existirem (evita sobreposição)
     if (chartCursos.current) chartCursos.current.destroy();
     if (chartBeneficiarios.current) chartBeneficiarios.current.destroy();
@@ -54,11 +50,11 @@ const MenuAdmin = () => {
     chartCursos.current = new Chart(ctxCursos, {
       type: "bar",
       data: {
-        labels: status.graficoCursos.labels,
+        labels: data.graficoCursos.labels,
         datasets: [
           {
             label: "Atendimentos",
-            data: status.graficoCursos.values,
+            data: data.graficoCursos.values,
             backgroundColor: ["#b80000", "#d94a4a", "#ef8a8a", "#fde5e5"],
             borderRadius: 6,
           },
@@ -90,11 +86,11 @@ const MenuAdmin = () => {
     chartBeneficiarios.current = new Chart(ctxBenef, {
       type: "doughnut",
       data: {
-        labels: status.graficoBeneficiarios.labels,
+        labels: data.graficoBeneficiarios.labels,
         datasets: [
           {
             label: "Status",
-            data: status.graficoBeneficiarios.values,
+            data: data.graficoBeneficiarios.values,
             backgroundColor: ["#b80000", "#fde5e5"],
             borderWidth: 1,
           },
@@ -112,18 +108,26 @@ const MenuAdmin = () => {
         },
       },
     });
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }); // Chama a função ao montar o componente
+
+  if (!dashboardData) {
+    return <div className="dashboard-loading">Carregando dados...</div>;
+  }
 
   // Função para simular atualização dos dados do painel
   const handleRefresh = () => {
     setLoading(true); // Ativa loading
-    setTimeout(() => {
-      setLoading(false); // Desativa loading
-      setLastUpdated("Atualizado em: " + new Date().toLocaleString("pt-BR")); // Atualiza data/hora
-      setToastMsg("Dados atualizados com sucesso!"); // Mensagem de sucesso
-      setShowToast(true); // Exibe toast
-      setTimeout(() => setShowToast(false), 3000); // Oculta toast após 3s
-    }, 1500); // Simula delay de atualização
+    setTimeout(async () => {
+      await fetchDashboardData();
+      setLoading(false);
+      setToastMsg("Dados atualizados com sucesso!");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }, 1500);
   };
 
   // Renderização do componente
@@ -197,16 +201,17 @@ const MenuAdmin = () => {
           aria-label="Indicadores rápidos do sistema"
         >
           <div className="kpi-box">
-            Total de Cursos: <strong>{status.cursos}</strong>
+            Total de Cursos: <strong>{dashboardData.cursos}</strong>
           </div>
           <div className="kpi-box">
-            Programas Ativos: <strong>{status.programas}</strong>
+            Programas Ativos: <strong>{dashboardData.programas}</strong>
           </div>
           <div className="kpi-box">
-            Usuários por Perfil: <strong>{status.usuarios}</strong>
+            Usuários por Perfil: <strong>{dashboardData.usuarios}</strong>
           </div>
           <div className="kpi-box">
-            Atendimentos no Mês: <strong>{status.atendimentosMes}</strong>
+            Atendimentos no Mês:{" "}
+            <strong>{dashboardData.atendimentosMes}</strong>
           </div>
         </section>
 
@@ -253,7 +258,7 @@ const MenuAdmin = () => {
         <section className="dashboard-alerts" aria-label="Ações pendentes">
           <h3>⚠️ Itens que exigem atenção</h3>
           <ul>
-            {status.pendencias.map((item, idx) => (
+            {dashboardData.pendencias.map((item, idx) => (
               <li key={idx}>{item}</li>
             ))}
           </ul>
@@ -266,7 +271,7 @@ const MenuAdmin = () => {
         >
           <h3>🔔 Notificações recentes</h3>
           <ul>
-            {status.notificacoes.map((msg, idx) => (
+            {dashboardData.notificacoes.map((msg, idx) => (
               <li key={idx}>{msg}</li>
             ))}
           </ul>
