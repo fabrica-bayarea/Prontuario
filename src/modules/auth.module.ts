@@ -9,7 +9,7 @@ import { MicrosoftStrategy } from 'src/strategy/microsoft.strategy';
 import { PrismaService } from 'src/services/prisma.service';
 import { AuthService } from 'src/services/auth.service';
 import { AuthController } from 'src/controllers/auth.controller';
-import { AdminAuth } from 'src/controllers/auth.controller';
+
 
 @Module({}) 
 export class AuthModule {
@@ -42,7 +42,7 @@ export class AuthModule {
           inject: [ConfigService],
         },
       ],
-      controllers: [AuthController, AdminAuth], //Admin acrescentado aos controllers
+      controllers: [AuthController], //Admin acrescentado aos controllers
       exports: [AuthService, JwtModule],
     };
   }

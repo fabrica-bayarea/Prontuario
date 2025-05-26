@@ -4,9 +4,10 @@ import { AppService } from '../services/app.service';
 import { AuthModule } from 'src/modules/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'src/modules/prisma.module';
+import { DashboardModule } from 'src/dashboard-adm/dashboard/dashboard.module';
 
 @Module({
-  imports: [ 
+  imports: [ DashboardModule, 
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

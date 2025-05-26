@@ -151,17 +151,8 @@ export class AuthController {
       );
     }
   }
-}
 
 /*Adm*/
-@ApiTags('Autenticação de administrador')
-@Controller({ path: 'admin', version: '1' })
-export class AdminAuth {
-  constructor(
-    private authService: AuthService,
-    private logger: Logger,
-  ) {}
-
   @ApiOperation({
     summary: 'Autenticação de admin',
     description: 'Realiza o login de um administrador e retorna um token.',
@@ -177,7 +168,7 @@ export class AdminAuth {
       
       this.logger.error('Erro ao tentar login admin:', error.message);
       throw error;
-      
+    
     }
   }
 }
