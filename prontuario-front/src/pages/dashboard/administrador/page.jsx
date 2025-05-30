@@ -1,8 +1,8 @@
 // Importa hooks do React e a biblioteca Chart.js para gráficos
 import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
-import LogoIESB from "../../../assets/Images/LogoIesb.png";
 import "../../dashboard/styledash.css";
+import SidebarLayout from "../../../components/SidebarLayout";
 
 const MenuAdmin = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -132,40 +132,7 @@ const MenuAdmin = () => {
 
   // Renderização do componente
   return (
-    <div className="dashboard-container">
-      {/* Barra lateral com navegação */}
-      <div className="dashboard-sidebar" aria-label="Menu de Navegação">
-        <img src={LogoIESB} alt="Logo IESB" className="logo-sidebar" />
-        <nav>
-          <ul>
-            <li>
-              <a href="/dashboard/administrador">🏠 Dashboard</a>
-            </li>
-            <li>
-              <a href="">📚 Cursos</a>
-            </li>
-            <li>
-              <a href="">👨‍🏫 Coordenadores</a>
-            </li>
-            <li>
-              <a href="">📥 Importar Usuários</a>
-            </li>
-            <li>
-              <a href="">📄 Conteúdo Institucional</a>
-            </li>
-            <li>
-              <a href="">⚙️ Configurações</a>
-            </li>
-            <li>
-              <a href="">🧾 Logs e Auditoria</a>
-            </li>
-            <li>
-              <a href="">📊 Relatórios</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-
+    <SidebarLayout>
       {/* Conteúdo principal do dashboard */}
       <div className="dashboard-main">
         {/* Cabeçalho com saudação e botão de atualização */}
@@ -284,7 +251,7 @@ const MenuAdmin = () => {
           {toastMsg}
         </div>
       )}
-    </div>
+    </SidebarLayout>
   );
 };
 
