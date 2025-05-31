@@ -219,3 +219,296 @@
   color: var(--vermelho-secundario);
   cursor: pointer;
 }
+/* =========================================
+   FORMULÁRIOS DOS MODAIS
+========================================= */
+#formNovoCurso input,
+#formNovoCurso select,
+#formNovoCurso textarea,
+#formCoordenador input,
+#formCoordenador select,
+#formCoordenador textarea {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: var(--vermelho-claro);
+  font-family: var(--fonte-principal);
+}
+
+#formNovoCurso button,
+#formCoordenador button {
+  margin-top: 1rem;
+  width: 100%;
+  background-color: var(--vermelho-principal);
+  color: white;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#formNovoCurso button:hover,
+#formCoordenador button:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+#formCoordenador fieldset {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+#formCoordenador legend {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+/* =========================================
+   TABELAS (GENÉRICAS E RESPONSIVAS)
+========================================= */
+.tabela-cursos table,
+.tabela-coordenadores table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tabela-cursos th,
+.tabela-cursos td,
+.tabela-coordenadores th,
+.tabela-coordenadores td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.tabela-coordenadores td button {
+  margin-right: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.tabela-coordenadores td button.edit {
+  background: #f0c040;
+  color: #333;
+}
+.tabela-coordenadores td button.delete {
+  background: #d0021b;
+  color: #fff;
+}
+.tabela-coordenadores td button.permissoes {
+  background: #3b7ddd;
+  color: #fff;
+}
+
+/* =========================================
+   TOAST DE FEEDBACK
+========================================= */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--vermelho-principal);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.toast.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* =========================================
+   SPINNER
+========================================= */
+.spinner {
+  border: 3px solid #fff;
+  border-top: 3px solid var(--vermelho-secundario);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner.hidden {
+  display: none;
+}
+
+/* =========================================
+   SEPARADORES E RESPONSIVIDADE
+========================================= */
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 2rem 0;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .dashboard-sidebar {
+    flex-direction: row;
+    width: 100%;
+    overflow-x: auto;
+    justify-content: space-around;
+    padding: 1rem;
+  }
+
+  .dashboard-main {
+    padding: 1.5rem;
+  }
+
+  .charts-section {
+    flex-direction: column;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-access {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .quick-access button {
+    width: 100%;
+  }
+
+  .tabela-cursos table,
+  .tabela-cursos thead,
+  .tabela-cursos tbody,
+  .tabela-cursos th,
+  .tabela-cursos td,
+  .tabela-cursos tr,
+  .tabela-coordenadores table,
+  .tabela-coordenadores thead,
+  .tabela-coordenadores tbody,
+  .tabela-coordenadores th,
+  .tabela-coordenadores td,
+  .tabela-coordenadores tr {
+    display: block;
+    width: 100%;
+  }
+
+  .tabela-cursos thead,
+  .tabela-coordenadores thead {
+    display: none;
+  }
+
+  .tabela-cursos td,
+  .tabela-coordenadores td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    margin-bottom: 1rem;
+  }
+
+  .tabela-cursos td::before,
+  .tabela-coordenadores td::before {
+    position: absolute;
+    left: 1rem;
+    top: 0.8rem;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  .tabela-cursos td:nth-child(1)::before {
+    content: "Curso";
+  }
+  .tabela-cursos td:nth-child(2)::before {
+    content: "Status";
+  }
+  .tabela-cursos td:nth-child(3)::before {
+    content: "Coordenadores";
+  }
+  .tabela-cursos td:nth-child(4)::before {
+    content: "Data";
+  }
+  .tabela-cursos td:nth-child(5)::before {
+    content: "Ações";
+  }
+
+  .tabela-coordenadores td:nth-child(1)::before {
+    content: "Nome";
+  }
+  .tabela-coordenadores td:nth-child(2)::before {
+    content: "E-mail";
+  }
+  .tabela-coordenadores td:nth-child(3)::before {
+    content: "Cursos";
+  }
+  .tabela-coordenadores td:nth-child(4)::before {
+    content: "Status";
+  }
+  .tabela-coordenadores td:nth-child(5)::before {
+    content: "Ações";
+  }
+}
+
+#cursoCoordsCheckboxes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+#cursoCoordsCheckboxes label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--cinza-texto);
+  white-space: nowrap; /* ❗ Evita quebra de linha no nome */
+  width: auto;
+}
+
+.card {
+  background: var(--vermelho-claro);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card h2 {
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.card label {
+  display: block;
+  margin-bottom: 1rem;
+}

@@ -4,7 +4,7 @@ import ForgotPassword from "../pages/auth/forgot-password/page";
 import Register from "../pages/auth/register/cadastro";
 import MenuAdmin from "../pages/dashboard/administrador/page";
 import MenuCor from "../pages/dashboard/administrador/Cordenador";
-
+import Cursos from "../pages/dashboard/administrador/Cursos"
 
 function AppRoutes() {
   return (
@@ -15,6 +15,7 @@ function AppRoutes() {
         <Route path="/auth/register" element={<Register />} />
         <Route path="/dashboard/administrador" element={<MenuAdmin />} />
         <Route path="/dashboard/administrador/cordenador" element={<MenuCor />} />
+        <Route path="/dashboard/administrador/cursos" element={<Cursos />} />
       </Routes>
     </Router>
   );
