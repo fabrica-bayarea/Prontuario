@@ -14,7 +14,7 @@ function AppRoutes() {
         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
         <Route path="/auth/register" element={<Register />} />
         <Route path="/dashboard/administrador" element={<MenuAdmin />} />
-        <Route path="/dashboard/administrador" element={<MenuCor />} />
+        <Route path="/dashboard/administrador/cordenador" element={<MenuCor />} />
       </Routes>
     </Router>
   );
