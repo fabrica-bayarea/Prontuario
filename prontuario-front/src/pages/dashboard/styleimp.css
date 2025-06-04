@@ -1,0 +1,213 @@
+@import url(./global.css);
+
+/* =========================================
+   ESTRUTURA GERAL
+========================================= */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+  background-color: var(--fundo-painel);
+}
+/* =========================================
+   SIDEBAR
+========================================= */
+.dashboard-sidebar {
+  background-color: var(--fundo-menu);
+  padding: 2rem 1rem;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-sidebar {
+  width: 100px;
+  margin-bottom: 2rem;
+}
+
+.dashboard-sidebar nav ul {
+  list-style: none;
+  width: 100%;
+}
+
+.dashboard-sidebar nav ul li {
+  margin-bottom: 1.2rem;
+}
+
+.dashboard-sidebar nav ul li a {
+  color: var(--cinza-texto);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  display: block;
+  border-radius: 8px;
+}
+
+.dashboard-sidebar nav ul li a:hover {
+  background-color: #fff;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--cinza-texto);
+}
+
+.update-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.update-info button,
+.quick-access button {
+  background-color: var(--vermelho-principal);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.update-info button:hover,
+.quick-access button:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+
+.importar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.importar-container h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: var(--cinza-texto);
+}
+
+.importar-container label,
+.importar-container select,
+.importar-container input[type="file"] {
+  display: block;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 600px;
+  font-family: var(--fonte-principal);
+}
+
+.importar-container select,
+.importar-container input[type="file"] {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: var(--vermelho-claro);
+}
+
+.campos-obrigatorios {
+  font-size: 0.95rem;
+  color: #666;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+
+.dropzone {
+  border: 2px dashed #bbb;
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  background-color: #fff;
+  color: #777;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  max-width: 600px;
+}
+
+.dropzone.dragover {
+  background-color: #fde5e5;
+  border-color: var(--vermelho-principal);
+  color: var(--vermelho-principal);
+}
+
+.resumo-validacao {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--cinza-texto);
+}
+
+.tabela-validacao {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.tabela-validacao th,
+.tabela-validacao td {
+  padding: 1rem;
+  border: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.tabela-validacao tr.erro {
+  background-color: #fff3f3;
+  color: #b80000;
+}
+
+.tabela-validacao tr.erro:hover {
+  background-color: #ffe0e0;
+}
+
+.tabela-validacao td.status {
+  text-align: center;
+  font-weight: bold;
+}
+
+.btn-sucesso {
+  background-color: #28a745;
+  color: #fff;
+  font-weight: bold;
+  padding: 0.8rem 1.4rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-sucesso:hover {
+  background-color: #218838;
+}
+
+#btnImportar[disabled] {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.link-modelo {
+  margin-top: 1rem;
+  display: inline-block;
+  font-size: 0.95rem;
+  color: var(--vermelho-principal);
+  text-decoration: underline;
+  cursor: pointer;
+}
