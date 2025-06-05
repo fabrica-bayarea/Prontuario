@@ -29,10 +29,10 @@ enum BoardVisibility {
 model User {
   id           String       @id @default(uuid())
   role         Role
-  name         String
+  name         String?
   email        String       @unique
   userName     String       @unique
-  passwordHash String
+  passwordHash String?
   authProvider AuthProvider
   isVerified   Boolean      @default(false)
   CreatedAt    DateTime     @default(now())
@@ -125,4 +125,68 @@ model TaskLabel {
   label Label @relation(fields: [labelId], references: [id])
 
   @@id([taskId, labelId])
+}
+
+// DADOS DASHBOARD
+model Dashboard {
+  id             Int       @id @default(autoincrement())
+  cursos         Int
+  programas      Int
+  usuarios       Int
+  atendimentosMes Int
+  pendencias     Pendencia[]
+  notificacoes   Notificacao[]
+  graficoCursos  GraficoCurso[]
+  graficoBeneficiarios GraficoBeneficiario[]
+}
+
+model Pendencia {
+  id          Int       @id @default(autoincrement())
+  descricao   String
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+}
+
+model Notificacao {
+  id          Int       @id @default(autoincrement())
+  mensagem    String
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+}
+
+model GraficoCurso {
+  id          Int       @id @default(autoincrement())
+  label       String
+  valor       Int
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+}
+
+model GraficoBeneficiario {
+  id          Int       @id @default(autoincrement())
+  label       String
+  valor       Int
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+}
+
+
+
+//DADOS CURSO
+model Curso {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  descricao  String
+  modalidade String
+  criadoEm   DateTime @default(now())
+}
+
+//DADOS COORDENADORES (ADMIN)
+model coordenador {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  telefone  String?
+  criadoEm  DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
 }
