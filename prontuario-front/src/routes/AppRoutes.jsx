@@ -4,7 +4,9 @@ import ForgotPassword from "../pages/auth/forgot-password/page";
 import Register from "../pages/auth/register/cadastro";
 import MenuAdmin from "../pages/dashboard/administrador/page";
 import MenuCor from "../pages/dashboard/administrador/Cordenador";
-import Cursos from "../pages/dashboard/administrador/Cursos"
+import Cursos from "../pages/dashboard/administrador/Cursos";
+import ImportarUsuarios from "../pages/dashboard/administrador/ImportarUsuarios";
+import ConteudoInstitucional from "../pages/dashboard/administrador/ConteudoInstitucional";
 
 function AppRoutes() {
   return (
@@ -16,6 +18,8 @@ function AppRoutes() {
         <Route path="/dashboard/administrador" element={<MenuAdmin />} />
         <Route path="/dashboard/administrador/cordenador" element={<MenuCor />} />
         <Route path="/dashboard/administrador/cursos" element={<Cursos />} />
+        <Route path="/dashboard/administrador/importarusuarios" element={<ImportarUsuarios/>}/>
+        <Route path="/dashboard/administrador/conteudoinstitucional" element={<ConteudoInstitucional/>}/>
       </Routes>
     </Router>
   );

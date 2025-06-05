@@ -1,0 +1,358 @@
+@import url(./global.css);
+
+
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+  background-color: var(--fundo-painel);
+}
+/* =========================================
+   SIDEBAR
+========================================= */
+.dashboard-sidebar {
+  background-color: var(--fundo-menu);
+  padding: 2rem 1rem;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-sidebar {
+  width: 100px;
+  margin-bottom: 2rem;
+}
+
+.dashboard-sidebar nav ul {
+  list-style: none;
+  width: 100%;
+}
+
+.dashboard-sidebar nav ul li {
+  margin-bottom: 1.2rem;
+}
+
+.dashboard-sidebar nav ul li a {
+  color: var(--cinza-texto);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  display: block;
+  border-radius: 8px;
+}
+
+.dashboard-sidebar nav ul li a:hover {
+  background-color: #fff;
+}
+/* =========================================
+   HEADER
+========================================= */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--cinza-texto);
+}
+
+.update-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.update-info button,
+.quick-access button {
+  background-color: var(--vermelho-principal);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.update-info button:hover,
+.quick-access button:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+/* ================================
+   CONTEÚDO INSTITUCIONAL – ADMIN
+================================ */
+
+.tabela-conteudos table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  background-color: #fff;
+}
+
+.tabela-conteudos th,
+.tabela-conteudos td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.tabela-conteudos td button {
+  margin-right: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.tabela-conteudos td button:hover {
+  opacity: 0.9;
+}
+
+.tabela-conteudos td button:nth-child(1) {
+  background-color: #f0c040; color: #333;
+}
+
+.tabela-conteudos td button:nth-child(2) {
+  background-color: #218838; color: #fff;
+}
+
+.tabela-conteudos td button:nth-child(3) {
+  background-color: #d0021b; color: #fff;
+}
+
+/* Modal de Conteúdo */
+#modalConteudo label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+#modalConteudo input[type="text"],
+#modalConteudo select,
+#modalConteudo textarea {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 1rem;
+  margin-top: 0.4rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: var(--vermelho-claro);
+}
+
+#modalConteudo fieldset {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+#modalConteudo legend {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+#modalConteudo button[type="submit"] {
+  margin-top: 1rem;
+  background-color: var(--vermelho-principal);
+  color: white;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
+
+#modalConteudo button[type="submit"]:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+@media (max-width: 768px) {
+  .tabela-conteudos table,
+  .tabela-conteudos thead,
+  .tabela-conteudos tbody,
+  .tabela-conteudos tr,
+  .tabela-conteudos td {
+    display: block;
+    width: 100%;
+  }
+
+  .tabela-conteudos thead {
+    display: none;
+  }
+
+  .tabela-conteudos td {
+    padding-left: 50%;
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .tabela-conteudos td::before {
+    position: absolute;
+    left: 1rem;
+    top: 0.8rem;
+    font-weight: bold;
+    white-space: nowrap;
+    color: #555;
+  }
+
+  .tabela-conteudos td:nth-child(1)::before { content: "Título"; }
+  .tabela-conteudos td:nth-child(2)::before { content: "Tipo"; }
+  .tabela-conteudos td:nth-child(3)::before { content: "Público-alvo"; }
+  .tabela-conteudos td:nth-child(4)::before { content: "Status"; }
+  .tabela-conteudos td:nth-child(5)::before { content: "Ações"; }
+}
+
+/* ================================
+   TELA 7 – CONTEÚDO INSTITUCIONAL
+================================= */
+
+#btnNovoConteudo {
+  background-color: var(--vermelho-principal);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  float: right;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+#btnNovoConteudo:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+/* Modal de Conteúdo */
+#modalConteudo .modal-content {
+  max-width: 600px;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+#modalConteudo h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: var(--cinza-texto);
+}
+
+#formConteudo label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: var(--cinza-texto);
+}
+
+#formConteudo input[type="text"],
+#formConteudo select,
+#formConteudo textarea {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--cinza-claro);
+  font-family: var(--fonte-principal);
+  background-color: var(--vermelho-claro);
+}
+
+#formConteudo textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+#formConteudo .grupo-checkbox {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+#formConteudo .grupo-checkbox label {
+  font-weight: normal;
+}
+
+#formConteudo .dropzone {
+  border: 2px dashed var(--cinza-claro);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  background-color: #fff;
+  color: var(--cinza-texto);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+#formConteudo .dropzone.dragover {
+  background-color: var(--vermelho-claro);
+  border-color: var(--vermelho-principal);
+}
+
+/* Campos dinâmicos */
+#campoUploadArquivo,
+#campoLinkExterno,
+#campoTextoInformativo {
+  display: none;
+}
+
+/* Botões da tabela */
+.btn-editar, .btn-excluir {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-editar {
+  background-color: #f0c040;
+  color: #333;
+}
+
+.btn-excluir {
+  background-color: #b80000;
+  color: #fff;
+  margin-left: 0.5rem;
+}
+
+.tabela-conteudo table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+
+.tabela-conteudo th,
+.tabela-conteudo td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.tabela-conteudo th {
+  background-color: var(--vermelho-claro);
+}
+
+.msg-vazio {
+  margin-top: 2rem;
+  font-weight: 500;
+  font-size: 1rem;
+  color: #888;
+  text-align: center;
+}
+

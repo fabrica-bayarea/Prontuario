@@ -157,15 +157,15 @@
 .tabela-validacao {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
+  margin-top: 0.7rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .tabela-validacao th,
 .tabela-validacao td {
-  padding: 1rem;
-  border: 1px solid #eee;
-  font-size: 0.95rem;
+  padding: 0.4rem 0.0rem; /* Ajuste estes valores */
+  border: 0.7px solid #eee;
+  font-size: 0.9rem;
 }
 
 .tabela-validacao tr.erro {
@@ -210,4 +210,35 @@
   color: var(--vermelho-principal);
   text-decoration: underline;
   cursor: pointer;
+}
+.hidden {
+  display: none;
+}
+
+button[disabled] {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.card select {
+  background-color: #fff; /* fundo branco */
+  color: #000;            /* letra preta */
+  font-family: var(--fonte-principal);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.1rem;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+.link-modelo {
+ color: #136ec9;   
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 1rem;
+  display: inline-block;
+  font-size: 0.95rem;
+}
+
+.link-modelo:hover {
+  color: #1975d8;      /* azul ainda mais escuro no hover */
+  text-decoration: none;
 }
