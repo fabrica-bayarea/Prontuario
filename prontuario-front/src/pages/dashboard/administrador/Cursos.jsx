@@ -4,42 +4,24 @@ import "../styledash.css";
 
 function Cursos() {
   useEffect(() => {
-    // 🔧 Utilitários locais
-    const salvarLocal = (chave, valor) =>
-      localStorage.setItem(chave, JSON.stringify(valor));
-    const carregarLocal = (chave) =>
-      JSON.parse(localStorage.getItem(chave)) || null;
-    const mostrarToast = (mensagem) => alert(mensagem); // Substituir futuramente por um toast visual
+    // Utilitário para exibir mensagem (toast)
+    const mostrarToast = (mensagem) => alert(mensagem);
 
-    // 📋 Dados simulados
+    // Dados estáticos para coordenadores (permanece em front)
     const coordenadoresDisponiveis = [
       "Maria Oliveira",
       "João Silva",
       "Carla Souza",
       "Ana Paula",
     ];
-    let cursos = carregarLocal("cursos") || [
-      {
-        id: 1,
-        nome: "Psicologia",
-        status: "ativo",
-        coordenadores: ["Maria Oliveira", "João Silva"],
-        data: "10/01/2023",
-      },
-      {
-        id: 2,
-        nome: "Nutrição",
-        status: "inativo",
-        coordenadores: [],
-        data: "21/03/2023",
-      },
-    ];
 
+    // Variáveis de controle local
+    let cursos = [];
     let cursoEditando = null;
     let cursoParaExcluir = null;
     let filtroAtual = "todos";
 
-    // 🔁 DOM Elements
+    // Elementos do DOM
     const el = {
       listaCursos: document.getElementById("listaCursos"),
       contadorCursos: document.getElementById("contadorCursos"),
@@ -62,6 +44,7 @@ function Cursos() {
       btnConfirmarExclusao: document.getElementById("btnConfirmarExclusao"),
     };
 
+    // Popula os checkboxes com os coordenadores disponíveis
     const preencherCheckboxCoordenadores = (selecionados = []) => {
       el.cursoCoordsContainer.innerHTML = "";
       coordenadoresDisponiveis.forEach((nome) => {
@@ -85,13 +68,99 @@ function Cursos() {
         (cb) => cb.value
       );
 
+    // FUNÇÕES DE INTEGRAÇÃO COM O EXPRESS (back‑end)
+
+    // Buscar cursos via GET /api/cursos
+    const fetchCursos = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/dashboard/administrador/cursos"
+        );
+        cursos = await response.json();
+        renderizarCursos();
+      } catch (error) {
+        console.error("Erro ao buscar cursos:", error);
+        mostrarToast("Erro ao carregar cursos.");
+      }
+    };
+
+    // Atualizar curso via PUT /api/cursos/:id
+    const atualizarCurso = async (cursoAtualizado) => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/dashboard/administrador/cursos${cursoAtualizado.id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(cursoAtualizado),
+          }
+        );
+        if (response.ok) {
+          mostrarToast("Curso atualizado com sucesso.");
+          await fetchCursos();
+        } else {
+          mostrarToast("Erro ao atualizar curso.");
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar curso:", error);
+        mostrarToast("Erro ao atualizar curso.");
+      }
+    };
+
+    // Adicionar novo curso via POST /api/cursos
+    const adicionarCurso = async (novoCurso) => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/dashboard/administrador/cursos",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(novoCurso),
+          }
+        );
+        if (response.ok) {
+          mostrarToast("Curso salvo com sucesso.");
+          await fetchCursos();
+        } else {
+          mostrarToast("Erro ao salvar curso.");
+        }
+      } catch (error) {
+        console.error("Erro ao salvar curso:", error);
+        mostrarToast("Erro ao salvar curso.");
+      }
+    };
+
+    // Excluir curso via DELETE /api/cursos/:id
+    const excluirCurso = async (cursoId) => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/dashboard/administrador/cursos/${cursoId}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (response.ok) {
+          mostrarToast("Curso excluído com sucesso.");
+          await fetchCursos();
+        } else {
+          mostrarToast("Erro ao excluir curso.");
+        }
+      } catch (error) {
+        console.error("Erro ao excluir curso:", error);
+        mostrarToast("Erro ao excluir curso.");
+      }
+    };
+
+    // Renderiza a tabela de cursos
     const renderizarCursos = () => {
       el.listaCursos.innerHTML = "";
       const termoBusca = el.buscaInput.value.toLowerCase();
       const filtrados = cursos.filter(
         (c) =>
           c.nome.toLowerCase().includes(termoBusca) &&
-          (filtroAtual === "todos" || c.status === filtroAtual)
+          (filtroAtual === "todos" ||
+            (filtroAtual === "ativos" && c.status === "ativo") ||
+            (filtroAtual === "inativos" && c.status === "inativo"))
       );
       el.contadorCursos.textContent = filtrados.length;
 
@@ -106,26 +175,18 @@ function Cursos() {
         toggle.className = "status-toggle";
         toggle.textContent =
           curso.status === "ativo" ? "✅ Ativo" : "🔘 Inativo";
-        toggle.onclick = () => {
+        toggle.style.color = "#000";
+        toggle.onclick = async () => {
           curso.status = curso.status === "ativo" ? "inativo" : "ativo";
-          salvarLocal("cursos", cursos);
-          renderizarCursos();
+          await atualizarCurso(curso);
         };
         tdStatus.appendChild(toggle);
 
         const tdCoord = document.createElement("td");
-        const coordBtn = document.createElement("button");
-        coordBtn.textContent = `${curso.coordenadores.length} coordenador(es)`;
-        coordBtn.onclick = () => {
-          el.listaCoordenadores.innerHTML = "";
-          curso.coordenadores.forEach((nome) => {
-            const li = document.createElement("li");
-            li.textContent = nome;
-            el.listaCoordenadores.appendChild(li);
-          });
-          el.modalCoordenadores.classList.remove("hidden");
-        };
-        tdCoord.appendChild(coordBtn);
+        tdCoord.textContent =
+          curso.coordenadores && curso.coordenadores.length
+            ? curso.coordenadores.join(", ")
+            : "Nenhum coordenador";
 
         const tdData = document.createElement("td");
         tdData.textContent = curso.data;
@@ -134,6 +195,7 @@ function Cursos() {
         [
           {
             icon: "✏️",
+            className: "edit-btn table-action-btn",
             handler: () => {
               cursoEditando = curso;
               el.formTitle.textContent = "Editar Curso";
@@ -147,6 +209,7 @@ function Cursos() {
           },
           {
             icon: "🗑️",
+            className: "delete-btn table-action-btn",
             handler: () => {
               cursoParaExcluir = curso;
               if (curso.status === "ativo") {
@@ -161,12 +224,14 @@ function Cursos() {
           },
           {
             icon: "📂",
+            className: "visu-btn table-action-btn",
             handler: () =>
               mostrarToast("Função de visualização não implementada."),
           },
-        ].forEach(({ icon, handler }) => {
+        ].forEach(({ icon, className, handler }) => {
           const btn = document.createElement("button");
           btn.textContent = icon;
+          btn.className = className;
           btn.onclick = handler;
           tdAcoes.appendChild(btn);
         });
@@ -176,6 +241,7 @@ function Cursos() {
       });
     };
 
+    // Eventos para filtros e busca
     el.filtroBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
         el.filtroBtns.forEach((b) => b.classList.remove("active"));
@@ -186,6 +252,8 @@ function Cursos() {
     });
 
     el.buscaInput.addEventListener("input", renderizarCursos);
+
+    // Abre o modal para adicionar um novo curso
     document.getElementById("addCursoBtn").addEventListener("click", () => {
       cursoEditando = null;
       el.formTitle.textContent = "Adicionar Novo Curso";
@@ -195,14 +263,15 @@ function Cursos() {
       el.modalNovoCurso.classList.remove("hidden");
     });
 
-    el.formNovoCurso.addEventListener("submit", (e) => {
+    // Submissão do formulário (criação/edição)
+    el.formNovoCurso.addEventListener("submit", async (e) => {
       e.preventDefault();
       const selecionados = getCoordenadoresSelecionados();
       if (selecionados.length === 0)
         return mostrarToast("Você precisa vincular ao menos 1 coordenador.");
 
       const novoCurso = {
-        id: cursoEditando ? cursoEditando.id : Date.now(),
+        id: cursoEditando ? cursoEditando.id : undefined,
         nome: el.cursoNome.value,
         status: el.cursoStatus.value,
         coordenadores: selecionados,
@@ -213,32 +282,27 @@ function Cursos() {
       };
 
       if (cursoEditando) {
-        cursos = cursos.map((c) => (c.id === cursoEditando.id ? novoCurso : c));
+        await atualizarCurso(novoCurso);
       } else {
-        cursos.push(novoCurso);
+        await adicionarCurso(novoCurso);
       }
-
-      salvarLocal("cursos", cursos);
-      mostrarToast("Curso salvo com sucesso.");
       el.modalNovoCurso.classList.add("hidden");
       el.formNovoCurso.reset();
-      renderizarCursos();
     });
 
+    // Eventos de confirmação de exclusão
     el.btnCancelarExclusao.addEventListener("click", () =>
       el.modalConfirmar.classList.add("hidden")
     );
-    el.btnConfirmarExclusao.addEventListener("click", () => {
+    el.btnConfirmarExclusao.addEventListener("click", async () => {
       if (cursoParaExcluir) {
-        cursos = cursos.filter((c) => c.id !== cursoParaExcluir.id);
-        salvarLocal("cursos", cursos);
-        renderizarCursos();
-        mostrarToast("Curso excluído com sucesso.");
+        await excluirCurso(cursoParaExcluir.id);
         el.modalConfirmar.classList.add("hidden");
         cursoParaExcluir = null;
       }
     });
 
+    // Fechar os modais via botão (modal-close)
     document.querySelectorAll(".modal-close").forEach((btn) => {
       btn.addEventListener("click", () => {
         btn.closest(".modal").classList.add("hidden");
@@ -250,8 +314,9 @@ function Cursos() {
     });
 
     preencherCheckboxCoordenadores();
-    renderizarCursos();
+    fetchCursos();
   }, []);
+
   return (
     <SidebarLayout>
       <main className="dashboard-main">
@@ -344,8 +409,7 @@ function Cursos() {
               &times;
             </span>
             <p id="mensagemAviso">
-              Este curso possui programas ativos vinculados. Para excluir,
-              inative ou remova os programas primeiro.
+              Este curso está ativo. Inative o curso antes de excluí-lo.
             </p>
           </div>
         </div>
@@ -388,9 +452,7 @@ function Cursos() {
 
               <label>Coordenadores Vinculados</label>
               <br />
-              <div id="cursoCoordsCheckboxes">
-                {/* Checkboxes gerados via JS */}
-              </div>
+              <div id="cursoCoordsCheckboxes"></div>
               <br />
               <br />
 

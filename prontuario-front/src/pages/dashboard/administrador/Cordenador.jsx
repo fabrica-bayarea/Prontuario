@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../../dashboard/stylecor.css";
-import LogoIESB from "../../../assets/Images/LogoIesb.png";
+import SidebarLayout from "../../../components/SidebarLayout";
 
 function MenuCor() {
   const [coordenadores, setCoordenadores] = useState([
@@ -61,7 +61,6 @@ function MenuCor() {
     const form = event.target;
     const nome = form.nome.value;
     const email = form.email.value;
-    const cpf = form.cpf.value;
     const cursos = Array.from(form.cursos.options)
       .filter((o) => o.selected)
       .map((o) => o.value);
@@ -104,24 +103,7 @@ function MenuCor() {
   });
 
   return (
-    <div className="dashboard-container">
-      {/* Sidebar */}
-      <aside className="dashboard-sidebar">
-        <img src={LogoIESB} alt="Logo IESB" className="logo-sidebar" />
-        <nav>
-          <ul>
-            <li><a href="#">🏠 Dashboard</a></li>
-            <li><a href="#">📚 Cursos</a></li>
-            <li><a href="#">👨‍🏫 Coordenadores</a></li>
-            <li><a href="#">📥 Importar Usuários</a></li>
-            <li><a href="#">📄 Conteúdo Institucional</a></li>
-            <li><a href="#">⚙️ Configurações</a></li>
-            <li><a href="#">🧾 Logs e Auditoria</a></li>
-            <li><a href="#">📊 Relatórios</a></li>
-          </ul>
-        </nav>
-      </aside>
-
+    <SidebarLayout>
       {/* Main */}
       <main className="dashboard-main">
         <header className="dashboard-header">
@@ -145,19 +127,25 @@ function MenuCor() {
           </select>
           <div className="status-filtros">
             <button
-              className={`filtro-btn ${filtroStatus === "Todos" ? "active" : ""}`}
+              className={`filtro-btn ${
+                filtroStatus === "Todos" ? "active" : ""
+              }`}
               onClick={() => setFiltroStatus("Todos")}
             >
               Todos
             </button>
             <button
-              className={`filtro-btn ${filtroStatus === "Ativo" ? "active" : ""}`}
+              className={`filtro-btn ${
+                filtroStatus === "Ativo" ? "active" : ""
+              }`}
               onClick={() => setFiltroStatus("Ativo")}
             >
               Ativos
             </button>
             <button
-              className={`filtro-btn ${filtroStatus === "Inativo" ? "active" : ""}`}
+              className={`filtro-btn ${
+                filtroStatus === "Inativo" ? "active" : ""
+              }`}
               onClick={() => setFiltroStatus("Inativo")}
             >
               Inativos
@@ -233,7 +221,9 @@ function MenuCor() {
               &times;
             </span>
             <h2>
-              {coordenadorSelecionado ? "Editar Coordenador" : "Adicionar Coordenador"}
+              {coordenadorSelecionado
+                ? "Editar Coordenador"
+                : "Adicionar Coordenador"}
             </h2>
             <form onSubmit={salvarCoordenador}>
               <label>
@@ -256,7 +246,12 @@ function MenuCor() {
               </label>
               <label>
                 CPF*
-                <input name="cpf" type="text" placeholder="000.000.000-00" required />
+                <input
+                  name="cpf"
+                  type="text"
+                  placeholder="000.000.000-00"
+                  required
+                />
               </label>
               <label>
                 Cursos vinculados*
@@ -326,7 +321,7 @@ function MenuCor() {
           </div>
         </div>
       )}
-    </div>
+    </SidebarLayout>
   );
 }
 

@@ -17,7 +17,7 @@ const SidebarLayout = ({ children }) => {
               <a href="/dashboard/administrador/cursos">📚 Cursos</a>
             </li>
             <li>
-              <a href="">👨‍🏫 Coordenadores</a>
+              <a href="/dashboard/administrador/cordenador">👨‍🏫 Coordenadores</a>
             </li>
             <li>
               <a href="">📥 Importar Usuários</a>

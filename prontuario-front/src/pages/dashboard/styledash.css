@@ -7,6 +7,7 @@
   min-height: 100vh;
   min-width: 99vw;
   overflow: hidden;
+  background-color: #f9f9f9;
 }
 
 .dashboard-main {
@@ -63,11 +64,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
 }
 
 .dashboard-title {
-  font-size: 2.2rem;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
   color: var(--cinza-texto);
 }
 
@@ -107,10 +110,56 @@
 
 .kpi-box {
   background-color: var(--vermelho-claro);
+  /* Adicionado padding para espaçamento interno dos KPIs */
   padding: 1.5rem;
   border-radius: 10px;
   font-weight: 600;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+/* ==================== FILTROS ==================== */
+.filters-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.filters-section input,
+.filters-section select {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #fbe9e9;
+  color: #700000;
+  font-weight: 500;
+}
+
+.filters-section input:focus,
+.filters-section select:focus {
+  outline: none;
+  border: 1px solid #700000;
+  box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.2);
+}
+
+.status-filtros {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filtro-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #b30000;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filtro-btn.active,
+.filtro-btn:hover {
+  background-color: #b30000;
 }
 
 /* =========================================
@@ -186,13 +235,13 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: 1000;
 }
 
 .modal.hidden {
@@ -209,15 +258,23 @@
   overflow-y: auto; /* Permite rolagem */
   position: relative;
   font-family: var(--fonte-principal);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
 
 .modal-close {
   position: absolute;
-  top: 10px;
-  right: 16px;
-  font-size: 1.4rem;
-  color: var(--vermelho-secundario);
+  top: 0.5rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
   cursor: pointer;
+  color: #b00000;
+  font-weight: bold;
+}
+
+.modal-close:hover {
+  color: #ff0000;
 }
 /* =========================================
    FORMULÁRIOS DOS MODAIS
@@ -426,12 +483,36 @@ hr {
     display: none;
   }
 
-  .tabela-cursos td,
-  .tabela-coordenadores td {
+  .tabela-cursos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd; /* Contorno externo */
+  }
+
+  .tabela-cursos td {
+    color: #333333;
+  }
+  .tabela-cursos th,
+  .tabela-cursos td {
+    padding: 1rem;
+    text-align: left;
     border: none;
-    position: relative;
-    padding-left: 50%;
-    margin-bottom: 1rem;
+  }
+
+  .tabela-cursos th {
+    background-color: white;
+    color: #700000;
+    font-weight: bold;
+  }
+
+  .tabela-cursos tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .tabela-cursos tbody tr:hover {
+    background-color: #f1f1f1;
   }
 
   .tabela-cursos td::before,
@@ -511,4 +592,47 @@ hr {
 .card label {
   display: block;
   margin-bottom: 1rem;
+}
+
+/* ==================== BOTÃO ADICIONAR ==================== */
+.botao-primario {
+  background-color: white;
+  color: #700000;
+  border: 1px solid #700000;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.botao-primario:hover {
+  background-color: #700000;
+  color: white;
+}
+
+/* ==================== BOTÕES AÇÃO ==================== */
+.table-action-btn {
+  padding: 0.4rem 0.6rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 0.3rem;
+  font-weight: bold;
+}
+
+.edit-btn {
+  background-color: #ffecb3;
+  color: #7a4e00;
+}
+
+.visu-btn {
+  background-color: #bbdefb;
+  color: #003c8f;
+}
+
+.delete-btn {
+  background-color: #ffebee;
+  color: #b71c1c;
+  border: 2px solid #b71c1c;
 }
