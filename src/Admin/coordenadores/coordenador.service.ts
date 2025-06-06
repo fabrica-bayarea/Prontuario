@@ -2,13 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/services/prisma.service';
 import { coordenador } from '@prisma/client';
 import { CreateCoordenadorDto } from './dto/criar-coordenadores.dto';
+import { UpdateCoordenadorDto } from './dto/update-coordenadores.dto';
 
 @Injectable()
 export class coordenadorService {
   constructor(private readonly prisma: PrismaService) {}
 
  async create(createCoordenadorDto: CreateCoordenadorDto) {
-  const telefone = createCoordenadorDto.telefone ?? null; // se undefined, vira null
+  const telefone = createCoordenadorDto.telefone ?? null; 
 
   return this.prisma.coordenador.create({
     data: {
@@ -33,15 +34,16 @@ export class coordenadorService {
     return coordenador;
   }
 
-  async update(id: number, data: Partial<coordenador>): Promise<coordenador> {
-    // Verifica se existe
-    await this.findOne(id);
+ async update(id: number, updateCoordenadorDto: UpdateCoordenadorDto) {
+  await this.findOne(id);
 
-    return this.prisma.coordenador.update({
-      where: { id },
-      data,
-    });
-  }
+  console.log(updateCoordenadorDto);
+
+  return this.prisma.coordenador.update({
+    where: { id },
+    data: updateCoordenadorDto,
+  });
+}
 
   async remove(id: number): Promise<void> {
     // Verifica se existe

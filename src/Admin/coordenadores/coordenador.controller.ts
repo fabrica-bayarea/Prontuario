@@ -12,6 +12,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { coordenadorService } from './coordenador.service';
 import { coordenador } from '@prisma/client';
 import { CreateCoordenadorDto } from 'src/Admin/coordenadores/dto/criar-coordenadores.dto';
+import { UpdateCoordenadorDto } from './dto/update-coordenadores.dto';
 
 @ApiTags('Gerenciar Coordenadores')
 @Controller('coordenadores')
@@ -41,13 +42,14 @@ export class coordenadorController {
     return this.coordenadorService.findOne(id);
   }
 
-  @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: Partial<coordenador>,
-  ) {
-    return this.coordenadorService.update(id, data);
-  }
+ // No controller:
+@Put(':id')
+update(
+  @Param('id', ParseIntPipe) id: number,
+  @Body() dto: UpdateCoordenadorDto,
+) {
+  return this.coordenadorService.update(id, dto); // dto = objeto com dados reais
+}
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
