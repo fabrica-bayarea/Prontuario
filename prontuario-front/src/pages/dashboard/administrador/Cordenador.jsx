@@ -1,62 +1,78 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../../dashboard/stylecor.css";
 import SidebarLayout from "../../../components/SidebarLayout";
 
+// URL base da sua API (ajuste a porta se necessário)
+const API_URL = "http://localhost:3000/coordenadores";
+
 function MenuCor() {
-  const [coordenadores, setCoordenadores] = useState([
-    {
-      id: 1,
-      nome: "João Silva",
-      email: "joao@iesb.edu.br",
-      cursos: ["Engenharia", "ADS"],
-      status: "Ativo",
-      permissoes: {
-        aprovarBeneficiarios: false,
-        cadastrarConteudos: false,
-        gerarRelatorios: false,
-      },
-    },
-  ]);
-
+  const [coordenadores, setCoordenadores] = useState([]);
   const [filtroStatus, setFiltroStatus] = useState("Todos");
-
   const [showModalForm, setShowModalForm] = useState(false);
   const [showModalConfirmar, setShowModalConfirmar] = useState(false);
   const [coordenadorSelecionado, setCoordenadorSelecionado] = useState(null);
 
-  // Abrir modal editar
+  // Buscar todos os coordenadores do back-end ao carregar a tela
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => setCoordenadores(data))
+      .catch((error) => console.error("Erro ao buscar coordenadores:", error));
+  }, []);
+
+  // Abrir modal para editar
   const handleEditar = (coord) => {
     setCoordenadorSelecionado(coord);
     setShowModalForm(true);
   };
 
-  // Bloquear (alternar status)
-  const handleBloquear = (id) => {
-    setCoordenadores((prev) =>
-      prev.map((coord) =>
-        coord.id === id
-          ? { ...coord, status: coord.status === "Ativo" ? "Inativo" : "Ativo" }
-          : coord
-      )
-    );
+  // Alternar status (Ativo <-> Inativo)
+  const handleBloquear = async (id) => {
+    const coord = coordenadores.find((c) => c.id === id);
+    if (!coord) return;
+
+    const novoStatus = coord.status === "Ativo" ? "Inativo" : "Ativo";
+
+    try {
+      await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: novoStatus }),
+      });
+
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      setCoordenadores(data);
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+    }
   };
 
-  // Excluir
+  // Abrir modal de confirmação para excluir
   const handleExcluir = (coord) => {
     setCoordenadorSelecionado(coord);
     setShowModalConfirmar(true);
   };
 
-  const confirmarExcluir = () => {
-    setCoordenadores((prev) =>
-      prev.filter((coord) => coord.id !== coordenadorSelecionado.id)
-    );
-    setShowModalConfirmar(false);
-    setCoordenadorSelecionado(null);
+  // Confirmar exclusão do coordenador
+  const confirmarExcluir = async () => {
+    try {
+      await fetch(`${API_URL}/${coordenadorSelecionado.id}`, {
+        method: "DELETE",
+      });
+
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      setCoordenadores(data);
+      setShowModalConfirmar(false);
+      setCoordenadorSelecionado(null);
+    } catch (error) {
+      console.error("Erro ao excluir coordenador:", error);
+    }
   };
 
-  // Salvar (adicionar/editar)
-  const salvarCoordenador = (event) => {
+  // Adicionar ou editar um coordenador
+  const salvarCoordenador = async (event) => {
     event.preventDefault();
     const form = event.target;
     const nome = form.nome.value;
@@ -66,37 +82,46 @@ function MenuCor() {
       .map((o) => o.value);
     const status = form.status.value;
 
-    if (coordenadorSelecionado) {
-      // Editar
-      setCoordenadores((prev) =>
-        prev.map((coord) =>
-          coord.id === coordenadorSelecionado.id
-            ? { ...coord, nome, email, cursos, status }
-            : coord
-        )
-      );
-    } else {
-      // Adicionar
-      const novo = {
-        id: Date.now(),
-        nome,
-        email,
-        cursos,
-        status,
-        permissoes: {
-          aprovarBeneficiarios: false,
-          cadastrarConteudos: false,
-          gerarRelatorios: false,
-        },
-      };
-      setCoordenadores((prev) => [...prev, novo]);
-    }
+    const payload = {
+      nome,
+      email,
+      cursos,
+      status,
+      permissoes: {
+        aprovarBeneficiarios: false,
+        cadastrarConteudos: false,
+        gerarRelatorios: false,
+      },
+    };
 
-    setShowModalForm(false);
-    setCoordenadorSelecionado(null);
+    try {
+      if (coordenadorSelecionado) {
+        // Atualiza coordenador existente
+        await fetch(`${API_URL}/${coordenadorSelecionado.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // Cria novo coordenador
+        await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      setCoordenadores(data);
+      setShowModalForm(false);
+      setCoordenadorSelecionado(null);
+    } catch (error) {
+      console.error("Erro ao salvar coordenador:", error);
+    }
   };
 
-  // 🔍 Filtrando coordenadores
+  // Filtro por status (opcional)
   const coordenadoresFiltrados = coordenadores.filter((coord) => {
     if (filtroStatus === "Todos") return true;
     return coord.status === filtroStatus;
