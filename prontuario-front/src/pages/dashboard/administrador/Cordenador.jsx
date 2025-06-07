@@ -3,7 +3,7 @@ import "../../dashboard/stylecor.css";
 import SidebarLayout from "../../../components/SidebarLayout";
 
 // URL base da sua API (ajuste a porta se necessário)
-const API_URL = "http://localhost:3000/coordenadores";
+const API_URL = "http://localhost:3000/admin/coordenadores";
 
 function MenuCor() {
   const [coordenadores, setCoordenadores] = useState([]);
@@ -15,9 +15,22 @@ function MenuCor() {
   // Buscar todos os coordenadores do back-end ao carregar a tela
   useEffect(() => {
     fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) => setCoordenadores(data))
-      .catch((error) => console.error("Erro ao buscar coordenadores:", error));
+      .then((res) => {
+        if (!res.ok) throw new Error(`Erro ${res.status}: ${res.statusText}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCoordenadores(data);
+        } else {
+          console.error("Resposta inesperada:", data);
+          setCoordenadores([]); // Evita erro de filter
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar coordenadores:", error);
+        setCoordenadores([]); // Evita crash
+      });
   }, []);
 
   // Abrir modal para editar
