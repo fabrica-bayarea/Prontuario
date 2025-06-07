@@ -157,14 +157,14 @@
 .tabela-validacao {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 0.7rem;
+  margin-top: 1rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .tabela-validacao th,
 .tabela-validacao td {
   padding: 0.4rem 0.0rem; /* Ajuste estes valores */
-  border: 0.7px solid #eee;
+  border: 1px solid #eee;
   font-size: 0.9rem;
 }
 
@@ -203,14 +203,6 @@
   cursor: not-allowed;
 }
 
-.link-modelo {
-  margin-top: 1rem;
-  display: inline-block;
-  font-size: 0.95rem;
-  color: var(--vermelho-principal);
-  text-decoration: underline;
-  cursor: pointer;
-}
 .hidden {
   display: none;
 }
@@ -242,3 +234,10 @@ button[disabled] {
   color: #1975d8;      /* azul ainda mais escuro no hover */
   text-decoration: none;
 }
+.celula-rotulo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+

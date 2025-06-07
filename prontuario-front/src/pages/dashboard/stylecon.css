@@ -1,55 +1,5 @@
 @import url(./global.css);
 
-
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-}
-
-.dashboard-main {
-  flex: 1;
-  padding: 2rem 3rem;
-  overflow-y: auto;
-  background-color: var(--fundo-painel);
-}
-/* =========================================
-   SIDEBAR
-========================================= */
-.dashboard-sidebar {
-  background-color: var(--fundo-menu);
-  padding: 2rem 1rem;
-  width: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.logo-sidebar {
-  width: 100px;
-  margin-bottom: 2rem;
-}
-
-.dashboard-sidebar nav ul {
-  list-style: none;
-  width: 100%;
-}
-
-.dashboard-sidebar nav ul li {
-  margin-bottom: 1.2rem;
-}
-
-.dashboard-sidebar nav ul li a {
-  color: var(--cinza-texto);
-  font-weight: 600;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  display: block;
-  border-radius: 8px;
-}
-
-.dashboard-sidebar nav ul li a:hover {
-  background-color: #fff;
-}
 /* =========================================
    HEADER
 ========================================= */
@@ -354,5 +304,71 @@
   font-size: 1rem;
   color: #888;
   text-align: center;
+}
+.button {
+ background-color: #b40c0c;
+ color: white;
+ padding: 8px 15px;
+ border-radius: 6;
+ border: none;
+ cursor: pointer;
+ float: right;
+ margin-bottom: 10;
+ font-weight: bold;
+        }
+/* stylecon.css */
+
+h1 {
+  color: #4a0202;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+button.adicionar-conteudo {
+  background-color: #b40c0c;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  float: right;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.filtros-container {
+  margin-bottom: 15px;
+}
+
+.filtros-container input,
+.filtros-container select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #f4cccc;
+  background-color: #f7dada;
+  margin-right: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+table th, table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #eee;
+}
+
+table th {
+  background-color: #fafafa;
+  font-weight: bold;
+}
+
+.sem-conteudo {
+  text-align: center;
+  padding: 20px;
+  color: #555;
 }
 

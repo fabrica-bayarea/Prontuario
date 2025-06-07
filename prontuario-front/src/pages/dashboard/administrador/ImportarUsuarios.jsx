@@ -111,26 +111,35 @@ const ImportarUsuarios = () => {
         {/* Passo 3 */}
  <div className="card">
  <h2>3. Validação dos Dados</h2>
- <div style={{ paddingBottom: 25 }}>
+ <div >
  Total: {resumo.total} | Válidos: {resumo.validos} | Com erro: {resumo.erros}
  </div>
  <table className="tabela-validacao"> 
- <thead>
- <tr>
- <th>Nome</th>
- <th>Email</th> 
- <th>Status</th>
- </tr>
- </thead>
-<tbody>
- {/* Dados fictícios para exemplo */}
-<tr>
- <td>João Silva</td>
- <td>joao@email.com</td>
-               <td>✔ Válido</td>
- </tr>
- </tbody>
- </table>
+ 
+  <tbody>
+  <tr>
+    <td>
+      <div className="celula-rotulo">
+        <strong>Nome</strong>
+        <div>João Silva</div>
+      </div>
+    </td>
+    <td>
+      <div className="celula-rotulo">
+        <strong>E-mail</strong>
+        <div>joao@email.com</div>
+      </div>
+    </td>
+    <td>
+      <div className="celula-rotulo">
+        <strong>Status</strong>
+        <div>✔ Válido</div>
+      </div>
+    </td>
+  </tr>
+</tbody>
+</table>
+
        
           <button className={resumo.erros > 0 ? '' : 'hidden'}>
             ⬇ Baixar erros (.csv)
