@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // Importa hooks do React e a biblioteca Chart.js para gráficos
 import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
@@ -28,8 +29,13 @@ const MenuAdmin = () => {
   const fetchDashboardData = async () => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/dashboard/administrador"
+        "http://localhost:3000/api/dashboard/graficos"
       );
+      if (!response.ok) {
+        setDashboardData(null);
+        setLastUpdated("Erro ao buscar dados");
+        return;
+      }
       const data = await response.json();
       setDashboardData(data);
       setLastUpdated("Atualizado em: " + new Date().toLocaleString("pt-BR"));
@@ -38,6 +44,10 @@ const MenuAdmin = () => {
       console.error("Erro ao buscar dados do dashboard:", error);
     }
   };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]); // Chama a função ao montar o componente
 
   const renderCharts = (data) => {
     // Destroi gráficos antigos se existirem (evita sobreposição)
