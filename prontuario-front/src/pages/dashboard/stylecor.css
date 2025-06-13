@@ -362,12 +362,12 @@ fieldset input[type="checkbox"] {
 }
 
 /* Botão Confirmar */
-.modal-content > div > button:last-child {
+.btn-salvar {
   background-color: #b00000;
   color: white;
 }
 
-.modal-content > div > button:last-child:hover {
+.btn-salvar:hover {
   background-color: #8a0000;
 }
 

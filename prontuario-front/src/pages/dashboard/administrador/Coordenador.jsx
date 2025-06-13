@@ -336,7 +336,9 @@ function MenuCor() {
                   Pode gerar relatórios
                 </label>
               </fieldset>
-              <button type="submit">Salvar</button>
+              <button className="btn-salvar" type="submit">
+                Salvar
+              </button>
             </form>
           </div>
         </div>
