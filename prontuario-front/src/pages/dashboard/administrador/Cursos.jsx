@@ -74,7 +74,7 @@ function Cursos() {
     const fetchCursos = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/dashboard/administrador/cursos"
+          "http://localhost:3000/dashboard/graficos"
         );
         cursos = await response.json();
         renderizarCursos();

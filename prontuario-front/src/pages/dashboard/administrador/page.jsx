@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 // Importa hooks do React e a biblioteca Chart.js para gráficos
 import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 import "../../dashboard/styledash.css";
-import SidebarLayout from "../../../components/SidebarLayout";
+import SidebarLayout from "../../../components/SidebarLayout"; // Importa o layout da barra lateral
 
 const MenuAdmin = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -28,14 +27,7 @@ const MenuAdmin = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/dashboard/graficos"
-      );
-      if (!response.ok) {
-        setDashboardData(null);
-        setLastUpdated("Erro ao buscar dados");
-        return;
-      }
+      const response = await fetch("http://localhost:3000/dashboard/graficos");
       const data = await response.json();
       setDashboardData(data);
       setLastUpdated("Atualizado em: " + new Date().toLocaleString("pt-BR"));
@@ -47,7 +39,8 @@ const MenuAdmin = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, [fetchDashboardData]); // Chama a função ao montar o componente
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const renderCharts = (data) => {
     // Destroi gráficos antigos se existirem (evita sobreposição)
@@ -119,10 +112,6 @@ const MenuAdmin = () => {
       },
     });
   };
-
-  useEffect(() => {
-    fetchDashboardData();
-  }); // Chama a função ao montar o componente
 
   if (!dashboardData) {
     return <div className="dashboard-loading">Carregando dados...</div>;

@@ -20,10 +20,12 @@ function MenuCor() {
         return res.json();
       })
       .then((data) => {
+        console.log("Retorno da API:", data); // Debug
         if (Array.isArray(data)) {
           setCoordenadores(data);
+        } else if (data && Array.isArray(data.coordenadores)) {
+          setCoordenadores(data.coordenadores);
         } else {
-          console.error("Resposta inesperada:", data);
           setCoordenadores([]); // Evita erro de filter
         }
       })
@@ -135,10 +137,12 @@ function MenuCor() {
   };
 
   // Filtro por status (opcional)
-  const coordenadoresFiltrados = coordenadores.filter((coord) => {
-    if (filtroStatus === "Todos") return true;
-    return coord.status === filtroStatus;
-  });
+  const coordenadoresFiltrados = Array.isArray(coordenadores)
+    ? coordenadores.filter((coord) => {
+        if (filtroStatus === "Todos") return true;
+        return coord.status === filtroStatus;
+      })
+    : [];
 
   return (
     <SidebarLayout>
@@ -209,7 +213,11 @@ function MenuCor() {
                   <tr key={coord.id}>
                     <td>{coord.nome}</td>
                     <td>{coord.email}</td>
-                    <td>{coord.cursos.join(", ")}</td>
+                    <td>
+                      {Array.isArray(coord.cursos)
+                        ? coord.cursos.join(", ")
+                        : "-"}
+                    </td>
                     <td>{coord.status}</td>
                     <td>
                       <button
