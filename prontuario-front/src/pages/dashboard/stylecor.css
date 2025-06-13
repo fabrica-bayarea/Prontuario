@@ -134,7 +134,6 @@
   border: 1px solid #ddd; /* Contorno externo */
 }
 
-
 .tabela-coordenadores td {
   color: #333333;
 }
@@ -142,7 +141,7 @@
 .tabela-coordenadores td {
   padding: 1rem;
   text-align: left;
- border: none;
+  border: none;
 }
 
 .tabela-coordenadores th {
@@ -218,8 +217,7 @@
 }
 .modal-content input,
 .modal-content select,
-.modal-content textarea 
-.modal-content input[type="email"]{
+.modal-content textarea .modal-content input[type="email"] {
   background-color: #ffffff; /* Fundo branco */
   color: #333333; /* Texto preto */
   border: 1px solid var(--cor-principal);
@@ -247,19 +245,20 @@
   color: #000000;
 }
 
-
-
 .modal-content label {
   color: #333333; /* Cor dos textos dos labels */
 }
 .modal-content {
-  background-color: white;
+  background: #fff;
   padding: 2rem;
   border-radius: 10px;
-  max-width: 500px;
   width: 90%;
+  max-width: 550px;
+  max-height: 90vh; /* Limite de altura */
+  overflow-y: auto; /* Permite rolagem */
   position: relative;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  font-family: var(--fonte-principal);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
 
 .modal-close {
