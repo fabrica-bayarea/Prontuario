@@ -1,8 +1,6 @@
 import SidebarLayout from "../../../components/SidebarLayout";
 import React, { useState } from 'react';
 
-
-
 function ConteudoInstitucional() {
   const [conteudos, setConteudos] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
@@ -14,6 +12,8 @@ function ConteudoInstitucional() {
   const [publico, setPublico] = useState([]);
   const [status, setStatus] = useState('rascunho');
   const [textoInformativo, setTextoInformativo] = useState('');
+  const [arquivoPDF, setArquivoPDF] = useState(null);
+  const [linkVideo, setLinkVideo] = useState('');
 
   const [filtroTitulo, setFiltroTitulo] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('');
@@ -26,6 +26,8 @@ function ConteudoInstitucional() {
     setPublico([]);
     setStatus('rascunho');
     setTextoInformativo('');
+    setArquivoPDF(null);
+    setLinkVideo('');
   };
 
   const salvarConteudo = (e) => {
@@ -34,14 +36,18 @@ function ConteudoInstitucional() {
       alert('Título é obrigatório');
       return;
     }
+
     const novo = {
       id: Date.now(),
       titulo,
-      tipo,
+      tipo, // O tipo ainda será salvo, mas não mais controlará a visibilidade
       publico,
       status,
       textoInformativo,
+      arquivoPDF: arquivoPDF ? arquivoPDF.name : null, // Salva o nome do arquivo, não o objeto File
+      linkVideo,
     };
+
     setConteudos([...conteudos, novo]);
     limparFormulario();
     setModalAberto(false);
@@ -111,7 +117,7 @@ function ConteudoInstitucional() {
       padding: 20,
       color: '#555',
     },
-     modalOverlay: {
+    modalOverlay: {
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: 'rgba(0,0,0,0.4)',
@@ -297,11 +303,11 @@ function ConteudoInstitucional() {
                     </button>
                   </td>
                 </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-{modalAberto && (
+              ))
+            )}
+          </tbody>
+        </table>
+        {modalAberto && (
           <div style={estilos.modalOverlay}>
             <div style={estilos.modalContainer}>
               <button
@@ -314,7 +320,7 @@ function ConteudoInstitucional() {
               <h2 style={estilos.modalTitle}>Adicionar Novo Conteúdo</h2>
               <form onSubmit={salvarConteudo}>
                 <label style={estilos.label}>
-                  Título* 
+                  Título*
                   <input
                     style={estilos.input}
                     value={titulo}
@@ -323,33 +329,54 @@ function ConteudoInstitucional() {
                     placeholder="Título do Conteúdo"
                   />
                 </label>
-
                 <label style={estilos.label}>
-                  Tipo de Conteúdo
-                  <select
-                    style={estilos.select}
-                    value={tipo}
-                    onChange={e => setTipo(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecione</option>
-                    <option value="PDF">PDF</option>
-                    <option value="Vídeo">Vídeo</option>
-                    <option value="Texto">Texto</option>
-                  </select>
+                   Tipo de Conteúdo
+                   <select
+                     style={estilos.select}
+                     value={tipo}
+                     onChange={e => setTipo(e.target.value)}
+                     required // Mantenha required se o tipo ainda for obrigatório
+                   >
+                     <option value="">Selecione</option>
+                     <option value="PDF">PDF</option>
+                     <option value="Vídeo">Vídeo</option>
+                     <option value="Texto">Texto</option>
+                   </select>
+                 </label>
+
+                {/* Agora todos os campos aparecem sempre */}
+                <label style={estilos.label}>
+                  Texto Informativo*
+                  <textarea
+                    style={estilos.textarea}
+                    value={textoInformativo}
+                    onChange={e => setTextoInformativo(e.target.value)}
+                          />
                 </label>
 
-                {tipo === 'Texto' && (
-                  <label style={estilos.label}>
-                    Texto Informativo*
-                    <textarea
-                      style={estilos.textarea}
-                      value={textoInformativo}
-                      onChange={e => setTextoInformativo(e.target.value)}
-                      required
-                    />
-                  </label>
-                )}
+                <label style={estilos.label}>
+                  Arquivo PDF*
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={e => setArquivoPDF(e.target.files[0])}
+                    // O mesmo vale para 'required' aqui.
+                    style={estilos.input}
+                  />
+                </label>
+
+                <label style={estilos.label}>
+                  Link do Vídeo*
+                  <input
+                    type="url"
+                    value={linkVideo}
+                    onChange={e => setLinkVideo(e.target.value)}
+                    // E aqui.
+                  
+                    style={estilos.input}
+                  />
+                </label>
+                
 
                 <fieldset style={estilos.fieldset}>
                   <legend style={estilos.legend}>Público-Alvo</legend>
