@@ -32,6 +32,11 @@ const SidebarLayout = ({ children }) => {
               </a>
             </li>
             <li>
+              <a href="/dashboard/administrador/agendamentos">
+                🗓️ Agendamentos
+              </a>
+            </li>
+            <li>
               <a href="">⚙️ Configurações</a>
             </li>
             <li>

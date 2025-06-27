@@ -7,6 +7,7 @@ import MenuCor from "../pages/dashboard/administrador/Coordenador";
 import Cursos from "../pages/dashboard/administrador/Cursos";
 import ImportarUsuarios from "../pages/dashboard/administrador/ImportarUsuarios";
 import ConteudoInstitucional from "../pages/dashboard/administrador/ConteudoInstitucional";
+import Agendamentos from "../pages/dashboard/administrador/Agendamentos";
 
 function AppRoutes() {
   return (
@@ -21,6 +22,7 @@ function AppRoutes() {
           element={<MenuCor />}
         />
         <Route path="/dashboard/administrador/cursos" element={<Cursos />} />
+
         <Route
           path="/dashboard/administrador/importarusuarios"
           element={<ImportarUsuarios />}
@@ -28,6 +30,10 @@ function AppRoutes() {
         <Route
           path="/dashboard/administrador/conteudoinstitucional"
           element={<ConteudoInstitucional />}
+        />
+        <Route
+          path="/dashboard/administrador/agendamentos"
+          element={<Agendamentos />}
         />
       </Routes>
     </Router>
