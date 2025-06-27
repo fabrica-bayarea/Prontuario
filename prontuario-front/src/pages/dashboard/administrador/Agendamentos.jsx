@@ -3,9 +3,7 @@ import "../styledash.css";
 import { useState, useEffect } from "react";
 
 function Agendamentos() {
-  const [agendamentos, setAgendamentos] = useState(
-    JSON.parse(localStorage.getItem("agendamentos")) || []
-  );
+  const [agendamentos, setAgendamentos] = useState([]);
   const [programas] = useState(
     JSON.parse(localStorage.getItem("programas")) || []
   );
@@ -31,9 +29,15 @@ function Agendamentos() {
     turno: "",
   });
 
+  // CARREGA OS AGENDAMENTOS DO BACKEND AO MONTAR
   useEffect(() => {
-    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-  }, [agendamentos]);
+    fetch("http://localhost:3000/agendamentos")
+      .then((res) => res.json())
+      .then((data) => setAgendamentos(data))
+      .catch((err) => console.error("Erro ao carregar agendamentos:", err));
+  }, []);
+
+  //localStorage.setItem removido daqui, para não salvar localmente
 
   const handleFiltroChange = (e) => {
     setFiltros({
@@ -49,13 +53,15 @@ function Agendamentos() {
     });
   };
 
-  const salvarAgendamento = (e) => {
+  const salvarAgendamento = async (e) => {
     e.preventDefault();
     const novo = {
       id: Date.now().toString(),
       ...formAgendamento,
       status: "agendado",
     };
+
+    console.log("Dados do novo agendamento:", novo);
 
     if (Object.values(novo).some((val) => val === "")) {
       alert("Preencha todos os campos obrigatórios.");
@@ -64,13 +70,43 @@ function Agendamentos() {
 
     setAgendamentos([...agendamentos, novo]);
     setShowModal(false);
+
+    try {
+      const res = await fetch("http://localhost:3000/agendamentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(novo),
+      });
+
+      if (!res.ok) throw new Error("Erro ao salvar");
+
+      const agendamentoCriado = await res.json();
+      setAgendamentos([...agendamentos, agendamentoCriado]);
+      setShowModal(false);
+    } catch (err) {
+      alert("Erro ao salvar agendamento");
+      console.error(err);
+    }
   };
 
-  const atualizarStatus = (id, novoStatus) => {
-    const atualizados = agendamentos.map((a) =>
-      a.id === id ? { ...a, status: novoStatus } : a
-    );
-    setAgendamentos(atualizados);
+  const atualizarStatus = async (id, novoStatus) => {
+    try {
+      const res = await fetch(`http://localhost:3000/agendamentos/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: novoStatus }),
+      });
+
+      if (!res.ok) throw new Error("Erro ao atualizar");
+
+      const atualizado = await res.json();
+      setAgendamentos((prev) =>
+        prev.map((a) => (a.id === id ? atualizado : a))
+      );
+    } catch (err) {
+      console.error("Erro ao atualizar status:", err);
+      alert("Erro ao atualizar agendamento");
+    }
   };
 
   const agendamentosFiltrados = agendamentos
@@ -193,7 +229,7 @@ function Agendamentos() {
                 <label>Beneficiário*</label>
                 <input
                   type="text"
-                  id="nomeAgendamento"
+                  id="beneficiarioAgendamento"
                   onChange={handleInputChange}
                   required
                 />
