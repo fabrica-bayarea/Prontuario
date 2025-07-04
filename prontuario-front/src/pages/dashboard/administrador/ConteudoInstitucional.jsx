@@ -308,137 +308,123 @@ function ConteudoInstitucional() {
           </tbody>
         </table>
         {modalAberto && (
-          <div style={estilos.modalOverlay}>
-            <div style={estilos.modalContainer}>
-              <button
-                style={estilos.btnClose}
-                onClick={() => setModalAberto(false)}
-                aria-label="Fechar modal"
-              >
-                ×
-              </button>
-              <h2 style={estilos.modalTitle}>Adicionar Novo Conteúdo</h2>
-              <form onSubmit={salvarConteudo}>
-                <label style={estilos.label}>
-                  Título*
-                  <input
-                    style={estilos.input}
-                    value={titulo}
-                    onChange={e => setTitulo(e.target.value)}
-                    required
-                    placeholder="Título do Conteúdo"
-                  />
-                </label>
-                <label style={estilos.label}>
-                   Tipo de Conteúdo
-                   <select
-                     style={estilos.select}
-                     value={tipo}
-                     onChange={e => setTipo(e.target.value)}
-                     required // Mantenha required se o tipo ainda for obrigatório
-                   >
-                     <option value="">Selecione</option>
-                     <option value="PDF">PDF</option>
-                     <option value="Vídeo">Vídeo</option>
-                     <option value="Texto">Texto</option>
-                   </select>
-                 </label>
+  <div style={estilos.modalOverlay}>
+    <div style={estilos.modalContainer}>
+      <button
+        style={estilos.btnClose}
+        onClick={() => setModalAberto(false)}
+        aria-label="Fechar modal"
+      >
+        ×
+      </button>
+      <h2 style={estilos.modalTitle}>Adicionar Novo Conteúdo</h2>
+      <form onSubmit={salvarConteudo}>
+        <label style={estilos.label}>
+          Título*
+          <input
+            style={estilos.input}
+            value={titulo}
+            onChange={e => setTitulo(e.target.value)}
+            required
+            placeholder="Título do Conteúdo"
+          />
+        </label>
 
-                {/* Agora todos os campos aparecem sempre */}
-                <label style={estilos.label}>
-                  Texto Informativo*
-                  <textarea
-                    style={estilos.textarea}
-                    value={textoInformativo}
-                    onChange={e => setTextoInformativo(e.target.value)}
-                          />
-                </label>
+        <label style={estilos.label}>
+          Tipo de Conteúdo
+          <select
+            style={estilos.select}
+            value={tipo}
+            onChange={e => setTipo(e.target.value)}
+            required
+          >
+            <option value="">Selecione</option>
+            <option value="PDF">PDF</option>
+            <option value="Vídeo">Vídeo</option>
+            <option value="Texto">Texto</option>
+          </select>
+        </label>
 
-                <label style={estilos.label}>
-                  Arquivo PDF*
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    onChange={e => setArquivoPDF(e.target.files[0])}
-                    // O mesmo vale para 'required' aqui.
-                    style={estilos.input}
-                  />
-                </label>
-
-                <label style={estilos.label}>
-                  Link do Vídeo*
-                  <input
-                    type="url"
-                    value={linkVideo}
-                    onChange={e => setLinkVideo(e.target.value)}
-                    // E aqui.
-                  
-                    style={estilos.input}
-                  />
-                </label>
-                
-
-                <fieldset style={estilos.fieldset}>
-                  <legend style={estilos.legend}>Público-Alvo</legend>
-                  {['Aluno', 'Coordenador', 'Beneficiário'].map(p => (
-                    <label key={p} style={estilos.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={publico.includes(p)}
-                        onChange={() => alternarPublico(p)}
-                      />
-                      {' '}{p}
-                    </label>
-                  ))}
-                </fieldset>
-
-                <label style={estilos.label}>
-                  Status
-                  <select
-                    style={estilos.select}
-                    value={status}
-                    onChange={e => setStatus(e.target.value)}
-                  >
-                    <option value="rascunho">Rascunho</option>
-                    <option value="publicado">Publicado</option>
-                  </select>
-                </label>
-
-                <div>
-                  <button type="submit" style={estilos.btnSalvar}>Salvar</button>
-                  <button
-                    type="button"
-                    onClick={() => setModalAberto(false)}
-                    style={estilos.btnCancelar}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+        {tipo === 'Texto' && (
+          <label style={estilos.label}>
+            Texto Informativo*
+            <textarea
+              style={estilos.textarea}
+              value={textoInformativo}
+              onChange={e => setTextoInformativo(e.target.value)}
+              required
+            />
+          </label>
         )}
 
-        {/* Modal excluir */}
-        {modalExcluirAberto && (
-          <div style={estilos.modalOverlay}>
-            <div style={estilos.modalContainer}>
-              <p>Tem certeza que deseja remover este conteúdo?</p>
-              <button
-                onClick={() => setModalExcluirAberto(false)}
-                style={estilos.btnCancelar}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmarExclusao}
-                style={estilos.btnSalvar}
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
+        {tipo === 'PDF' && (
+          <label style={estilos.label}>
+            Arquivo PDF*
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={e => setArquivoPDF(e.target.files[0])}
+              required
+              style={estilos.input}
+            />
+          </label>
         )}
+
+        {tipo === 'Vídeo' && (
+          <label style={estilos.label}>
+            Link do Vídeo*
+            <input
+              type="url"
+              value={linkVideo}
+              onChange={e => setLinkVideo(e.target.value)}
+              required
+              placeholder="https://youtube.com/..."
+              style={estilos.input}
+            />
+          </label>
+        )}
+
+        <fieldset style={estilos.fieldset}>
+          <legend style={estilos.legend}>Público-Alvo</legend>
+          {['Aluno', 'Coordenador', 'Beneficiário'].map(p => (
+            <label key={p} style={estilos.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={publico.includes(p)}
+                onChange={() => alternarPublico(p)}
+              />
+              {' '}{p}
+            </label>
+          ))}
+        </fieldset>
+
+        <label style={estilos.label}>
+          Status
+          <select
+            style={estilos.select}
+            value={status}
+            onChange={e => setStatus(e.target.value)}
+          >
+            <option value="rascunho">Rascunho</option>
+            <option value="publicado">Publicado</option>
+          </select>
+        </label>
+
+        <div>
+          <button type="submit" style={estilos.btnSalvar}>Salvar</button>
+          <button
+            type="button"
+            onClick={() => setModalAberto(false)}
+            style={estilos.btnCancelar}
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
       </div>
     </SidebarLayout>
   );
