@@ -3,7 +3,7 @@ import "../../dashboard/stylecor.css";
 import SidebarLayout from "../../../components/SidebarLayout";
 
 // URL base da sua API (ajuste a porta se necessário)
-const API_URL = "http://localhost:3000/coordenadores";
+const API_URL = "http://localhost:3000/admin/coordenadores";
 
 function MenuCor() {
   const [coordenadores, setCoordenadores] = useState([]);
@@ -15,9 +15,24 @@ function MenuCor() {
   // Buscar todos os coordenadores do back-end ao carregar a tela
   useEffect(() => {
     fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) => setCoordenadores(data))
-      .catch((error) => console.error("Erro ao buscar coordenadores:", error));
+      .then((res) => {
+        if (!res.ok) throw new Error(`Erro ${res.status}: ${res.statusText}`);
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Retorno da API:", data); // Debug
+        if (Array.isArray(data)) {
+          setCoordenadores(data);
+        } else if (data && Array.isArray(data.coordenadores)) {
+          setCoordenadores(data.coordenadores);
+        } else {
+          setCoordenadores([]); // Evita erro de filter
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar coordenadores:", error);
+        setCoordenadores([]); // Evita crash
+      });
   }, []);
 
   // Abrir modal para editar
@@ -122,10 +137,12 @@ function MenuCor() {
   };
 
   // Filtro por status (opcional)
-  const coordenadoresFiltrados = coordenadores.filter((coord) => {
-    if (filtroStatus === "Todos") return true;
-    return coord.status === filtroStatus;
-  });
+  const coordenadoresFiltrados = Array.isArray(coordenadores)
+    ? coordenadores.filter((coord) => {
+        if (filtroStatus === "Todos") return true;
+        return coord.status === filtroStatus;
+      })
+    : [];
 
   return (
     <SidebarLayout>
@@ -196,7 +213,11 @@ function MenuCor() {
                   <tr key={coord.id}>
                     <td>{coord.nome}</td>
                     <td>{coord.email}</td>
-                    <td>{coord.cursos.join(", ")}</td>
+                    <td>
+                      {Array.isArray(coord.cursos)
+                        ? coord.cursos.join(", ")
+                        : "-"}
+                    </td>
                     <td>{coord.status}</td>
                     <td>
                       <button
@@ -315,7 +336,9 @@ function MenuCor() {
                   Pode gerar relatórios
                 </label>
               </fieldset>
-              <button type="submit">Salvar</button>
+              <button className="btn-salvar" type="submit">
+                Salvar
+              </button>
             </form>
           </div>
         </div>

@@ -17,7 +17,9 @@ const SidebarLayout = ({ children }) => {
               <a href="/dashboard/administrador/cursos">📚 Cursos</a>
             </li>
             <li>
-              <a href="/dashboard/administrador/cordenador">👨‍🏫 Coordenadores</a>
+              <a href="/dashboard/administrador/coordenador">
+                👨‍🏫 Coordenadores
+              </a>
             </li>
             <li>
               <a href="/dashboard/administrador/importarusuarios">
@@ -25,7 +27,14 @@ const SidebarLayout = ({ children }) => {
               </a>
             </li>
             <li>
-              <a href="">📄 Conteúdo Institucional</a>
+              <a href="/dashboard/administrador/conteudoinstitucional">
+                📄 Conteúdo Institucional
+              </a>
+            </li>
+            <li>
+              <a href="/dashboard/administrador/agendamentos">
+                🗓️ Agendamentos
+              </a>
             </li>
             <li>
               <a href="">⚙️ Configurações</a>

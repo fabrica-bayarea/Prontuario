@@ -122,15 +122,17 @@
   flex-wrap: wrap;
   gap: 0.75rem;
   margin: 1rem 0;
+  margin-bottom: 15px;
 }
 
 .filters-section input,
 .filters-section select {
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background-color: #fbe9e9;
-  color: #700000;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #f4cccc;
+  background-color: #f7dada;
+  color: #000;
+  margin-right: 8;
   font-weight: 500;
 }
 
@@ -237,11 +239,29 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+}
+
+.modal h2 {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #4a0202;
+}
+
+.modal input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #f5cccc;
+  background-color: var(--vermelho-claro);
+  font-family: var(--fonte-principal);
+  color: #000;
+  box-sizing: border-box;
 }
 
 .modal.hidden {
@@ -249,23 +269,24 @@
 }
 
 .modal-content {
-  background: #fff;
+  background-color: #fff;
   padding: 2rem;
-  border-radius: 10px;
+  border-radius: 8px;
   width: 90%;
-  max-width: 550px;
-  max-height: 90vh; /* Limite de altura */
+  max-width: 80vh;
+  max-height: 80vh; /* Limite de altura */
   overflow-y: auto; /* Permite rolagem */
   position: relative;
   font-family: var(--fonte-principal);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+  color: #4a0202;
 }
 
 .modal-close {
   position: absolute;
   top: 0.5rem;
   right: 0.75rem;
-  background: none;
+  background: transparent;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
@@ -279,6 +300,9 @@
 /* =========================================
    FORMULÁRIOS DOS MODAIS
 ========================================= */
+#formNovoAgendamento input,
+#formNovoAgendamento select,
+#formNovoAgendamento textarea,
 #formNovoCurso input,
 #formNovoCurso select,
 #formNovoCurso textarea,
@@ -295,6 +319,7 @@
   font-family: var(--fonte-principal);
 }
 
+#formNovoAgendamento button,
 #formNovoCurso button,
 #formCoordenador button {
   margin-top: 1rem;
@@ -308,9 +333,23 @@
   cursor: pointer;
 }
 
+#formNovoAgendamento label {
+  font-weight: 100;
+  margin-top: 2px;
+  margin-bottom: 0px;
+  color: #4a0202;
+}
+
+#formNovoAgendamento button:hover,
 #formNovoCurso button:hover,
 #formCoordenador button:hover {
   background-color: var(--vermelho-secundario);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(24%) sepia(98%) saturate(7493%) hue-rotate(350deg)
+    brightness(102%) contrast(105%);
+  cursor: pointer;
 }
 
 #formCoordenador fieldset {
@@ -335,13 +374,21 @@
   margin-top: 1rem;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
+.tabela-conteudos table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
 
+.tabela-conteudos th,
+.tabela-conteudos td,
 .tabela-cursos th,
 .tabela-cursos td,
 .tabela-coordenadores th,
 .tabela-coordenadores td {
-  padding: 1rem;
-  border-bottom: 1px solid #eee;
+  padding: 10px;
+  border: 1px solid #eee;
   text-align: left;
   font-size: 0.95rem;
 }

@@ -34,7 +34,7 @@ export default function Login() {
   }
 
   function redirectToDashboard() {
-    navigate("/login");
+    navigate("/dashboard/administrador");
   }
 
   async function handleSubmit(e) {
@@ -117,7 +117,11 @@ export default function Login() {
       </div>
 
       <div className="socialLogin">
-        <button type="button" className="socialButton">
+        <button
+          type="button"
+          className="socialButton"
+          onClick={redirectToDashboard}
+        >
           <img src="/images/iesb-logo.png" alt="IESB" width="24" height="24" />
         </button>
         <a href={`${apiBaseUrl}/v1/auth/google`} className="socialButton">
