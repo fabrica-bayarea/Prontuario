@@ -56,27 +56,26 @@ export class AuthService {
    * ção é guardado o providerId em vez da senha.
    */
   private async findOrCreateUser(data: any, provider: any): Promise<any> {
-    let user = await this.prisma.user.findUnique({
-      where: { email: data.email },
+  let user = await this.prisma.user.findUnique({
+    where: { email: data.email },
+  });
+
+  if (!user) {
+    user = await this.prisma.user.create({
+      data: {
+        email: data.email,
+        name: data.name,
+        userName: data.userName,  // <<< GARANTA QUE ESTÁ VINDO NO DATA
+        passwordHash: provider === 'local' ? data.password : data.providerId,
+        providerId: provider === 'local' ? null : data.providerId,
+        role: 'ADMIN',
+        authProvider: provider,
+      },
     });
-
-    if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          email: data.email,
-          name: data.name,
-          userName: data.userName,
-          passwordHash: provider === 'local' ? data.password : data.providerId,
-          providerId: provider === 'local' ? null : data.providerId,
-          role: 'ADMIN',
-          authProvider: provider,
-        },
-      });
-    }
-
-    return user;
   }
 
+  return user;
+}
   /**
    * Trata erros específicos ao criar um usuário.
    */

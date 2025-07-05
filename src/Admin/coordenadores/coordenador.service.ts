@@ -16,23 +16,55 @@ export class coordenadorService {
       nome: createCoordenadorDto.nome,
       email: createCoordenadorDto.email,
       telefone: telefone,
+      cpf: createCoordenadorDto.cpf ?? null,
+      status: createCoordenadorDto.status ?? null,
+      cursos: createCoordenadorDto.cursos ?? [],
+      permissoes: createCoordenadorDto.permissoes
     },
   });
 }
 
   async findAll(): Promise<coordenador[]> {
-    return this.prisma.coordenador.findMany();
+  return this.prisma.coordenador.findMany({
+    select: {
+      id: true,
+      nome: true,
+      email: true,
+      telefone: true,
+      cpf: true,
+      cursos: true,
+      status: true,
+      permissoes: true,
+      criadoEm: true,
+      atualizadoEm: true,
+    },
+  });
+}
+
+async findOne(id: number): Promise<coordenador> {
+  const coordenador = await this.prisma.coordenador.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      nome: true,
+      email: true,
+      telefone: true,
+      cpf: true,
+      cursos: true,
+      status: true,
+      permissoes: true,
+      criadoEm: true,
+      atualizadoEm: true,
+    },
+  });
+
+  if (!coordenador) {
+    throw new NotFoundException(`coordenador com ID ${id} não encontrado`);
   }
 
-  async findOne(id: number): Promise<coordenador> {
-    const coordenador = await this.prisma.coordenador.findUnique({ where: { id } });
+  return coordenador;
+}
 
-    if (!coordenador) {
-      throw new NotFoundException(`coordenador com ID ${id} não encontrado`);
-    }
-
-    return coordenador;
-  }
 
  async update(id: number, updateCoordenadorDto: UpdateCoordenadorDto) {
   await this.findOne(id);
@@ -40,9 +72,17 @@ export class coordenadorService {
   console.log(updateCoordenadorDto);
 
   return this.prisma.coordenador.update({
-    where: { id },
-    data: updateCoordenadorDto,
-  });
+  where: { id },
+  data: {
+    nome: updateCoordenadorDto.nome,
+    email: updateCoordenadorDto.email,
+    cpf: updateCoordenadorDto.cpf,
+    status: updateCoordenadorDto.status,
+    cursos: updateCoordenadorDto.cursos,
+    permissoes: updateCoordenadorDto.permissoes,
+    telefone: updateCoordenadorDto.telefone ?? null, // se usar telefone também
+  },
+});
 }
 
   async remove(id: number): Promise<void> {

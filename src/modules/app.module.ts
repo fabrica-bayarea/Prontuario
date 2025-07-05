@@ -6,10 +6,12 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'src/modules/prisma.module';
 import { DashboardModule } from 'src/Admin/dashboard/dashboard.module';
 import { CoordenadoresModule } from 'src/Admin/coordenadores/coordenador.module';
+import { AgendamentosModule } from 'src/Admin/agendamentos/agendamentos.module';
 
 @Module({
   imports: [ DashboardModule, 
     CoordenadoresModule, 
+    AgendamentosModule, 
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

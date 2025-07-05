@@ -31,7 +31,7 @@ model User {
   role         Role
   name         String?
   email        String       @unique
-  userName     String       @unique
+  userName     String?       @unique
   passwordHash String?
   authProvider AuthProvider
   isVerified   Boolean      @default(false)
@@ -183,10 +183,41 @@ model Curso {
 
 //DADOS COORDENADORES (ADMIN)
 model coordenador {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  email     String   @unique
-  telefone  String?
-  criadoEm  DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  nome       String
+  email      String
+  telefone   String?
+  cpf        String?     // << ESTE CAMPO PRECISA EXISTIR
+  status     String?
+  cursos     String[] @default([])
+  criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
+  permissoes Json?
+}
+
+//AGENDAMENTO
+model Agendamento {
+  id           String   @id @default(uuid())
+  beneficiario String
+  programa     String
+  tipo         String
+  aluno        String
+  data         DateTime
+  turno        String
+  status       String   @default("agendado")
+  criadoEm     DateTime @default(now())
+}
+model Programa {
+  id   String @id @default(uuid())
+  nome String @unique
+}
+
+model TipoAtendimento {
+  id   String @id @default(uuid())
+  nome String @unique
+}
+
+model Aluno {
+  id   String @id @default(uuid())
+  nome String @unique
 }
