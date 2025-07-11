@@ -7,7 +7,10 @@ import MenuCor from "../pages/dashboard/administrador/Coordenador";
 import Cursos from "../pages/dashboard/administrador/Cursos";
 import ImportarUsuarios from "../pages/dashboard/administrador/ImportarUsuarios";
 import ConteudoInstitucional from "../pages/dashboard/administrador/ConteudoInstitucional";
+import Config from "../pages/dashboard/administrador/Configurações";
 import Agendamentos from "../pages/dashboard/administrador/Agendamentos";
+import LogsAuditoria from "../pages/dashboard/administrador/Logs";
+import Relatorios from "../pages/dashboard/administrador/Relatorio";
 
 function AppRoutes() {
   return (
@@ -35,7 +38,20 @@ function AppRoutes() {
           path="/dashboard/administrador/agendamentos"
           element={<Agendamentos />}
         />
+        <Route
+          path="/dashboard/administrador/configurações"
+          element={<Config />}
+        />
+        <Route
+          path="/dashboard/administrador/logs"
+          element={<LogsAuditoria />}
+        />
+        <Route
+          path="/dashboard/administrador/relatorio"
+          element={<Relatorios />}
+        />
       </Routes>
+      
     </Router>
   );
 }

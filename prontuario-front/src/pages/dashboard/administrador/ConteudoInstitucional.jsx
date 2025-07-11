@@ -1,9 +1,5 @@
 import SidebarLayout from "../../../components/SidebarLayout";
-<<<<<<< HEAD
 import React, { useState } from 'react';
-=======
-import { useState } from "react";
->>>>>>> 2e77a58d560bdda42d0f9f66d7de152a93bb17bf
 
 function ConteudoInstitucional() {
   const [conteudos, setConteudos] = useState([]);
@@ -14,15 +10,10 @@ function ConteudoInstitucional() {
   const [titulo, setTitulo] = useState("");
   const [tipo, setTipo] = useState("");
   const [publico, setPublico] = useState([]);
-<<<<<<< HEAD
   const [status, setStatus] = useState('rascunho');
   const [textoInformativo, setTextoInformativo] = useState('');
   const [arquivoPDF, setArquivoPDF] = useState(null);
   const [linkVideo, setLinkVideo] = useState('');
-=======
-  const [status, setStatus] = useState("rascunho");
-  const [textoInformativo, setTextoInformativo] = useState("");
->>>>>>> 2e77a58d560bdda42d0f9f66d7de152a93bb17bf
 
   const [filtroTitulo, setFiltroTitulo] = useState("");
   const [filtroTipo, setFiltroTipo] = useState("");
@@ -33,15 +24,10 @@ function ConteudoInstitucional() {
     setTitulo("");
     setTipo("");
     setPublico([]);
-<<<<<<< HEAD
     setStatus('rascunho');
     setTextoInformativo('');
     setArquivoPDF(null);
     setLinkVideo('');
-=======
-    setStatus("rascunho");
-    setTextoInformativo("");
->>>>>>> 2e77a58d560bdda42d0f9f66d7de152a93bb17bf
   };
 
   const salvarConteudo = (e) => {
@@ -132,24 +118,12 @@ function ConteudoInstitucional() {
       color: "#555",
     },
     modalOverlay: {
-<<<<<<< HEAD
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
       backgroundColor: 'rgba(0,0,0,0.4)',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-=======
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0,0,0,0.4)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
->>>>>>> 2e77a58d560bdda42d0f9f66d7de152a93bb17bf
       zIndex: 1000,
     },
     modalContainer: {
@@ -351,7 +325,6 @@ function ConteudoInstitucional() {
           </tbody>
         </table>
         {modalAberto && (
-<<<<<<< HEAD
   <div style={estilos.modalOverlay}>
     <div style={estilos.modalContainer}>
       <button
@@ -412,116 +385,6 @@ function ConteudoInstitucional() {
               style={estilos.input}
             />
           </label>
-=======
-          <div style={estilos.modalOverlay}>
-            <div style={estilos.modalContainer}>
-              <button
-                style={estilos.btnClose}
-                onClick={() => setModalAberto(false)}
-                aria-label="Fechar modal"
-              >
-                ×
-              </button>
-              <h2 style={estilos.modalTitle}>Adicionar Novo Conteúdo</h2>
-              <form onSubmit={salvarConteudo}>
-                <label style={estilos.label}>
-                  Título*
-                  <input
-                    style={estilos.input}
-                    value={titulo}
-                    onChange={(e) => setTitulo(e.target.value)}
-                    required
-                    placeholder="Título do Conteúdo"
-                  />
-                </label>
-
-                <label style={estilos.label}>
-                  Tipo de Conteúdo
-                  <select
-                    style={estilos.select}
-                    value={tipo}
-                    onChange={(e) => setTipo(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecione</option>
-                    <option value="PDF">PDF</option>
-                    <option value="Vídeo">Vídeo</option>
-                    <option value="Texto">Texto</option>
-                  </select>
-                </label>
-
-                {tipo === "Texto" && (
-                  <label style={estilos.label}>
-                    Texto Informativo*
-                    <textarea
-                      style={estilos.textarea}
-                      value={textoInformativo}
-                      onChange={(e) => setTextoInformativo(e.target.value)}
-                      required
-                    />
-                  </label>
-                )}
-
-                <fieldset style={estilos.fieldset}>
-                  <legend style={estilos.legend}>Público-Alvo</legend>
-                  {["Aluno", "Coordenador", "Beneficiário"].map((p) => (
-                    <label key={p} style={estilos.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        checked={publico.includes(p)}
-                        onChange={() => alternarPublico(p)}
-                      />{" "}
-                      {p}
-                    </label>
-                  ))}
-                </fieldset>
-
-                <label style={estilos.label}>
-                  Status
-                  <select
-                    style={estilos.select}
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                  >
-                    <option value="rascunho">Rascunho</option>
-                    <option value="publicado">Publicado</option>
-                  </select>
-                </label>
-
-                <div>
-                  <button type="submit" style={estilos.btnSalvar}>
-                    Salvar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setModalAberto(false)}
-                    style={estilos.btnCancelar}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Modal excluir */}
-        {modalExcluirAberto && (
-          <div style={estilos.modalOverlay}>
-            <div style={estilos.modalContainer}>
-              <p>Tem certeza que deseja remover este conteúdo?</p>
-              <button
-                onClick={() => setModalExcluirAberto(false)}
-                style={estilos.btnCancelar}
-              >
-                Cancelar
-              </button>
-              <button onClick={confirmarExclusao} style={estilos.btnSalvar}>
-                Confirmar
-              </button>
-            </div>
-          </div>
->>>>>>> 2e77a58d560bdda42d0f9f66d7de152a93bb17bf
         )}
 
         {tipo === 'Vídeo' && (

@@ -1,0 +1,170 @@
+/* Importação de fonte - Garanta que 'Inter' esteja disponível */
+@import url(./global.css);
+
+/* Variáveis CSS para facilitar a manutenção */
+:root {
+  --vermelho-claro: #fde7e7;
+  --vermelho-principal: #d32f2f; /* Não usado diretamente aqui, mas bom ter */
+  --vermelho-secundario: #b71c1c; /* Não usado diretamente aqui, mas bom ter */
+  --cinza-texto: #3c3c3c;
+  --cinza-claro-borda: #ccc;
+  --verde-botao: #28a745;
+  --verde-botao-hover: #218838;
+  --fonte-principal: 'Inter', sans-serif;
+  --sombra-card: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos gerais do layout */
+body {
+  font-family: var(--fonte-principal);
+  margin: 0;
+  background-color: #f0f2f5; /* Um fundo cinza claro para a página */
+}
+
+.dashboard-main {
+  padding: 2rem;
+  max-width: 1200px; /* Largura máxima do conteúdo */
+  margin: 0 auto; /* Centraliza o conteúdo */
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee; /* Linha divisória sutil */
+}
+
+.dashboard-title {
+  font-size: 2.5rem; /* Tamanho do título */
+  color: var(--cinza-texto);
+  margin: 0;
+  font-weight: 700; /* Negrito */
+}
+
+/* Container principal dos filtros para o card branco */
+.relatorios-filtros-container {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: var(--sombra-card);
+  display: grid;
+  /* Grid responsivo: 3 colunas em telas maiores, 2 em médias, 1 em pequenas */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem; /* Espaçamento entre os itens da grid */
+  margin-bottom: 2rem;
+}
+
+/* Estilos para cada rótulo e seu input/select */
+.filter-label {
+  display: flex;
+  flex-direction: column; /* Rótulo acima do campo */
+  font-weight: 600; /* Peso da fonte do rótulo */
+  font-size: 0.95rem;
+  color: var(--cinza-texto);
+}
+
+.relatorios-filtros-container select,
+.relatorios-filtros-container input[type="date"] {
+  padding: 0.75rem 1rem; /* Mais padding para campos maiores */
+  margin-top: 0.5rem; /* Espaçamento entre rótulo e campo */
+  border-radius: 8px; /* Cantos arredondados */
+  border: 1px solid var(--cinza-claro-borda); /* Borda cinza clara */
+  background-color: var(--vermelho-claro); /* Fundo rosa claro, como na imagem */
+  font-family: var(--fonte-principal);
+  font-size: 1rem;
+  color: var(--cinza-texto); /* Cor do texto dentro do campo */
+  appearance: none; /* Remove a seta padrão do select */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  /* Seta personalizada para selects */
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%233c3c3c" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  cursor: pointer;
+}
+
+.relatorios-filtros-container select:focus,
+.relatorios-filtros-container input[type="date"]:focus {
+  outline: none;
+  border-color: var(--verde-botao); /* Borda verde ao focar */
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2); /* Sombra suave ao focar */
+}
+
+/* Estilos para a seção de "Dados do Relatório" (preview) */
+.relatorio-dados {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: var(--sombra-card);
+  margin-bottom: 2rem;
+  border-top: 5px solid var(--verde-botao); /* Linha verde no topo */
+}
+
+.relatorio-dados h2 {
+  font-size: 1.3rem;
+  color: var(--cinza-texto);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.relatorio-dados p {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0.5rem 0;
+}
+
+
+/* Container do botão Gerar PDF */
+.relatorio-btn-container {
+  margin-top: 2rem;
+  /* Se você quiser centralizar o botão, use: text-align: center; */
+  /* Se quiser à esquerda, como na imagem: text-align: left; (padrão) */
+}
+
+/* Estilos do botão Gerar PDF */
+.btn-gerar-pdf {
+  background-color: var(--verde-botao);
+  color: white;
+  padding: 0.8rem 1.8rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: inline-flex; /* Para alinhar ícone e texto */
+  align-items: center; /* Alinha verticalmente */
+  gap: 0.75rem; /* Espaçamento entre ícone e texto */
+}
+
+.btn-gerar-pdf:hover {
+  background-color: var(--verde-botao-hover);
+  transform: translateY(-2px); /* Efeito de leve elevação */
+}
+
+/* Media Queries para responsividade, se necessário ajustar o grid */
+@media (max-width: 900px) {
+  .relatorios-filtros-container {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Duas colunas em telas médias */
+  }
+}
+
+@media (max-width: 600px) {
+  .relatorios-filtros-container {
+    grid-template-columns: 1fr; /* Uma coluna em telas pequenas */
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  .dashboard-main {
+    padding: 1rem;
+  }
+  .dashboard-title {
+    font-size: 2rem;
+  }
+  .btn-gerar-pdf {
+    width: 100%; /* Botão ocupa a largura total em telas pequenas */
+    justify-content: center; /* Centraliza o conteúdo do botão */
+  }
+}

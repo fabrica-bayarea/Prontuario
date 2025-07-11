@@ -1,0 +1,86 @@
+@import url(./global.css);
+
+:root {
+  --vermelho-claro: #fde7e7;
+  --vermelho-principal: #d32f2f;
+  --vermelho-secundario: #b71c1c;
+  --cinza-texto: #3c3c3c;
+  --cinza-claro: #ccc;
+  --fonte-principal: 'Inter', sans-serif;
+}
+
+.filters-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.filters-section input[type="search"],
+.filters-section input[type="date"],
+.filters-section select {
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--cinza-claro);
+  font-size: 0.95rem;
+  font-family: var(--fonte-principal);
+  background-color: var(--vermelho-claro);
+  color: var(--cinza-texto);
+}
+
+.filters-section button {
+  background-color: var(--vermelho-principal);
+  color: #fff;
+  font-weight: bold;
+  padding: 0.3rem 1.0rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.filters-section button:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+.tabela-logs table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  margin-top: 1rem;
+}
+
+.tabela-logs th,
+.tabela-logs td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.tabela-logs th {
+  background-color: var(--vermelho-claro);
+  color: var(--cinza-texto);
+}
+
+#resumoValidacao {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: var(--cinza-texto);
+}
+
+#btnExportarPDF,
+#btnExportarCSV {
+  background-color: #3b7ddd;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+#btnExportarPDF:hover,
+#btnExportarCSV:hover {
+  background-color: #295bb3;
+}
