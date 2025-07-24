@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../../dashboard/styleconf.css";
 import SidebarLayout from "../../../components/SidebarLayout";
 
@@ -7,7 +7,9 @@ function Config() {
   const [aprovManual, setAprovManual] = useState(false);
   const [notificaEmail, setNotificaEmail] = useState(false);
   const [notificaSMS, setNotificaSMS] = useState(false);
-  const [emailInstitucional, setEmailInstitucional] = useState("notificacoes@iesb.br");
+  const [emailInstitucional, setEmailInstitucional] = useState(
+    "notificacoes@iesb.br"
+  );
   const [textoTermo, setTextoTermo] = useState("");
   const [coordPermissoes, setCoordPermissoes] = useState({
     aprova: false,
@@ -85,10 +87,10 @@ function Config() {
           </div>
 
           {/* Termos de Uso */}
-           <div className="config-section">
+          <div className="config-section">
             <h2>Termos de Uso e LGPD</h2>
-        
-            <label htmlFor="textoDoTermo">Texto do Termo</label> {/* Separado */}
+            <label htmlFor="textoDoTermo">Texto do Termo</label>{" "}
+            {/* Separado */}
             <textarea
               id="textoDoTermo" // Adicionado ID para associação com a label
               value={textoTermo}
@@ -96,8 +98,12 @@ function Config() {
               rows="6"
             />
             {/* FIM DA MUDANÇA */}
-            <p style={{ marginBottom: '1rem', color: 'var(--cinza-texto)' }}>Última atualização: 30/04/2025</p>
-            <button id="btnPreVisualizarTermo" onClick={preVisualizarTermo}>Pré-visualizar Termo</button>
+            <p style={{ marginBottom: "1rem", color: "var(--cinza-texto)" }}>
+              Última atualização: 30/04/2025
+            </p>
+            <button id="btnPreVisualizarTermo" onClick={preVisualizarTermo}>
+              Pré-visualizar Termo
+            </button>
           </div>
 
           {/* Permissões por Perfil */}
@@ -120,7 +126,12 @@ function Config() {
                     <input
                       type="checkbox"
                       checked={coordPermissoes.aprova}
-                      onChange={(e) => setCoordPermissoes({ ...coordPermissoes, aprova: e.target.checked })}
+                      onChange={(e) =>
+                        setCoordPermissoes({
+                          ...coordPermissoes,
+                          aprova: e.target.checked,
+                        })
+                      }
                     />
                   </td>
                   <td>❌</td>
@@ -132,7 +143,12 @@ function Config() {
                     <input
                       type="checkbox"
                       checked={coordPermissoes.edita}
-                      onChange={(e) => setCoordPermissoes({ ...coordPermissoes, edita: e.target.checked })}
+                      onChange={(e) =>
+                        setCoordPermissoes({
+                          ...coordPermissoes,
+                          edita: e.target.checked,
+                        })
+                      }
                     />
                   </td>
                   <td>❌</td>
@@ -144,7 +160,12 @@ function Config() {
                     <input
                       type="checkbox"
                       checked={coordPermissoes.dados}
-                      onChange={(e) => setCoordPermissoes({ ...coordPermissoes, dados: e.target.checked })}
+                      onChange={(e) =>
+                        setCoordPermissoes({
+                          ...coordPermissoes,
+                          dados: e.target.checked,
+                        })
+                      }
                     />
                   </td>
                   <td>❌</td>
@@ -157,7 +178,9 @@ function Config() {
                 </tr>
               </tbody>
             </table>
-            <button id="btnSalvarPermissoes" onClick={salvarPermissoes}>Salvar Permissões</button>
+            <button id="btnSalvarPermissoes" onClick={salvarPermissoes}>
+              Salvar Permissões
+            </button>
           </div>
         </div>
       </main>

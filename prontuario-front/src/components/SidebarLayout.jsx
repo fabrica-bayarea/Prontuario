@@ -37,13 +37,15 @@ const SidebarLayout = ({ children }) => {
               </a>
             </li>
             <li>
-              <a href="">⚙️ Configurações</a>
+              <a href="/dashboard/administrador/Configurações">
+                ⚙️ Configurações
+              </a>
             </li>
             <li>
-              <a href="">🧾 Logs e Auditoria</a>
+              <a href="/dashboard/administrador/Logs">🧾 Logs e Auditoria</a>
             </li>
             <li>
-              <a href="">📊 Relatórios</a>
+              <a href="/dashboard/administrador/Relatorio">📊 Relatórios</a>
             </li>
           </ul>
         </nav>

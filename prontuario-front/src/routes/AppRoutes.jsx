@@ -8,9 +8,10 @@ import Cursos from "../pages/dashboard/administrador/Cursos";
 import ImportarUsuarios from "../pages/dashboard/administrador/ImportarUsuarios";
 import ConteudoInstitucional from "../pages/dashboard/administrador/ConteudoInstitucional";
 import Config from "../pages/dashboard/administrador/Configurações";
-import Agendamentos from "../pages/dashboard/administrador/Agendamentos";
+import Agendamentos from "../pages/dashboard/administrador/agendamentos/Agendamentos";
 import LogsAuditoria from "../pages/dashboard/administrador/Logs";
 import Relatorios from "../pages/dashboard/administrador/Relatorio";
+import TiposAtendimento from "../pages/dashboard/administrador/agendamentos/TipodeAtendimento";
 
 function AppRoutes() {
   return (
@@ -50,8 +51,11 @@ function AppRoutes() {
           path="/dashboard/administrador/relatorio"
           element={<Relatorios />}
         />
+        <Route
+          path="/dashboard/administrador/tiposAtendimento"
+          element={<TiposAtendimento />}
+        />
       </Routes>
-      
     </Router>
   );
 }
