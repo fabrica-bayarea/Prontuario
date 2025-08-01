@@ -12,6 +12,7 @@ import Agendamentos from "../pages/dashboard/administrador/agendamentos/Agendame
 import LogsAuditoria from "../pages/dashboard/administrador/Logs";
 import Relatorios from "../pages/dashboard/administrador/Relatorio";
 import TiposAtendimento from "../pages/dashboard/administrador/agendamentos/TipodeAtendimento";
+import Programas from"../pages/dashboard/administrador/agendamentos/Programas";
 
 function AppRoutes() {
   return (
@@ -54,6 +55,10 @@ function AppRoutes() {
         <Route
           path="/dashboard/administrador/tiposAtendimento"
           element={<TiposAtendimento />}
+        />
+        <Route
+          path="/dashboard/administrador/programas"
+          element={<Programas />}
         />
       </Routes>
     </Router>
