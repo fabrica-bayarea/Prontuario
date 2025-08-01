@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SidebarLayout from "../../../components/SidebarLayout";
+import SidebarLayout from "../../../../components/SidebarLayout";
 import SidebarAgenda from "../../../../components/SideBarAgenda"; 
 
  function Programas() {
