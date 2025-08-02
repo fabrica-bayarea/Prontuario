@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SidebarLayout from "../../../../components/SidebarLayout";
 import SidebarAgenda from "../../../../components/SideBarAgenda";
 
 function TiposAtendimento() {
   const [programas, setProgramas] = useState([]);
-  const [tiposAtendimento, setTiposAtendimento] = useState([]);
+  // const [tiposAtendimento, setTiposAtendimento] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
   const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
   const [formData, setFormData] = useState({
@@ -20,7 +20,7 @@ function TiposAtendimento() {
     programaId: "",
     status: "ativo",
   });
-  const [textoConfirmar, setTextoConfirmar] = useState("");
+  const [textoConfirmar] = useState("");
 
   useEffect(() => {
     // Simular fetch inicial dos programas e tipos de atendimento
@@ -28,15 +28,15 @@ function TiposAtendimento() {
       { id: 1, nome: "Programa A" },
       { id: 2, nome: "Programa B" },
     ]);
-    setTiposAtendimento([]);
+    // setTiposAtendimento([]);
   }, []);
 
   const abrirModal = () => setModalAberto(true);
   const fecharModal = () => setModalAberto(false);
-  const abrirConfirmar = (texto) => {
-    setTextoConfirmar(texto);
-    setModalConfirmarAberto(true);
-  };
+  // const abrirConfirmar = (texto) => {
+  //   setTextoConfirmar(texto);
+  //   setModalConfirmarAberto(true);
+  // };
   const fecharConfirmar = () => setModalConfirmarAberto(false);
 
   const handleChange = (e) => {

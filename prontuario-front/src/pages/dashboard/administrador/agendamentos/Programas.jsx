@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SidebarLayout from "../../../../components/SidebarLayout";
 import SidebarAgenda from "../../../../components/SideBarAgenda";
+import "../../../dashboard/styledash.css";
 
 function Programas() {
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -67,7 +68,7 @@ function Programas() {
                 onClick={fecharModal}
                 aria-label="Fechar Modal"
               >
-                ×
+                x
               </button>
               <h2 id="modalTituloPrograma">Cadastro de Programa</h2>
 

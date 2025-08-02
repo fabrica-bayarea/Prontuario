@@ -11,7 +11,7 @@ export default function Login() {
 
   async function login(email, password, rememberMe) {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch("http://localhost:3000/v1/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export default function Login() {
   }
 
   const apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:5173/";
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
   return (
     <div className="formContainer">
@@ -117,13 +117,9 @@ export default function Login() {
       </div>
 
       <div className="socialLogin">
-        <button
-          type="button"
-          className="socialButton"
-          onClick={redirectToDashboard}
-        >
+        <a href={`${apiBaseUrl}/v1/auth/google`} className="socialButton">
           <img src="/images/iesb-logo.png" alt="IESB" width="24" height="24" />
-        </button>
+        </a>
         <a href={`${apiBaseUrl}/v1/auth/google`} className="socialButton">
           <img
             src="/images/google-icon.png"
