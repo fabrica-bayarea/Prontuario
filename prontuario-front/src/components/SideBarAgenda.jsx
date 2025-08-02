@@ -87,7 +87,12 @@ const SideBarAgenda = ({ children }) => {
               <button style={buttonStyle}>Programas</button>
             </li>
             <li>
-              <button style={buttonStyle}>Escalas</button>
+              <button
+                style={buttonStyle}
+                onClick={() => navigate("/dashboard/administrador/escalas")}
+              >
+                Escalas
+              </button>
             </li>
           </ul>
         </nav>
