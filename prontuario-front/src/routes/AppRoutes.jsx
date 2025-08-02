@@ -12,11 +12,8 @@ import Agendamentos from "../pages/dashboard/administrador/agendamentos/Agendame
 import LogsAuditoria from "../pages/dashboard/administrador/Logs";
 import Relatorios from "../pages/dashboard/administrador/Relatorio";
 import TiposAtendimento from "../pages/dashboard/administrador/agendamentos/TipodeAtendimento";
-<<<<<<< HEAD
 import Escalas from "../pages/dashboard/administrador/agendamentos/Escalas";
-=======
-import Programas from"../pages/dashboard/administrador/agendamentos/Programas";
->>>>>>> eb7eeac7abc3d74dbbeb4e588f060c2924488385
+import Programas from "../pages/dashboard/administrador/agendamentos/Programas";
 
 function AppRoutes() {
   return (
@@ -60,14 +57,11 @@ function AppRoutes() {
           path="/dashboard/administrador/tiposatendimento"
           element={<TiposAtendimento />}
         />
-<<<<<<< HEAD
         <Route path="/dashboard/administrador/escalas" element={<Escalas />} />
-=======
         <Route
           path="/dashboard/administrador/programas"
           element={<Programas />}
         />
->>>>>>> eb7eeac7abc3d74dbbeb4e588f060c2924488385
       </Routes>
     </Router>
   );
