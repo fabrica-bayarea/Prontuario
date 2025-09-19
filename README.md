@@ -138,4 +138,3 @@ prontuario/
  Iniciar back-end (npm run start:dev)
 
  Iniciar front-end (npm run dev)
->>>>>>> 78925c83 (Correção do repositório)
