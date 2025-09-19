@@ -1,0 +1,685 @@
+/* =========================================
+   ESTRUTURA GERAL
+========================================= */
+@import url(./global.css);
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  min-width: 99vw;
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+  background-color: var(--fundo-painel);
+}
+
+/* =========================================
+   SIDEBAR
+========================================= */
+.dashboard-sidebar {
+  background-color: var(--fundo-menu);
+  padding: 2rem 1rem;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-sidebar {
+  width: 100px;
+  margin-bottom: 2rem;
+}
+
+.dashboard-sidebar nav ul {
+  list-style: none;
+  width: 100%;
+}
+
+.dashboard-sidebar nav ul li {
+  margin-bottom: 1.2rem;
+}
+
+.dashboard-sidebar nav ul li a {
+  color: var(--cinza-texto);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  display: block;
+  border-radius: 8px;
+}
+
+.dashboard-sidebar nav ul li a:hover {
+  background-color: #fff;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cinza-texto);
+}
+
+.update-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.update-info button,
+.quick-access button {
+  background-color: var(--vermelho-principal);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.update-info button:hover,
+.quick-access button:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+/* =========================================
+   INDICADORES (KPI)
+========================================= */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  margin-top: 2.5rem;
+}
+
+.kpi-box {
+  background-color: var(--vermelho-claro);
+  /* Adicionado padding para espaçamento interno dos KPIs */
+  padding: 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+/* ==================== FILTROS ==================== */
+.filters-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  margin-bottom: 15px;
+}
+
+.filters-section input,
+.filters-section select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #f4cccc;
+  background-color: #f7dada;
+  color: #000;
+  margin-right: 8;
+  font-weight: 500;
+}
+
+.filters-section input:focus,
+.filters-section select:focus {
+  outline: none;
+  border: 1px solid #700000;
+  box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.2);
+}
+
+.status-filtros {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filtro-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #b30000;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filtro-btn.active,
+.filtro-btn:hover {
+  background-color: #b30000;
+}
+
+/* =========================================
+   GRÁFICOS
+========================================= */
+.charts-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.chart-container {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  flex: 1 1 45%;
+  min-width: 300px;
+}
+
+.chart-container h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--cinza-texto);
+}
+
+/* =========================================
+   AÇÕES RÁPIDAS
+========================================= */
+.quick-access {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  margin-top: 2.5rem;
+}
+
+/* =========================================
+   ALERTAS E NOTIFICAÇÕES
+========================================= */
+.dashboard-alerts,
+.dashboard-notificacoes {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.dashboard-alerts h3,
+.dashboard-notificacoes h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.dashboard-alerts ul,
+.dashboard-notificacoes ul {
+  padding-left: 1.5rem;
+}
+
+.dashboard-alerts li::before {
+  content: "⚠️ ";
+}
+.dashboard-notificacoes li::before {
+  content: "🔔 ";
+}
+
+/* =========================================
+   MODAIS (GENÉRICOS)
+========================================= */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal h2 {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #4a0202;
+}
+
+.modal input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #f5cccc;
+  background-color: var(--vermelho-claro);
+  font-family: var(--fonte-principal);
+  color: #000;
+  box-sizing: border-box;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 80vh;
+  max-height: 80vh; /* Limite de altura */
+  overflow-y: auto; /* Permite rolagem */
+  position: relative;
+  font-family: var(--fonte-principal);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+  color: #4a0202;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #b00000;
+  font-weight: bold;
+}
+
+.modal-close:hover {
+  color: #ff0000;
+}
+/* =========================================
+   FORMULÁRIOS DOS MODAIS
+========================================= */
+#formNovoAgendamento input,
+#formNovoAgendamento select,
+#formNovoAgendamento textarea,
+#formNovoCurso input,
+#formNovoCurso select,
+#formNovoCurso textarea,
+#formCoordenador input,
+#formCoordenador select,
+#formCoordenador textarea {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: var(--vermelho-claro);
+  font-family: var(--fonte-principal);
+}
+
+#formNovoAgendamento button,
+#formNovoCurso button,
+#formCoordenador button {
+  margin-top: 1rem;
+  width: 100%;
+  background-color: var(--vermelho-principal);
+  color: white;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#formNovoAgendamento label {
+  font-weight: 100;
+  margin-top: 2px;
+  margin-bottom: 0px;
+  color: #4a0202;
+}
+
+#formNovoAgendamento button:hover,
+#formNovoCurso button:hover,
+#formCoordenador button:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(24%) sepia(98%) saturate(7493%) hue-rotate(350deg)
+    brightness(102%) contrast(105%);
+  cursor: pointer;
+}
+
+#formCoordenador fieldset {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+#formCoordenador legend {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+/* =========================================
+   TABELAS (GENÉRICAS E RESPONSIVAS)
+========================================= */
+.tabela-cursos table,
+.tabela-coordenadores table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+.tabela-conteudos table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tabela-conteudos th,
+.tabela-conteudos td,
+.tabela-cursos th,
+.tabela-cursos td,
+.tabela-coordenadores th,
+.tabela-coordenadores td {
+  padding: 10px;
+  border: 1px solid #eee;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.tabela-coordenadores td button {
+  margin-right: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.tabela-coordenadores td button.edit {
+  background: #f0c040;
+  color: #333;
+}
+.tabela-coordenadores td button.delete {
+  background: #d0021b;
+  color: #fff;
+}
+.tabela-coordenadores td button.permissoes {
+  background: #3b7ddd;
+  color: #fff;
+}
+
+/* =========================================
+   TOAST DE FEEDBACK
+========================================= */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--vermelho-principal);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.toast.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* =========================================
+   SPINNER
+========================================= */
+.spinner {
+  border: 3px solid #fff;
+  border-top: 3px solid var(--vermelho-secundario);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner.hidden {
+  display: none;
+}
+
+/* =========================================
+   SEPARADORES E RESPONSIVIDADE
+========================================= */
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 2rem 0;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .dashboard-sidebar {
+    flex-direction: row;
+    width: 100%;
+    overflow-x: auto;
+    justify-content: space-around;
+    padding: 1rem;
+  }
+
+  .dashboard-main {
+    padding: 1.5rem;
+  }
+
+  .charts-section {
+    flex-direction: column;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-access {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .quick-access button {
+    width: 100%;
+  }
+
+  .tabela-cursos table,
+  .tabela-cursos thead,
+  .tabela-cursos tbody,
+  .tabela-cursos th,
+  .tabela-cursos td,
+  .tabela-cursos tr,
+  .tabela-coordenadores table,
+  .tabela-coordenadores thead,
+  .tabela-coordenadores tbody,
+  .tabela-coordenadores th,
+  .tabela-coordenadores td,
+  .tabela-coordenadores tr {
+    display: block;
+    width: 100%;
+  }
+
+  .tabela-cursos thead,
+  .tabela-coordenadores thead {
+    display: none;
+  }
+
+  .tabela-cursos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd; /* Contorno externo */
+  }
+
+  .tabela-cursos td {
+    color: #333333;
+  }
+  .tabela-cursos th,
+  .tabela-cursos td {
+    padding: 1rem;
+    text-align: left;
+    border: none;
+  }
+
+  .tabela-cursos th {
+    background-color: white;
+    color: #700000;
+    font-weight: bold;
+  }
+
+  .tabela-cursos tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .tabela-cursos tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+
+  .tabela-cursos td::before,
+  .tabela-coordenadores td::before {
+    position: absolute;
+    left: 1rem;
+    top: 0.8rem;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  .tabela-cursos td:nth-child(1)::before {
+    content: "Curso";
+  }
+  .tabela-cursos td:nth-child(2)::before {
+    content: "Status";
+  }
+  .tabela-cursos td:nth-child(3)::before {
+    content: "Coordenadores";
+  }
+  .tabela-cursos td:nth-child(4)::before {
+    content: "Data";
+  }
+  .tabela-cursos td:nth-child(5)::before {
+    content: "Ações";
+  }
+
+  .tabela-coordenadores td:nth-child(1)::before {
+    content: "Nome";
+  }
+  .tabela-coordenadores td:nth-child(2)::before {
+    content: "E-mail";
+  }
+  .tabela-coordenadores td:nth-child(3)::before {
+    content: "Cursos";
+  }
+  .tabela-coordenadores td:nth-child(4)::before {
+    content: "Status";
+  }
+  .tabela-coordenadores td:nth-child(5)::before {
+    content: "Ações";
+  }
+}
+
+#cursoCoordsCheckboxes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+#cursoCoordsCheckboxes label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--cinza-texto);
+  white-space: nowrap; /* ❗ Evita quebra de linha no nome */
+  width: auto;
+}
+
+.card {
+  background: var(--vermelho-claro);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card h2 {
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.card label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+/* ==================== BOTÃO ADICIONAR ==================== */
+.botao-primario {
+  background-color: white;
+  color: #700000;
+  border: 1px solid #700000;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.botao-primario:hover {
+  background-color: #700000;
+  color: white;
+}
+
+/* ==================== BOTÕES AÇÃO ==================== */
+.table-action-btn {
+  padding: 0.4rem 0.6rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 0.3rem;
+  font-weight: bold;
+}
+
+.edit-btn {
+  background-color: #ffecb3;
+  color: #7a4e00;
+}
+
+.visu-btn {
+  background-color: #bbdefb;
+  color: #003c8f;
+}
+
+.delete-btn {
+  background-color: #ffebee;
+  color: #b71c1c;
+  border: 2px solid #b71c1c;
+}

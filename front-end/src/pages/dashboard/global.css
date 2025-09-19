@@ -1,0 +1,28 @@
+/* =========================================
+   VARIÁVEIS GLOBAIS E RESET DE ESTILOS
+========================================= */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
+
+:root {
+  --vermelho-principal: #b80000;
+  --vermelho-secundario: #900000;
+  --vermelho-claro: #fde5e5;
+  --cinza-texto: #4f0707;
+  --fundo-painel: #fff;
+  --fundo-menu: #f9c2c2;
+  --cinza-claro: #ccc;
+  --fonte-principal: "Inter", sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--fonte-principal);
+  background-color: #f8f8f8;
+  color: var(--cinza-texto);
+  min-height: 100vh;
+}

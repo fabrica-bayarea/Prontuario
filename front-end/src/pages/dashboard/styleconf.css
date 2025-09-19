@@ -1,0 +1,115 @@
+@import url(./global.css);
+
+:root {
+  --vermelho-claro: #fde7e7;
+  --vermelho-principal: #d32f2f;
+  --vermelho-secundario: #b71c1c;
+  --cinza-texto: #3c3c3c;
+  --cinza-claro: #ccc;
+  --fonte-principal: 'Inter', sans-serif;
+}
+
+/* Container geral dos blocos */
+.config-section {
+  background-color: var(--vermelho-claro); /* rosa claro */
+  padding: 2rem 2.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 2.5rem;
+  max-width: 800px;
+}
+
+/* Títulos das seções */
+.config-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: var(--cinza-texto);
+  font-weight: 700;
+}
+
+/* Labels que envolvem checkbox e texto */
+.config-section label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* checkbox à esquerda, texto ao lado */
+  gap: 0.5rem; /* espaçamento entre checkbox e texto */
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: var(--cinza-texto);
+  cursor: pointer;
+}
+
+/* Checkboxes */
+.config-section input[type="checkbox"] {
+  transform: scale(1.2);
+  accent-color: var(--vermelho-principal);
+}
+
+/* Inputs texto padrão */
+.config-section input[type="text"],
+.config-section textarea {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--cinza-claro);
+  background-color: white; /* para maior contraste e leitura */
+  font-family: var(--fonte-principal);
+  color: var(--cinza-texto);
+  box-sizing: border-box;
+}
+
+/* Área de texto */
+.config-section textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Botões */
+#btnPreVisualizarTermo,
+#btnSalvarPermissoes {
+  margin-top: 1rem;
+  background-color: var(--vermelho-principal);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+#btnPreVisualizarTermo:hover,
+#btnSalvarPermissoes:hover {
+  background-color: var(--vermelho-secundario);
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+  .config-section {
+    padding: 1.5rem 1rem;
+    max-width: 100%;
+  }
+
+  .config-section label {
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+
+  .config-section input[type="text"],
+  .config-section textarea {
+    font-size: 0.95rem;
+  }
+}
+
+/* Ajustes extras para que o input email institucional fique com a largura adequada */
+.config-section input[type="text"][value="notificacoes@iesb.br"] {
+  width: auto;
+  min-width: 200px;
+}
+
+.config-section .last-updated-text {
+  margin-bottom: 1rem;
+  color: var(--cinza-texto);
+}

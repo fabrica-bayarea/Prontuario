@@ -1,63 +1,141 @@
-![Centro Universitário IESB](../assets/logoIesb.png)
+# 🩺 Prontuário
 
-## Back-end - NestJS
+![Node.js](https://img.shields.io/badge/Node.js-18.x-green?logo=node.js)
+![NestJS](https://img.shields.io/badge/NestJS-9.x-red?logo=nestjs)
+![React](https://img.shields.io/badge/React-18.x-61dafb?logo=react)
+![Vite](https://img.shields.io/badge/Vite-4.x-646CFF?logo=vite)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-blue?logo=prisma)
+![Postgres](https://img.shields.io/badge/PostgreSQL-15.x-blue?logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-Engine-blue?logo=docker)
 
-### Tecnologias
-- NestJS
-- TypeScript
-- Prisma
-- Postgres
-- Docker
+Sistema de **Prontuário Eletrônico** desenvolvido com **NestJS + Prisma + PostgreSQL (Docker)** no back-end e **React + Vite** no front-end.
 
-### Rodando localmente
+---
 
-1. Mude para a pasta `back-end`:
-  ```bash
-  cd back-end
-  ```
+## 🛠️ Tecnologias utilizadas
 
-2. Instale as dependências:
-  ```bash
-  npm install
-  ```
+### Back-end
+- [NestJS](https://nestjs.com/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Prisma ORM](https://www.prisma.io/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Docker](https://www.docker.com/)
 
-3. Crie um container do Postgres:
-  ```bash
-  docker run --name database_trello \
-    -e POSTGRES_PASSWORD=password_postgres -e POSTGRES_USER=user_postgres \
-    -d -p 5432:5432 postgres
-  ```
+### Front-end
+- [React](https://react.dev/)
+- [Vite](https://vitejs.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
 
-4. Criar arquivo .env de acordo com o arquivo .env.example que está na pasta "back-end/"
-  
-> [!IMPORTANT]  
-> É crucial que as variaveis de ambiente usada na criação do container seja a mesma no "DATABASE_URL"
+---
 
-5. Aplique as migrações no banco de dados:
-  ```bash
-  npx prisma migrate dev
-  ```
+## 🚀 Rodando o projeto localmente
 
-6. Inicie a aplicação:
-  ```bash
-  npm run start:dev
-  ```
+### 1️⃣ Clonar o repositório
+```bash
+git clone https://github.com/seu-usuario/prontuario.git
+cd prontuario
 
-7. Acesse [http://localhost:3000/docs](http://localhost:3000/docs) com o seu navegador para ver o resultado.
+2️⃣ Back-end (NestJS)
+
+Entre na pasta do back-end:
+
+cd back-end
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Instale as dependências:
 
-## CONFIGURANDO O ADMINISTRADOR NO POSTGRES
+npm install
 
-1. Criar o administrador no banco de dados:
-   
-   npx ts-node prisma/seed.ts
 
-2. Acesse o PrismaStudio e ative 'isAdmin':
+Crie o container do PostgreSQL:
+
+docker run --name database_prontuario \
+  -e POSTGRES_USER=user_prontuario \
+  -e POSTGRES_PASSWORD=password_prontuario \
+  -e POSTGRES_DB=prontuario \
+  -d -p 5432:5432 postgres
+
+
+Crie um arquivo .env na pasta back-end/ baseado no .env.example.
+Exemplo mínimo:
+
+DATABASE_URL="postgresql://user_prontuario:password_prontuario@localhost:5432/prontuario"
+PORT=3000
+JWT_SECRET="sua_chave_super_secreta"
+JWT_EXPIRES_IN="1d"
+
+
+Aplique as migrações no banco de dados:
+
+npx prisma migrate dev
+
+
+Crie o usuário administrador:
+
+npx ts-node prisma/seed.ts
+
+
+Se precisar editar manualmente:
 
 npx prisma studio
 
-No prisma studio, selecione user e o Admin deve aparecer lá. Use a edição para ativar 'isAdmin'.
 
-3. Após isso, basta iniciar normalmente o código do back e fazer o teste no swagger
+No Prisma Studio, edite o usuário e ative o campo isAdmin.
+
+Inicie o servidor:
+
+npm run start:dev
+
+
+📌 Swagger disponível em:
+
+http://localhost:3000/docs
+
+3️⃣ Front-end (React + Vite)
+
+Abra outro terminal e entre na pasta do front:
+
+cd front-end
+
+
+Instale as dependências:
+
+npm install
+
+
+Inicie o projeto:
+
+npm run dev
+
+
+A aplicação estará disponível em:
+
+http://localhost:5173
+
+📦 Estrutura do Projeto
+prontuario/
+├── back-end/      # API (NestJS + Prisma + Postgres)
+│   ├── prisma/    # Definição do schema e migrações
+│   ├── src/       # Código-fonte do back-end
+│   └── .env       # Variáveis de ambiente (ignorado no git)
+│
+└── front-end/     # Interface (React + Vite)
+    ├── src/       # Componentes React
+    └── public/    # Arquivos estáticos
+
+✅ Checklist para rodar local
+
+ Clonar repositório
+
+ Criar container Postgres com usuário, senha e DB corretos
+
+ Configurar .env no back-end
+
+ Rodar prisma migrate dev
+
+ Criar usuário admin (seed.ts ou Prisma Studio)
+
+ Iniciar back-end (npm run start:dev)
+
+ Iniciar front-end (npm run dev)
+>>>>>>> 78925c83 (Correção do repositório)

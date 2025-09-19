@@ -1,2 +1,10 @@
-front-end/node_modules/
-back-end/node_modules/
+# Arquivos de log e de dependências
+node_modules/
+
+# Arquivos de ambiente
+.env
+
+# Logs e outros
+npm-debug.log
+yarn-error.log
+>>>>>>> 78925c83 (Correção do repositório)

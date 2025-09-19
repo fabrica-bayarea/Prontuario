@@ -1,0 +1,276 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  local
+  google
+  microsoft
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+  OBSERVER
+}
+
+//VisibilidadeTiposdeAtendimentos
+enum Visibilidade {
+  ALUNO_E_BENEFICIARIO
+  SOMENTE_ALUNO
+  SOMENTE_COORDENADOR
+}
+
+enum BoardVisibility {
+  PUBLIC
+  PRIVATE
+  TEAM
+}
+
+model User {
+  id           String        @id @default(uuid())
+  role         Role
+  name         String?
+  email        String        @unique
+  userName     String?       @unique
+  passwordHash String?
+  authProvider AuthProvider
+  isVerified   Boolean       @default(false)
+  CreatedAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  providerId   String?
+  isAdmin      Boolean       @default(false)
+  boards       Board[]       @relation("OwnerBoards")
+  memberships  BoardMember[]
+  tasksCreated Task[]        @relation("TaskCreator")
+
+  @@unique([authProvider, providerId], name: "AuthProviderAndIdUnique")
+}
+
+model Board {
+  id          String          @id @default(uuid())
+  ownerId     String
+  title       String
+  description String?
+  visibility  BoardVisibility @default(PRIVATE)
+  isArchived  Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  owner   User          @relation("OwnerBoards", fields: [ownerId], references: [id])
+  members BoardMember[]
+  lists   List[]
+  labels  Label[]
+}
+
+model BoardMember {
+  boardId  String
+  userId   String
+  role     Role
+  joinedAt DateTime @default(now())
+
+  board Board @relation(fields: [boardId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@id([boardId, userId])
+}
+
+model List {
+  id         String   @id @default(uuid())
+  boardId    String
+  title      String
+  position   Int
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  board Board  @relation(fields: [boardId], references: [id])
+  tasks Task[]
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  listId      String
+  creatorId   String
+  title       String
+  description String?
+  position    Int
+  status      String
+  dueDate     DateTime?
+  isArchived  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  list    List        @relation(fields: [listId], references: [id])
+  creator User        @relation("TaskCreator", fields: [creatorId], references: [id])
+  labels  TaskLabel[]
+}
+
+model Label {
+  id        String   @id @default(uuid())
+  boardId   String
+  name      String
+  color     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  board Board       @relation(fields: [boardId], references: [id])
+  tasks TaskLabel[]
+}
+
+model TaskLabel {
+  taskId  String
+  labelId String
+
+  task  Task  @relation(fields: [taskId], references: [id])
+  label Label @relation(fields: [labelId], references: [id])
+
+  @@id([taskId, labelId])
+}
+
+// DADOS DASHBOARD
+model Dashboard {
+  id                   Int                   @id @default(autoincrement())
+  cursos               Int
+  programas            Int
+  usuarios             Int
+  atendimentosMes      Int
+  pendencias           Pendencia[]
+  notificacoes         Notificacao[]
+  graficoCursos        GraficoCurso[]
+  graficoBeneficiarios GraficoBeneficiario[]
+}
+
+model Pendencia {
+  id          Int       @id @default(autoincrement())
+  descricao   String
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+}
+
+model Notificacao {
+  id          Int       @id @default(autoincrement())
+  mensagem    String
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+}
+
+model GraficoCurso {
+  id          Int       @id @default(autoincrement())
+  label       String
+  valor       Int
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+}
+
+model GraficoBeneficiario {
+  id          Int       @id @default(autoincrement())
+  label       String
+  valor       Int
+  dashboardId Int
+  dashboard   Dashboard @relation(fields: [dashboardId], references: [id])
+}
+
+//DADOS CURSO
+model Curso {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  descricao  String
+  modalidade String
+  criadoEm   DateTime @default(now())
+}
+
+//DADOS COORDENADORES (ADMIN)
+model coordenador {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  email        String
+  telefone     String?
+  cpf          String? // << ESTE CAMPO PRECISA EXISTIR
+  status       String?
+  cursos       String[] @default([])
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  permissoes   Json?
+}
+
+//AGENDAMENTO
+model Agendamento {
+  id           String   @id @default(uuid())
+  beneficiario String
+  programa     String
+  tipo         String
+  aluno        String
+  data         DateTime
+  turno        String
+  status       String   @default("agendado")
+  criadoEm     DateTime @default(now())
+}
+
+model ProgramaAgendamento {
+  id   String @id @default(uuid())
+  nome String @unique
+}
+
+model TipoAtendimentoAgendamento {
+  id   String @id @default(uuid())
+  nome String @unique
+}
+
+model Aluno {
+  id   String @id @default(uuid())
+  nome String @unique
+}
+
+model TipoAtendimento {
+  id                  String       @id @default(uuid())
+  nome                String
+  sigla               String
+  descricao           String?
+  publico             String?
+  duracao             Int?
+  frequencia          String?
+  visibilidade        Visibilidade
+  instrucoesAluno     String?
+  orientacoesPublicas String?
+  status              String
+  programaId          String
+  programa            Programa     @relation(fields: [programaId], references: [id], name: "ProgramaTipoAtendimento")
+}
+
+model Programa {
+  id          String    @id @default(uuid())
+  nome        String
+  descricao   String?
+  tipo        String
+  status      String
+  sala        String?
+  inicio      DateTime?
+  fim         DateTime?
+  curso       String
+  assistentes String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tiposAtendimento TipoAtendimento[] @relation("ProgramaTipoAtendimento")
+  Escala           Escala[]
+}
+
+model Escala {
+  id         String   @id @default(uuid())
+  nome       String
+  matricula  String
+  curso      String
+  status     String
+  turnos     String[] // ["Seg - Manhã", "Ter - Tarde"]
+  programaId String
+  programa   Programa @relation(fields: [programaId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
