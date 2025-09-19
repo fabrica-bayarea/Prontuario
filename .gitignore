@@ -54,3 +54,9 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+node_modules/
+.DS_Store
+dist/
+env/
+back-end/node_modules/
+front-end/node_modules/
