@@ -10,7 +10,7 @@ cd prontuario
 
 ## comando para rodar o front
 
-```
+```bash
 cd frontEnd
 
 npm install
