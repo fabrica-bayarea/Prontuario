@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  api:
+    build: . 
+    container_name: bayarea_api
+    ports:
+      - "3001:3001" 
+    volumes:
+      - .:/usr/app 
+      - /usr/app/node_modules 
+    environment:
+      - PORT=3001
+      - MONGO_URL=mongodb://mongo_db:27017/bayarea
+    depends_on:
+      - mongo_db 
+
+  mongo_db:
+    image: mongo:latest
+    container_name: bayarea_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data_db:/data/db 
