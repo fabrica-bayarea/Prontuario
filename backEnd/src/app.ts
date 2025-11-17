@@ -1,5 +1,6 @@
 import express = require ('express'); 
 import 'dotenv/config';
+import prontuarioRoutes from './routes/prontuarioRoutes'; 
 // REMOVA: import './config/Database';
 
 class App {
@@ -9,6 +10,7 @@ class App {
     this.app = express();
     this.middlewares();
     this.routes();
+    this.app.use('/api/prontuarios', prontuarioRoutes); 
     // A conexão com o banco NÃO é mais chamada aqui
   }
 
