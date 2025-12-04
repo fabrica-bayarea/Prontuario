@@ -1,6 +1,59 @@
 import React from "react";
 import { IMaskInput } from "react-imask";
 
+const calcularIdade = (dataNascimento) => {
+  if (!dataNascimento) return "";
+
+  const dataNasc = new Date(dataNascimento);
+  const dataHoje = new Date();
+
+  let idade = dataHoje.getFullYear() - dataNasc.getFullYear();
+  const mes = dataHoje.getMonth() - dataNasc.getMonth();
+
+  if (mes < 0 || (mes === 0 && dataHoje.getDate() < dataNasc.getDate())) {
+    idade--;
+  }
+  return idade;
+}
+
+// função de validação de CPF
+const validarCPF = (cpf) => {
+
+  //remove caracteres de formatação (., -)
+  const cleanCpf = cpf.replace(/[^\d]/g, "");
+
+  //verificar se tem 11 dígitos
+  if (cleanCpf.length !== 11) return false;
+
+  //verificar se todos os dígitos são iguais 
+  if (/^(\d)\1{10}$/.test(cleanCpf)) return false;
+
+  let soma;
+  let resto;
+
+  //validação do primeiro dígito verificador
+  soma = 0;
+  for (let i = 1; i <= 9; i++) {
+    soma = soma + parseInt(cleanCpf.substring(i - 1, i)) * (11 - i);    
+  }
+  resto = (soma * 10) % 11;
+
+  if ((resto === 10) || (resto === 11)) resto = 0;
+  if (resto !== parseInt(cleanCpf.substring(9, 10))) return false;
+
+  //validação do segundo dígito verificador
+  soma = 0;
+  for (let i = 1; i <= 10; i++) {
+    soma = soma + parseInt(cleanCpf.substring(i - 1, i)) * (12 - i);
+  }
+  resto = (soma * 10) % 11;
+
+  if ((resto === 10) || (resto === 11)) resto = 0;
+  if (resto !== parseInt(cleanCpf.substring(10, 11))) return false;
+    
+  return true;
+};
+
 function Etapa1({ formData, handleChange, proximaEtapa }) {
   const estados = [
     "",
@@ -17,8 +70,57 @@ function Etapa1({ formData, handleChange, proximaEtapa }) {
     "Direito"
   ];
 
+  // Função para lidar com a mudança da Data de nascimento
+  const handleDataNascimentoChange = (e) => {
+    const dataNascimento = e.target.value;
+    const idadeCalculada =  calcularIdade(dataNascimento);
+
+    //atualiza o estado da data de nascimento
+    handleChange(e);
+
+    // atualizar o campo "idade" com o valor calculado
+    const eventoIdade = {
+      target: {
+        name: 'idade',
+        value: idadeCalculada.toString()
+      }
+    };
+    if (idadeCalculada !== "") {
+      handleChange(eventoIdade);
+    }
+  }; 
+  
+  // verifica o estado da validação do CPF
+  const isCpfValid = formData.cpf && formData.cpf.replace(/[^\d]/g, "").length === 11 ? validarCPF(formData.cpf) : null;
+
+  const cpfStatusStyle = {
+    fontSize: '0.9em',
+    fontWeight: 'bold',
+    marginLeft: '10px',
+    color: isCpfValid === true ? 'green' : (isCpfValid === false ? 'red' : 'inherit')    
+  };
+
+  const handleNext = () => {
+
+    const form = document.getElementById('etapa1-form');
+    if (form && !form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    if (formData.atendimentoParaQuem === "Outra pessoa" && !formData.nomeOutraPessoa) {
+      alert("Obrigatório");
+      return;
+    }
+
+    if (formData.cpf && isCpfValid === false) {
+      alert("Por favor, insira um CPF válido");
+      return;
+    }
+  }
+  
   return (
-    <>
+    <form id="etapa1-form">
       <div>
         <label htmlFor="nome">Nome Completo<span className="required">*</span>
         </label>
@@ -32,6 +134,11 @@ function Etapa1({ formData, handleChange, proximaEtapa }) {
 
      <div>
       <label htmlFor="cpf">CPF<span className="required">*</span></label>
+      {isCpfValid !== null && (
+        <span style={cpfStatusStyle}>
+          {isCpfValid ? "Válido" : "Inválido"}
+        </span>
+      )}
         <IMaskInput
         mask="000.000.000-00"
         id="cpf"
@@ -54,14 +161,14 @@ function Etapa1({ formData, handleChange, proximaEtapa }) {
           id="dataNascimento"
           name="dataNascimento"
           value={formData.dataNascimento || ""}
-          onChange={handleChange}
+          onChange={handleDataNascimentoChange}
           placeholder="dd/mm/aaaa"/>
    
      </div>
 
       <div>
         <label htmlFor="idade">Idade<span className="required">*</span></label>
-        <input type="number" id="idade" name="idade" min="0" value={formData.idade || ""} onChange={handleChange} required/>
+        <input type="number" id="idade" name="idade" min="0" value={formData.idade || ""} onChange={handleChange} required readOnly/>
       </div>
 
      <div>
@@ -258,7 +365,7 @@ function Etapa1({ formData, handleChange, proximaEtapa }) {
         {formData.atendimentoParaQuem === "Outra pessoa" && (
           <div style={{ marginTop: 8 }}>
             <label htmlFor="nomeOutraPessoa">Nome da outra pessoa</label>
-            <input type="text" id="nomeOutraPessoa" name="nomeOutraPessoa" value={formData.nomeOutraPessoa || ""} onChange={handleChange}/>
+            <input type="text" id="nomeOutraPessoa" name="nomeOutraPessoa" value={formData.nomeOutraPessoa || ""} onChange={handleChange} required/>
           </div>
         )}
       </div>
@@ -277,13 +384,14 @@ function Etapa1({ formData, handleChange, proximaEtapa }) {
         </select>
       </div>
 
-      {/* botão para avançar etapas */}
+              {/* botão para avançar etapas */}
       <div style={{ marginTop: 12 }}>
         <button type="button" onClick={proximaEtapa}>
           Avançar
         </button>
       </div>
-    </>
+      
+    </form>
   );
 }
 
