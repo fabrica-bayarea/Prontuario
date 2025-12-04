@@ -1,17 +1,17 @@
-// src/server.ts
-import appInstance = require('./app'); // Importa a instância do App (compatível com `export =`)
-import database = require('./config/Database'); // Importa a instância do Database
+
+import appInstance from './app'; 
+import database from './config/Database'
 
 const PORT = process.env.PORT || 3001;
 
-// Criamos uma função async para controlar a inicialização
+
 async function startServer() {
   try {
-    // 1. Conecta ao banco e ESPERA
+   
     await database.connect();
     
-    // 2. SÓ DEPOIS, inicia o servidor
-    appInstance.listen(PORT, () => {
+    
+    appInstance.app.listen(PORT, () => {
       console.log(` Servidor rodando na porta ${PORT}`);
     });
   } catch (error) {

@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import Etapa1 from './Etapa1';
 import Etapa2 from './Etapa2';
 import Etapa3 from './Etapa3';
+import { ProntuarioService } from './services/api';
 
 //Lista do campos obrigatorios-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const camposObrigatoriosPorEtapa = {
@@ -186,19 +187,35 @@ const handleChange = (e) =>{
 
 
 // Checagem para ver se os campos obrigatorios foram preenchidos ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   const camposDaEtapa3 = camposObrigatoriosPorEtapa[3];
-
   for (const campo of camposDaEtapa3) {
-  
     const valorDoCampo = formData[campo];
     if (!valorDoCampo || (typeof valorDoCampo === 'string' && valorDoCampo.trim() === '') || (Array.isArray(valorDoCampo) && valorDoCampo.length === 0)) {
-      
       alert(`O campo "${campo}" da última etapa é obrigatório.`);
       return; 
     }
+  }
+
+  try {
+    // Feedback visual (opcional, pode por um loading aqui se quiser)
+    console.log("Enviando dados para o servidor...", formData);
+
+    // Chama o serviço que criamos
+    const resposta = await ProntuarioService.criar(formData);
+
+    console.log("✅ Sucesso!", resposta);
+    alert(`Formulário salvo com sucesso! ID: ${resposta._id}`);
+
+    // Opcional: Limpar o formulário ou voltar para a etapa 1
+    // setFormData({ ...estadoInicial... });
+    // setEtapaAtual(1);
+
+  } catch (error) {
+    console.error("❌ Erro ao enviar:", error);
+    alert("Houve um erro ao salvar os dados. Verifique se o servidor está rodando.");
   }
 
   const formDataJson = JSON.stringify(formData, null, 2);

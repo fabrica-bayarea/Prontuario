@@ -9,10 +9,16 @@ import {
 
 const router = Router(); 
 
+router.get('/', (req, res) => {
+  return res.json({ message: 'API BayArea está funcionando!' });
+});
+
 router.post('/', criarProntuario); 
 router.get('/', listarProntuario); 
 router.get('/:id', listarPorIdProntuario); 
 router.put('/:id', atualizarProntuarioPorId); 
 router.delete('/:id', deletarProntuarioPorId); 
+
+
 
 export default router; 
