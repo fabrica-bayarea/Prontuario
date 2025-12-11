@@ -3,236 +3,173 @@ import Etapa1 from './Etapa1';
 import Etapa2 from './Etapa2';
 import Etapa3 from './Etapa3';
 import { ProntuarioService } from './services/api';
+import './Questionario.css'; // <--- 1. Importação do CSS
 
-//Lista do campos obrigatorios-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ... (Mantenha o objeto camposObrigatoriosPorEtapa igual) ...
 const camposObrigatoriosPorEtapa = {
-  // Etapa 1: Dados Pessoais, de Contato e de Atendimento Inicial 
+  // ... (seu código existente)
   1: [
-     'nome', 
-     'email',                         
-     'cpf', 
-     'dataNascimento', 
-     'idade', 
-     'cep', 
-     'genero', 
-     'corRaca',
-     'clinicaAtendimento',
-     'areaAtendimento',
-     'estado',
-     'cidade',
-     'telefone',
-     'classAtendimento',
-     'atendimentoParaQuem',
-     'acompanhamentoOutroLugar',
-     'atendimentoParaOutraPessoa'    
-     
+    'nome', 'email', 'cpf', 'dataNascimento', 'idade', 'cep', 'genero', 'corRaca', 'clinicaAtendimento', 'areaAtendimento', 'estado', 'cidade', 'telefone', 'classAtendimento', 'atendimentoParaQuem', 'acompanhamentoOutroLugar', 'atendimentoParaOutraPessoa'
   ],
-
-  // Etapa 2: Dados Socioeconômicos, de Moradia e Saúde Familiar
   2: [
-    'pessoasPorCasa',            
-    'suaCasaE',
-    'rendaFamiliar', 
-    'origemRenda',             
-    'quaisBeneficios',         
-    'suaCasaEstuda',
-    'residemSuaCasa',
-    'residenciaDoencaCronica', 
-    'residenciaDeficiencia',
-    'comoSoubeIESB'               
+    'pessoasPorCasa', 'suaCasaE', 'rendaFamiliar', 'origemRenda', 'suaCasaEstuda', 'residemSuaCasa', 'residenciaDoencaCronica', 'residenciaDeficiencia', //'comoSoubeIESB'
   ],
-
-  // Etapa 3: Motivo da Busca e Conhecimento do Serviço
   3: [
-    'servicoIESB', 
-    'antesIESB', 
-    'encaminhamentoMedico'
+    'servicoIESB', 'antesIESB', 'encaminhamentoMedico'
   ] 
 };
 
-
 function Questionario () {
+  // ... (Mantenha todo o estado e funções existentes iguais) ...
+  const[etapaAtual,setEtapaAtual] = useState(1); 
+  // ... (funções proximaEtapa, anteriorEtapa, handleChange, handleSubmit, formData...)
 
-// Controla qual etapa do formulário está sendo exibida.---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-const[etapaAtual,setEtapaAtual] = useState(1); 
-
-// Funções para navegar entre as etapas do formulário.-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-const proximaEtapa = () =>{   
-  
-  const camposDaEtapaAtual = camposObrigatoriosPorEtapa[etapaAtual];
-
-  for (const campo of camposDaEtapaAtual) {
-   
-    const valorDoCampo = formData[campo];
-    if (!valorDoCampo || (typeof valorDoCampo === 'string' && valorDoCampo.trim() === '') || (Array.isArray(valorDoCampo) && valorDoCampo.length === 0)) {
-      alert(`O campo "${campo}" é obrigatório.`);
-      return; 
-    }
-  }
-    if (etapaAtual < 3){
-        setEtapaAtual(etapaAtual + 1)
-}}
-
-
-const anteriorEtapa = () =>{
-    if (etapaAtual > 1){
-        setEtapaAtual(etapaAtual - 1)
-}}
-
-// Armazena todos os dados do formulário em um único objeto de estado.-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-const[formData,setFormData] = useState({
-
-  //Etapa 1
-  nome:'', //0 
-  email:'', //1 
-  cpf:'', //2 
-  dataNascimento:'', //3 
-  idade:'', //4 
-  cep:'', //5 
-  endereco:'', //6
-  estadoCivil:'', //7 
-  genero:'', //8
-  corRaca:'', //9
-  clinicaAtendimento:'', //10
-  areaAtendimento:'', //10
-  classAtendimento:'', //11
-  estado:'', //12
-  cidade:'', //13
-  telefone:'', //14
-  faculdadeParticular:'', //15
-  atendimentoParaQuem:'', //16
-  nomeOutraPessoa:'' , //16
-  acompanhamentoOutroLugar:'', //17
-  atendimentoParaOutraPessoa:'Não', //18
-  
-  //Etapa 2
-  pessoasPorCasa:'', //19
-  suaCasaE:'', //20
-  outroTipoCasa: '', //20
-  valorAluguel: '', //20
-  rendaFamiliar:'', //21
-  origemRenda:'', //22
-  outroOrigemRenda:'',
-  CADUnico:'', //23
-  beneficioSocial:'', //24
-  outroBeneficio: '',
-  outroBeneficioValor: '',
-  quaisBeneficios: ['Não tem beneficios sociais'], //24
-  valoresBeneficios:{}, //24
-  suaCasaEstuda:'', //25
-  valorMensalidade:'',//25
-  residemSuaCasa:[], //26
-  residenciaDoencaCronica:[], //27
-  residenciaDeficiencia:'', //28
-  quaisDeficiencia:[], //28
-  outraDeficienciaEspecifique: '', //28
-  acompanhamentoMedico:'', //27
-  outroAcompanhamento:'', //27
-  tipoAcompanhamento:'', //27 
-  especialidadeMedica:'', //29
-  outraEspecialidade:'', //29
-  gastosSaude:[], //30
-  valoresGastosSaude:{}, //30
-  gastosAlimentacao:[], //31
-  valoresGastosAlimentacao:{}, //31
-  possuiFinanciamento:'', //32
-  tiposFinanciamento:'', //32
-  gastoAgua:'', //33
-  gastoEnergia:'', //34
-  gastoInternet:'', //35
-  gastoCondominio:'', //36
-  comoSoubeIESB:[], //37
-  fonteRedeSocio: '', //37
-  outroFonteRedeSocio:'', //37
-
-  //Etapa3
-  servicoIESB:[], //38
-  antesIESB:[], //39tip
-  encaminhamentoMedico:'' //40
-});
-
-// Manipulador de eventos genérico que atualiza o estado 'formData' para qualquer tipo de input.-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-const handleChange = (e) =>{
-  const{name,value,type,checked} = e.target;
-  
-   if(type === 'checkbox' ){
-
-    setFormData(prevFormData => {
-      const listaAtual = prevFormData[name] ? [...prevFormData[name]]:[]
-
-      if(checked){
-        listaAtual.push(value);
-
-      } else{
-
-        const index = listaAtual.indexOf(value);
-
-        if (index > -1){
-          listaAtual.splice(index,1);
-        }
+  const proximaEtapa = () =>{   
+    const camposDaEtapaAtual = camposObrigatoriosPorEtapa[etapaAtual];
+    for (const campo of camposDaEtapaAtual) {
+      const valorDoCampo = formData[campo];
+      if (!valorDoCampo || (typeof valorDoCampo === 'string' && valorDoCampo.trim() === '') || (Array.isArray(valorDoCampo) && valorDoCampo.length === 0)) {
+        alert(`O campo "${campo}" é obrigatório.`);
+        return; 
       }
-
-      return {...prevFormData,[name]: listaAtual};
-     });
-
-   } else { 
-      setFormData(prevFormData =>({...prevFormData,[name]:value,
-         ...(name === 'beneficioSocial' && value === 'Sim' && { quaisBeneficios: [] }),
-         ...(name === 'beneficioSocial' && value === 'Nao' && { quaisBeneficios: ['Não tem Beneficios sociais'] })
-      }));
-   } 
- 
-};
-
-
-// Checagem para ver se os campos obrigatorios foram preenchidos ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const camposDaEtapa3 = camposObrigatoriosPorEtapa[3];
-  for (const campo of camposDaEtapa3) {
-    const valorDoCampo = formData[campo];
-    if (!valorDoCampo || (typeof valorDoCampo === 'string' && valorDoCampo.trim() === '') || (Array.isArray(valorDoCampo) && valorDoCampo.length === 0)) {
-      alert(`O campo "${campo}" da última etapa é obrigatório.`);
-      return; 
     }
+    if (etapaAtual < 3){ setEtapaAtual(etapaAtual + 1) }
   }
 
-  try {
-    // Feedback visual (opcional, pode por um loading aqui se quiser)
-    console.log("Enviando dados para o servidor...", formData);
+  const anteriorEtapa = () =>{ if (etapaAtual > 1){ setEtapaAtual(etapaAtual - 1) } }
 
-    // Chama o serviço que criamos
-    const resposta = await ProntuarioService.criar(formData);
+  const [formData,setFormData] = useState({
+     // ... (Mantenha seu estado inicial exatamente como está)
+     nome:'', 
+     email:'', 
+     cpf:'', 
+     dataNascimento:'', 
+     idade:'', 
+     cep:'', 
+     complemento:'', 
+     logradouro:'',
+     bairro:'',
+     estadoCivil:'', 
+     genero:'', 
+     corRaca:'', 
+     clinicaAtendimento:'', 
+     areaAtendimento:'', 
+     classAtendimento:'', 
+     estado:'', 
+     cidade:'', 
+     telefone:'', 
+     faculdadeParticular:'', 
+     atendimentoParaQuem:'', 
+     nomeOutraPessoa:'' , 
+     acompanhamentoOutroLugar:'', 
+     atendimentoParaOutraPessoa:'Não', 
+     pessoasPorCasa:'', 
+     suaCasaE:'', 
+     outroTipoCasa: '', 
+     valorAluguel: '', 
+     rendaFamiliar:'', 
+     origemRenda:'', 
+     outroOrigemRenda:'', 
+     CADUnico:'', 
+     beneficioSocial:'', 
+     outroBeneficio: '', 
+     outroBeneficioValor: '', 
+     quaisBeneficios: ['Não tem beneficios sociais'], 
+     valoresBeneficios:{}, 
+     suaCasaEstuda:'', 
+     valorMensalidade:'', 
+     residemSuaCasa:[], 
+     residenciaDoencaCronica:[], 
+     residenciaDeficiencia:'', 
+     quaisDeficiencia:[], 
+     outraDeficienciaEspecifique: '', 
+     acompanhamentoMedico:'', 
+     outroAcompanhamento:'', 
+     tipoAcompanhamento:'', 
+     especialidadeMedica:'', 
+     outraEspecialidade:'', 
+     gastosSaude:[], 
+     valoresGastosSaude:{}, 
+     gastosAlimentacao:[], 
+     valoresGastosAlimentacao:{}, 
+     possuiFinanciamento:'', 
+     tiposFinanciamento:'', 
+     gastoAgua:'', 
+     gastoEnergia:'', 
+     gastoInternet:'', 
+     gastoCondominio:'', 
+     comoSoubeIESB:[], 
+     fonteRedeSocio: '', 
+     outroFonteRedeSocio:'', 
+     servicoIESB:[], 
+     antesIESB:[], 
+     encaminhamentoMedico:''
+  });
 
-    console.log("✅ Sucesso!", resposta);
-    alert(`Formulário salvo com sucesso! ID: ${resposta._id}`);
+  const handleChange = (e) =>{
+    // ... (Mantenha sua lógica handleChange exatamente como está)
+    const{name,value,type,checked} = e.target;
+    if(type === 'checkbox' ){
+      setFormData(prevFormData => {
+        const listaAtual = prevFormData[name] ? [...prevFormData[name]]:[]
+        if(checked){ listaAtual.push(value); } else{ const index = listaAtual.indexOf(value); if (index > -1){ listaAtual.splice(index,1); } }
+        return {...prevFormData,[name]: listaAtual};
+      });
+    } else { 
+        setFormData(prevFormData =>({...prevFormData,[name]:value, ...(name === 'beneficioSocial' && value === 'Sim' && { quaisBeneficios: [] }), ...(name === 'beneficioSocial' && value === 'Nao' && { quaisBeneficios: ['Não tem Beneficios sociais'] }) }));
+    } 
+  };
 
-    // Opcional: Limpar o formulário ou voltar para a etapa 1
-    // setFormData({ ...estadoInicial... });
-    // setEtapaAtual(1);
+  const handleSubmit = async (e) => {
+    // ... (Mantenha sua lógica handleSubmit exatamente como está)
+    e.preventDefault();
+    const camposDaEtapa3 = camposObrigatoriosPorEtapa[3];
+    for (const campo of camposDaEtapa3) {
+        const valorDoCampo = formData[campo];
+        if (!valorDoCampo || (typeof valorDoCampo === 'string' && valorDoCampo.trim() === '') || (Array.isArray(valorDoCampo) && valorDoCampo.length === 0)) {
+        alert(`O campo "${campo}" da última etapa é obrigatório.`);
+        return; 
+        }
+    }
+    try {
+        console.log("Enviando dados...", formData);
+        const resposta = await ProntuarioService.criar(formData);
+        console.log("✅ Sucesso!", resposta);
+        alert(`Formulário salvo com sucesso! ID: ${resposta._id}`);
+    } catch (error) {
+        console.error("❌ Erro ao enviar:", error);
+        alert("Houve um erro ao salvar os dados.");
+    }
+  };
 
-  } catch (error) {
-    console.error("❌ Erro ao enviar:", error);
-    alert("Houve um erro ao salvar os dados. Verifique se o servidor está rodando.");
-  }
+  return(
+    <div className="formulario-container"> {/* <--- 3. Container Principal */}
+      
+      <div className="formulario-header">
+         <h1>Prontuário BayArea</h1>
+         <p>Formulário de Prontuário</p>
+      </div>
 
-  const formDataJson = JSON.stringify(formData, null, 2);
-  console.log('Dados do formulário em formato JSON:', formDataJson);
-  console.log("Formulário completo, Dados:", formData);
-  alert("Formulario preenchido com sucesso!");
+      {/* <--- 2. Visual Stepper adicionado aqui */}
+      <div className="stepper">
+        <div className={`step ${etapaAtual >= 1 ? 'active' : ''}`}>
+          <div className="step-circle">1</div>
+          <div className="step-label">Dados Pessoais</div>
+        </div>
+        <div className={`step ${etapaAtual >= 2 ? 'active' : ''}`}>
+          <div className="step-circle">2</div>
+          <div className="step-label">Socioeconômico</div>
+        </div>
+        <div className={`step ${etapaAtual >= 3 ? 'active' : ''}`}>
+          <div className="step-circle">3</div>
+          <div className="step-label">Serviços</div>
+        </div>
+      </div>
+
+      {etapaAtual === 1 && <Etapa1 formData={formData} handleChange={handleChange} proximaEtapa={proximaEtapa} />}
+      {etapaAtual === 2 && <Etapa2 formData={formData} handleChange={handleChange} proximaEtapa={proximaEtapa} anteriorEtapa={anteriorEtapa} handleSubmit={handleSubmit}/>}
+      {etapaAtual === 3 && <Etapa3 formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} anteriorEtapa={anteriorEtapa}/>} 
+    </div> 
+  );
 };
-
-// Renderiza o componente da etapa correta com base no estado 'etapaAtual'.--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-return(
-  
-<div>
-  <h1>IESBem Formulário</h1>
-     {etapaAtual === 1 && <Etapa1 formData={formData} handleChange={handleChange} proximaEtapa={proximaEtapa} />}
-     {etapaAtual === 2 && <Etapa2 formData={formData} handleChange={handleChange} proximaEtapa={proximaEtapa} anteriorEtapa={anteriorEtapa} handleSubmit={handleSubmit}/>}
-     {etapaAtual === 3 && <Etapa3 formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} anteriorEtapa={anteriorEtapa}/>} 
-</div> 
-);
-};
-export default Questionario
+export default Questionario;

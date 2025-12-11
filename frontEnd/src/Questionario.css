@@ -1,0 +1,229 @@
+ /* frontEnd/src/Formulario.css */
+
+/* --- Container Principal --- */
+.formulario-container {
+  margin: 2rem auto;
+  background-color: #ffffff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  text-align: left;
+}
+
+/* --- Cabeçalho e Título --- */
+.formulario-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.formulario-header h1 {
+  font-size: 1.8rem;
+  color: #cc0000; /* Vermelho IESB aproximado */
+  margin: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.formulario-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* --- Stepper (Passos 1-2-3) --- */
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.stepper::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e0e0e0;
+  z-index: 0;
+}
+
+.step {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  padding: 0 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.step-circle {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-circle {
+  background-color: #cc0000;
+  color: #fff;
+}
+
+.step-label {
+  font-size: 0.85rem;
+  color: #999;
+  font-weight: 500;
+}
+
+.step.active .step-label {
+  color: #cc0000;
+  font-weight: 700;
+}
+
+/* --- Grid do Formulário --- */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+}
+
+/* Classes utilitárias para largura dos campos */
+.col-12 { grid-column: span 12; }
+.col-8  { grid-column: span 8; }
+.col-6  { grid-column: span 6; }
+.col-4  { grid-column: span 4; }
+.col-3  { grid-column: span 3; }
+
+/* Responsividade: em telas pequenas, tudo vira coluna única */
+@media (max-width: 768px) {
+  .col-8, .col-6, .col-4, .col-3 {
+    grid-column: span 12;
+  }
+}
+
+/* --- Estilo dos Campos --- */
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+
+.required {
+  color: #cc0000;
+  margin-left: 4px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+select {
+  background-color: #f0f0f0;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box; /* Garante que padding não estoure a largura */
+}
+
+input:focus, select:focus {
+  border-color: #cc0000;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+}
+
+/* Fieldset e Legend */
+fieldset {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0;
+  background-color: #fafafa;
+}
+
+legend {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #444444;
+  padding: 0 5px;
+}
+
+/* Radio e Checkbox */
+.radio-group, .checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.radio-option, .checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+input[type="radio"], input[type="checkbox"] {
+  accent-color: #cc0000;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+/* --- Botões --- */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+button {
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button[type="button"]:first-child {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+button[type="button"]:first-child:hover {
+  background-color: #d0d0d0;
+}
+
+button[type="button"]:last-child, button[type="submit"] {
+  background-color: #cc0000;
+  color: white;
+  margin-left: auto; /* Empurra para a direita se estiver sozinho */
+}
+
+button[type="button"]:last-child:hover, button[type="submit"]:hover {
+  background-color: #a30000;
+}

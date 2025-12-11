@@ -7,7 +7,9 @@ interface IProntuario extends Document {
     dataNascimento: Date;
     idade: number;
     cep: string;
-    endereco: string;
+    complemento: string;
+    logradouro: string;
+    bairro: string;
     estadoCivil: string;
     genero: string;
     corRaca: string;
@@ -72,7 +74,9 @@ const ProntuarioSchema: Schema = new Schema({
   dataNascimento: { type: Date, required: true },
   idade: { type: Number, required: true },
   cep: { type: String, required: true },
-  endereco: { type: String, required: true },
+  complemento: { type: String, required: true },
+  logradouro: { type: String, required: true },
+  bairro: { type: String, required: true },
   estadoCivil: { type: String, required: true },
   genero: { type: String, required: true },
   corRaca: { type: String, required: true },
