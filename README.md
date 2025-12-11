@@ -17,3 +17,11 @@ npm install
 
 npm run dev
 ```
+
+## comando para rodar o back com docker
+
+```
+cd backEnd
+
+docker-compose up --build
+```
