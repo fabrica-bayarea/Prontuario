@@ -1,0 +1,56 @@
+name: CI Pipeline - Front e Back
+
+on:
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+  test-backend:
+    name: Build e Lint - Back-End
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backEnd # Diz ao robô para entrar na pasta do backend
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Ajuste para a versão que usam no projeto
+          
+      - name: Instalar dependências (Back-End)
+        run: npm install
+        
+      - name: Rodar Lint (Back-End)
+        run: npm run lint --if-present
+        
+      - name: Rodar Build (Back-End)
+        run: npm run build --if-present
+
+  test-frontend:
+    name: Build e Lint - Front-End
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontEnd # Diz ao robô para entrar na pasta do frontend
+        
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Instalar dependências (Front-End)
+        run: npm install
+        
+      - name: Rodar Lint (Front-End)
+        run: npm run lint --if-present
+        
+      - name: Rodar Build (Front-End)
+        run: npm run build --if-present
