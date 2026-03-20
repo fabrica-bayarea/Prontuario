@@ -3,7 +3,7 @@
 ## comando para clonar o repositorio na branch develop
 
 ```
-git clone -b develop https://github.com/fabrica-bayarea/Prontuario.git
+git clone -b main https://github.com/fabrica-bayarea/Prontuario.git
 
 cd prontuario
 ```
