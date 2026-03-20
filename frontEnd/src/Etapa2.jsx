@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function Etapa2({ formData, handleChange, proximaEtapa, anteriorEtapa, handleSubmit }) { //Adicionei handleSubmit aqui caso precise, mas o fluxo usa proximaEtapa
+function Etapa2({ formData, handleChange, proximaEtapa, anteriorEtapa}) {
   const [mostrarOutroCampo, setMostrarOutroCampo] = useState(false);
   // ... (Mantenha todos os useState e funções handlers iguais)
   const [mostrarCampoAluguel, setMostrarCampoAluguel] = useState(false);
@@ -11,7 +11,6 @@ function Etapa2({ formData, handleChange, proximaEtapa, anteriorEtapa, handleSub
   const [mostrarOpcoesAcompanhamento, setMostrarOpcoesAcompanhamento] = useState(false);
   const [mostrarOutroAcompanhamento, setMostrarOutroAcompanhamento] = useState(false);
   const [mostrarOutraEspecialidade, setMostrarOutraEspecialidade] = useState(false);
-  const [mostrarOpcoesFinanciamento, setMostrarOpcoesFinanciamento] = useState(false);
   const [mostrarOpcoesRedeSocio, setMostrarOpcoesRedeSocio] = useState(false);
   const [mostrarOutroRedeSocio, setMostrarOutroRedeSocio] = useState(false);
 
@@ -35,7 +34,6 @@ function Etapa2({ formData, handleChange, proximaEtapa, anteriorEtapa, handleSub
   const handleCheckboxChange = (event, campo) => { const { value, checked } = event.target; const valoresAtuais = formData[campo] || []; const novosValores = checked ? [...valoresAtuais, value] : valoresAtuais.filter((item) => item !== value); handleChange({ target: { name: campo, value: novosValores }, }); if (campo === "quaisDeficiencia" && value === "def_outra" && !checked) { handleChange({ target: { name: "outraDeficienciaEspecifique", value: "" }, }); } };
   const handleAcompanhamentoMedicoChange = (event) => { const { value } = event.target; handleChange(event); setMostrarOpcoesAcompanhamento(value === "Sim"); setMostrarOutroAcompanhamento(value === "Outro"); if (value !== "Sim") { handleChange({ target: { name: "tipoAcompanhamento", value: "" } }); handleChange({ target: { name: "especialidadeMedica", value: "" } }); handleChange({ target: { name: "outraEspecialidade", value: "" } }); setMostrarOutraEspecialidade(false); } if (value !== "Outro") { handleChange({ target: { name: "outroAcompanhamento", value: "" } }); } };
   const handleEspecialidadeChange = (event) => { const { value } = event.target; handleChange(event); setMostrarOutraEspecialidade(value === "Outra"); if (value !== "Outra") { handleChange({ target: { name: "outraEspecialidade", value: "" } }); } };
-  const handlePossuiFinanciamentoChange = (event) => { const { value } = event.target; handleChange(event); setMostrarOpcoesFinanciamento(value === "Sim"); if (value !== "Sim") { handleChange({ target: { name: "tiposFinanciamento", value: [] } }); } };
   const handleGastoAguaChange = (e) => { const valorFormatado = formatarMoeda(e.target.value); handleChange({ target: { name: "gastoAgua", value: valorFormatado } }); };
   const handleGastoEnergiaChange = (e) => { const valorFormatado = formatarMoeda(e.target.value); handleChange({ target: { name: "gastoEnergia", value: valorFormatado } }); };
   const handleGastoInternetChange = (e) => { const valorFormatado = formatarMoeda(e.target.value); handleChange({ target: { name: "gastoInternet", value: valorFormatado } }); };
@@ -261,7 +259,7 @@ function Etapa2({ formData, handleChange, proximaEtapa, anteriorEtapa, handleSub
                       id={id} 
                       value={id} 
                       checked={formData.gastosSaude?.includes(id)} 
-                      onChange={(e)=>{ const { checked, value } = e.target; const novos = checked ? [...(formData.gastosSaude||[]), value] : (formData.gastosSaude||[]).filter(i=>i!==value); handleChange({target:{name:"gastosSaude", value:novos}}); if(!checked){ const nv = {...(formData.valoresGastosSaude||{})}; deletenv[value]; handleChange({target:{name:"valoresGastosSaude", value:nv}});} }}
+                      onChange={(e)=>{ const { checked, value } = e.target; const novos = checked ? [...(formData.gastosSaude||[]), value] : (formData.gastosSaude||[]).filter(i=>i!==value); handleChange({target:{name:"gastosSaude", value:novos}}); if(!checked){ const nv = {...(formData.valoresGastosSaude||{})}; handleChange({target:{name:"valoresGastosSaude", value:nv}});} }}
                   />
                   <label htmlFor={id} style={{ margin: 0, cursor: 'pointer' }}>
                       {label}
@@ -302,7 +300,6 @@ function Etapa2({ formData, handleChange, proximaEtapa, anteriorEtapa, handleSub
                         handleChange({target:{name:"gastosAlimentacao", value:novos}}); 
                         if(!checked){ 
                             const nv = {...(formData.valoresGastosAlimentacao||{})}; 
-                            delete nv[value];
                             handleChange({target:{name:"valoresGastosAlimentacao", value:nv}});
                         } 
                     }}
