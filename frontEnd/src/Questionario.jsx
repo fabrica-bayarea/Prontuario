@@ -9,10 +9,10 @@ import './Questionario.css'; // <--- 1. Importação do CSS
 const camposObrigatoriosPorEtapa = {
   // ... (seu código existente)
   1: [
-    'nome', 'email', 'cpf', 'dataNascimento', 'idade', 'cep', 'genero', 'corRaca', 'clinicaAtendimento', 'areaAtendimento', 'estado', 'cidade', 'telefone', 'classAtendimento', 'atendimentoParaQuem', 'acompanhamentoOutroLugar', 'atendimentoParaOutraPessoa'
+    //'nome', 'email', 'cpf', 'dataNascimento', 'idade', 'cep', 'genero', 'corRaca', 'clinicaAtendimento', 'areaAtendimento', 'estado', 'cidade', 'telefone', 'classAtendimento', 'atendimentoParaQuem', 'acompanhamentoOutroLugar', 'atendimentoParaOutraPessoa'
   ],
   2: [
-    'pessoasPorCasa', 'suaCasaE', 'rendaFamiliar', 'origemRenda', 'suaCasaEstuda', 'residemSuaCasa', 'residenciaDoencaCronica', 'residenciaDeficiencia', //'comoSoubeIESB'
+    //'pessoasPorCasa', 'suaCasaE', 'rendaFamiliar', 'origemRenda', 'suaCasaEstuda', 'residemSuaCasa', 'residenciaDoencaCronica', 'residenciaDeficiencia', //'comoSoubeIESB'
   ],
   3: [
     'servicoIESB', 'antesIESB', 'encaminhamentoMedico'

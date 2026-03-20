@@ -55,10 +55,6 @@ const validarCPF = (cpf) => {
 };
 
 function Etapa1({ formData, handleChange, proximaEtapa }) {
-  const estados = [
-    "",
-    "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"
-  ];
 
   const areasAtendimento = [
     "",
@@ -99,25 +95,6 @@ function Etapa1({ formData, handleChange, proximaEtapa }) {
     marginLeft: '10px',
     color: isCpfValid === true ? 'green' : (isCpfValid === false ? 'red' : 'inherit')    
   };
-
-  const handleNext = () => {
-
-    const form = document.getElementById('etapa1-form');
-    if (form && !form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-
-    if (formData.atendimentoParaQuem === "Outra pessoa" && !formData.nomeOutraPessoa) {
-      alert("Obrigatório");
-      return;
-    }
-
-    if (formData.cpf && isCpfValid === false) {
-      alert("Por favor, insira um CPF válido");
-      return;
-    }
-  }
 
   const buscarCep = async (cep) => {
     // Remove caracteres não numéricos
