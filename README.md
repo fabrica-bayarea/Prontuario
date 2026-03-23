@@ -1,8 +1,16 @@
 # 🏥 Prontuário - Fábrica BayArea
 
-![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-green)
-![NodeJS](https://img.shields.io/badge/Node.js-20.x-success)
-![License](https://img.shields.io/badge/License-Proprietária-blue)
+**Back-End (`/backEnd`)**
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-C21325?logo=jest&logoColor=white)
+
+**Front-End (`/frontEnd`)**
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)
+![CSS](https://img.shields.io/badge/CSS-1572B6?logo=css3&logoColor=white)
 
 Bem-vindo ao repositório oficial do sistema de **Prontuário** da Fábrica BayArea. 
 
