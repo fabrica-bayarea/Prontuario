@@ -40,7 +40,7 @@ Para rodar este projeto na sua máquina, você precisará do **Node.js (v20+)**,
 
 ### 1. Clonando o repositório
 ```bash
-git clone [https://github.com/fabrica-bayarea/Prontuario.git](https://github.com/fabrica-bayarea/Prontuario.git)
+git clone -b main https://github.com/fabrica-bayarea/Prontuario.git
 cd Prontuario
 ```
 
