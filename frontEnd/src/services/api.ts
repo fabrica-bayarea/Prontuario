@@ -11,8 +11,15 @@ export const ProntuarioService = {
   // Função para criar um novo prontuário (POST)
   criar: async (dadosDoFormulario: any) => {
     try {
+      // Mongoose: required String rejeita string vazia — complemento é opcional no formulário
+      const complemento =
+        typeof dadosDoFormulario.complemento === 'string' &&
+        dadosDoFormulario.complemento.trim() !== ''
+          ? dadosDoFormulario.complemento.trim()
+          : 'Sem complemento';
+      const payload = { ...dadosDoFormulario, complemento };
       // Isso envia um POST para http://localhost:3001/api/prontuarios
-      const response = await api.post('/prontuarios', dadosDoFormulario);
+      const response = await api.post('/prontuarios', payload);
       return response.data;
     } catch (error: any) {
       console.error('Erro ao integrar com backend:', error);
