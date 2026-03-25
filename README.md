@@ -8,7 +8,7 @@
 ![Jest](https://img.shields.io/badge/Jest-C21325?logo=jest&logoColor=white)
 
 **Front-End (`/frontEnd`)**
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
 ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)
 ![CSS](https://img.shields.io/badge/CSS-1572B6?logo=css3&logoColor=white)
 
@@ -29,7 +29,7 @@ O projeto está dividido em duas frentes principais (Front-End e Back-End), util
 * **Ferramentas:** Docker, Jest para testes
 
 **Front-End (`/frontEnd`)**
-* **Linguagem:** TypeScript
+* **Linguagem:** JavaScript
 * **Framework:** React 
 * **Estilização:** CSS
 ---
