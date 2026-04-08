@@ -1,0 +1,73 @@
+name: Security Pipeline
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security:
+    name: SAST + SonarQube
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------
+      # CHECKOUT
+      # ------------------------
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ------------------------
+      # SETUP NODE
+      # ------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # ------------------------
+      # INSTALAR DEPENDÊNCIAS
+      # ------------------------
+      - name: Instalar dependências (backEnd)
+        working-directory: ./backEnd
+        run: npm install
+
+      - name: Instalar dependências (frontEnd)
+        working-directory: ./frontEnd
+        run: npm install
+
+      # ------------------------
+      # TESTES
+      # ------------------------
+      - name: Rodar testes (backEnd)
+        working-directory: ./backEnd
+        run: npm test --if-present
+
+      # ------------------------
+      # SEMGREP (SAST)
+      # ------------------------
+      - name: Instalar Semgrep
+        run: pip install semgrep
+
+      - name: Rodar Semgrep
+        run: semgrep scan --config=p/owasp-top-ten --error
+
+      # ------------------------
+      # SONARQUBE
+      # ------------------------
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=fabrica-bayarea_Prontuario
+            -Dsonar.organization=fabrica-bayarea
+            -Dsonar.sources=backEnd,frontEnd
+            -Dsonar.exclusions=**/node_modules/**,**/*.test.ts
