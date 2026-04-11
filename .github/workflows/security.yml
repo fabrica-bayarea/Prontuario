@@ -4,18 +4,69 @@ on:
   push:
     branches: [ "main", "develop" ]
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: [ "main", "develop" ]
 
-permissions:
-  contents: read
-  security-events: write
+permissions: read-all
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+
+  # =========================================
+  # CODEQL (SAST AVANÇADO)
+  # =========================================
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        language: [ 'javascript' ]
+
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Rodar CodeQL
+        uses: github/codeql-action/analyze@v3
+
+
+  # =========================================
+  # SAST + SONAR + SEMGREP
+  # =========================================
   security:
     name: SAST + SonarQube
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      security-events: write
+
+    timeout-minutes: 30
+
+    needs: codeql
+    if: always()
+
     steps:
+
       # ------------------------
       # CHECKOUT
       # ------------------------
@@ -31,6 +82,22 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Cache node_modules (backEnd)
+        uses: actions/cache@v4
+        with:
+          path: ./backEnd/node_modules
+          key: ${{ runner.os }}-back-${{ hashFiles('backEnd/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-back-
+
+      - name: Cache node_modules (frontEnd)
+        uses: actions/cache@v4
+        with:
+          path: ./frontEnd/node_modules
+          key: ${{ runner.os }}-front-${{ hashFiles('frontEnd/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-front-
+
       # ------------------------
       # INSTALAR DEPENDÊNCIAS
       # ------------------------
@@ -43,9 +110,8 @@ jobs:
         run: npm install
 
       # ------------------------
-      # TESTES (BACKEND)
+      # TESTES
       # ------------------------
-      # ⚠️ Temporário
       - name: Rodar testes (backEnd)
         working-directory: ./backEnd
         run: npm test || true
@@ -59,7 +125,14 @@ jobs:
       - name: Rodar Semgrep
         id: semgrep
         continue-on-error: true
-        run: semgrep scan --config=p/owasp-top-ten --error
+        run: semgrep scan --config=p/owasp-top-ten --sarif-output=semgrep.sarif
+
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
 
       # ------------------------
       # SONARQUBE
@@ -67,7 +140,7 @@ jobs:
       - name: SonarQube Scan
         id: sonar
         continue-on-error: true
-        uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4
+        uses: SonarSource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
