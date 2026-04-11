@@ -20,43 +20,55 @@ jobs:
   codeql:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
-
+ 
     permissions:
       contents: read
       security-events: write
-
+ 
     timeout-minutes: 30
-
+ 
     strategy:
       matrix:
         language: [ 'javascript' ]
-
+ 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+ 
       - name: Inicializar CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-
+ 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v4
-
+ 
       - name: Rodar CodeQL
-        id: codeql_run
-        continue-on-error: true
         uses: github/codeql-action/analyze@v4
-
-      - name: Checar resultado do CodeQL
-        if: always()
+ 
+      # ✅ Consulta a API do GitHub para verificar alertas HIGH/CRITICAL abertos
+      - name: Checar alertas do CodeQL via API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ "${{ steps.codeql_run.outcome }}" = "failure" ]; then
-            echo "❌ CodeQL encontrou vulnerabilidades ou falhou"
+          echo "🔍 Consultando alertas de code scanning..."
+ 
+          ALERTS=$(curl -s \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/code-scanning/alerts?tool_name=CodeQL&state=open&severity=high,critical&per_page=100")
+ 
+          COUNT=$(echo "$ALERTS" | jq '[.[] | select(.rule.severity == "high" or .rule.severity == "critical")] | length')
+ 
+          echo "⚠️ Alertas High/Critical encontrados: $COUNT"
+ 
+          if [ "$COUNT" -gt "0" ]; then
+            echo "❌ CodeQL encontrou $COUNT vulnerabilidade(s) de severidade High ou Critical"
+            echo "$ALERTS" | jq '.[].rule.description'
             exit 1
           fi
-          echo "✅ CodeQL sem vulnerabilidades"
-
+ 
+          echo "✅ Nenhuma vulnerabilidade High/Critical encontrada pelo CodeQL"
 
   # =========================================
   # SAST + SONAR + SEMGREP
