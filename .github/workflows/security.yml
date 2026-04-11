@@ -31,8 +31,6 @@ jobs:
       matrix:
         language: [ 'javascript' ]
 
-    continue-on-error: true
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,7 +44,18 @@ jobs:
         uses: github/codeql-action/autobuild@v4
 
       - name: Rodar CodeQL
+        id: codeql_run
+        continue-on-error: true
         uses: github/codeql-action/analyze@v4
+
+      - name: Checar resultado do CodeQL
+        if: always()
+        run: |
+          if [ "${{ steps.codeql_run.outcome }}" = "failure" ]; then
+            echo "❌ CodeQL encontrou vulnerabilidades ou falhou"
+            exit 1
+          fi
+          echo "✅ CodeQL sem vulnerabilidades"
 
 
   # =========================================
@@ -125,7 +134,16 @@ jobs:
       - name: Rodar Semgrep
         id: semgrep
         continue-on-error: true
-        run: semgrep scan --config=p/owasp-top-ten --sarif-output=semgrep.sarif
+        run: semgrep scan --config=p/owasp-top-ten --sarif-output=semgrep.sarif --error
+
+      - name: Registrar resultado do Semgrep
+        if: always()
+        run: |
+          if [ "${{ steps.semgrep.outcome }}" = "failure" ]; then
+            echo "SEMGREP_FAILED=true" >> $GITHUB_ENV
+          else
+            echo "SEMGREP_FAILED=false" >> $GITHUB_ENV
+          fi
 
       - name: Upload Semgrep SARIF
         uses: github/codeql-action/upload-sarif@v4
@@ -155,13 +173,26 @@ jobs:
       # SECURITY GATE (FINAL)
       # ------------------------
       - name: Security Gate
+        if: always()
         run: |
-          echo "Semgrep result: ${{ steps.semgrep.outcome }}"
+          echo "Semgrep falhou: $SEMGREP_FAILED"
           echo "Sonar result: ${{ steps.sonar.outcome }}"
 
-          if [ "${{ steps.semgrep.outcome }}" != "success" ] || [ "${{ steps.sonar.outcome }}" != "success" ]; then
-            echo "❌ Falha de segurança detectada"
+          FAILED=0
+
+          if [ "$SEMGREP_FAILED" = "true" ]; then
+            echo "❌ Semgrep encontrou vulnerabilidades"
+            FAILED=1
+          fi
+
+          if [ "${{ steps.sonar.outcome }}" != "success" ]; then
+            echo "❌ SonarQube falhou"
+            FAILED=1
+          fi
+
+          if [ "$FAILED" = "1" ]; then
+            echo "❌ Falha de segurança detectada — pipeline bloqueada"
             exit 1
           fi
 
-          echo "✅ Pipeline seguro"
+          echo "✅ Semgrep e SonarQube sem vulnerabilidades"
