@@ -20,35 +20,59 @@ jobs:
   codeql:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
-
+ 
     permissions:
       contents: read
       security-events: write
-
+ 
     timeout-minutes: 30
-
+ 
     strategy:
       matrix:
         language: [ 'javascript' ]
-
-    continue-on-error: true
-
+ 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+ 
       - name: Inicializar CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-
+ 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-
+        uses: github/codeql-action/autobuild@v4
+ 
       - name: Rodar CodeQL
-        uses: github/codeql-action/analyze@v3
-
-
+        uses: github/codeql-action/analyze@v4
+ 
+      # ✅ Consulta a API do GitHub para verificar alertas HIGH/CRITICAL abertos
+      - name: Checar alertas do CodeQL via API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # github.ref em PRs retorna refs/pull/N/merge — a API precisa de refs/heads/<branch>
+          # github.head_ref tem o branch de origem do PR; github.ref_name funciona em pushes diretos
+          BRANCH_REF="refs/heads/${{ github.head_ref || github.ref_name }}"
+          echo "🔍 Consultando alertas de code scanning para o branch: $BRANCH_REF"
+ 
+          ALERTS=$(curl -s \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/code-scanning/alerts?tool_name=CodeQL&state=open&ref=$BRANCH_REF&per_page=100")
+ 
+          COUNT=$(echo "$ALERTS" | jq '[.[] | select(.rule.severity == "high" or .rule.severity == "critical")] | length')
+ 
+          echo "⚠️ Alertas High/Critical encontrados: $COUNT"
+ 
+          if [ "$COUNT" -gt "0" ]; then
+            echo "❌ CodeQL encontrou $COUNT vulnerabilidade(s) de severidade High ou Critical"
+            echo "$ALERTS" | jq '.[].rule.description'
+            exit 1
+          fi
+ 
+          echo "✅ Nenhuma vulnerabilidade High/Critical encontrada pelo CodeQL"
+          
   # =========================================
   # SAST + SONAR + SEMGREP
   # =========================================
@@ -125,10 +149,19 @@ jobs:
       - name: Rodar Semgrep
         id: semgrep
         continue-on-error: true
-        run: semgrep scan --config=p/owasp-top-ten --sarif-output=semgrep.sarif
+        run: semgrep scan --config=p/owasp-top-ten --sarif-output=semgrep.sarif --error
+
+      - name: Registrar resultado do Semgrep
+        if: always()
+        run: |
+          if [ "${{ steps.semgrep.outcome }}" = "failure" ]; then
+            echo "SEMGREP_FAILED=true" >> $GITHUB_ENV
+          else
+            echo "SEMGREP_FAILED=false" >> $GITHUB_ENV
+          fi
 
       - name: Upload Semgrep SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: semgrep.sarif
@@ -143,6 +176,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
         with:
           args: >
             -Dsonar.projectKey=fabrica-bayarea_Prontuario
@@ -154,13 +188,26 @@ jobs:
       # SECURITY GATE (FINAL)
       # ------------------------
       - name: Security Gate
+        if: always()
         run: |
-          echo "Semgrep result: ${{ steps.semgrep.outcome }}"
+          echo "Semgrep falhou: $SEMGREP_FAILED"
           echo "Sonar result: ${{ steps.sonar.outcome }}"
 
-          if [ "${{ steps.semgrep.outcome }}" != "success" ] || [ "${{ steps.sonar.outcome }}" != "success" ]; then
-            echo "❌ Falha de segurança detectada"
+          FAILED=0
+
+          if [ "$SEMGREP_FAILED" = "true" ]; then
+            echo "❌ Semgrep encontrou vulnerabilidades"
+            FAILED=1
+          fi
+
+          if [ "${{ steps.sonar.outcome }}" != "success" ]; then
+            echo "❌ SonarQube falhou"
+            FAILED=1
+          fi
+
+          if [ "$FAILED" = "1" ]; then
+            echo "❌ Falha de segurança detectada — pipeline bloqueada"
             exit 1
           fi
 
-          echo "✅ Pipeline seguro"
+          echo "✅ Semgrep e SonarQube sem vulnerabilidades"
