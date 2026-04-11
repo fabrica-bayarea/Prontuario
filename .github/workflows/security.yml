@@ -51,12 +51,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "🔍 Consultando alertas de code scanning..."
+          # github.ref em PRs retorna refs/pull/N/merge — a API precisa de refs/heads/<branch>
+          # github.head_ref tem o branch de origem do PR; github.ref_name funciona em pushes diretos
+          BRANCH_REF="refs/heads/${{ github.head_ref || github.ref_name }}"
+          echo "🔍 Consultando alertas de code scanning para o branch: $BRANCH_REF"
  
           ALERTS=$(curl -s \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/code-scanning/alerts?tool_name=CodeQL&state=open&severity=high,critical&per_page=100")
+            "https://api.github.com/repos/${{ github.repository }}/code-scanning/alerts?tool_name=CodeQL&state=open&ref=$BRANCH_REF&per_page=100")
  
           COUNT=$(echo "$ALERTS" | jq '[.[] | select(.rule.severity == "high" or .rule.severity == "critical")] | length')
  
@@ -69,7 +72,7 @@ jobs:
           fi
  
           echo "✅ Nenhuma vulnerabilidade High/Critical encontrada pelo CodeQL"
-
+          
   # =========================================
   # SAST + SONAR + SEMGREP
   # =========================================
