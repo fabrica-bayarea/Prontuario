@@ -63,6 +63,20 @@ jobs:
           SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
           jq '.runs[].tool.extensions[]?.rules[]? | {id, severity: .properties["security-severity"]}' "$SARIF_FILE" | head -50
 
+      - name: Debug results com severidade
+        run: |
+          SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
+          jq -r '
+            .runs[] as $run |
+            $run.results[] |
+            . as $result |
+            ($run.tool.extensions[]?.rules[]? |
+              select(.id == $result.ruleId) |
+              .properties["security-severity"] // "sem-score"
+            ) as $sev |
+            "\($sev) | \($result.ruleId)"
+          ' "$SARIF_FILE"
+
       - name: Checar severidade no SARIF do CodeQL
         run: |
           SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
