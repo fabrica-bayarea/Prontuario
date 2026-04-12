@@ -58,6 +58,11 @@ jobs:
           echo "--- Total de results ---"
           jq '[.runs[].results[]] | length' "$SARIF_FILE"
 
+      - name: Debug rules do SARIF
+        run: |
+          SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
+          jq '.runs[].tool.extensions[]?.rules[]? | {id, severity: .properties["security-severity"]}' "$SARIF_FILE" | head -50
+
       - name: Checar severidade no SARIF do CodeQL
         run: |
           SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
