@@ -48,34 +48,6 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           output: codeql-results
-        
-      - name: Debug SARIF do CodeQL
-        run: |
-          SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
-          echo "📄 Arquivo: $SARIF_FILE"
-          echo "--- Estrutura dos results ---"
-          jq '.runs[].results[0]' "$SARIF_FILE"
-          echo "--- Total de results ---"
-          jq '[.runs[].results[]] | length' "$SARIF_FILE"
-
-      - name: Debug rules do SARIF
-        run: |
-          SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
-          jq '.runs[].tool.extensions[]?.rules[]? | {id, severity: .properties["security-severity"]}' "$SARIF_FILE" | head -50
-
-      - name: Debug results com severidade
-        run: |
-          SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
-          jq -r '
-            .runs[] as $run |
-            $run.results[] |
-            . as $result |
-            ($run.tool.extensions[]?.rules[]? |
-              select(.id == $result.ruleId) |
-              .properties["security-severity"] // "sem-score"
-            ) as $sev |
-            "\($sev) | \($result.ruleId)"
-          ' "$SARIF_FILE"
 
       - name: Checar severidade no SARIF do CodeQL
         run: |
@@ -86,19 +58,30 @@ jobs:
             exit 1
           fi
 
-          COUNT=$(jq '[
-            .runs[].results[] |
-            select(
-              .properties["problem.severity"] == "error" or
-              (.rule.properties["security-severity"] // 0 | tonumber) >= 7.0
-            )
-          ] | length' "$SARIF_FILE")
+          COUNT=$(jq '
+            .runs[] as $run |
+            $run.results[] |
+            . as $result |
+            ($run.tool.extensions[]?.rules[]? |
+              select(.id == $result.ruleId) |
+              .properties["security-severity"] // 0 | tonumber
+            ) |
+            select(. >= 7.0)
+          ' "$SARIF_FILE" | jq -s 'length')
 
           echo "⚠️ Alertas High/Critical encontrados: $COUNT"
 
           if [ "$COUNT" -gt "0" ]; then
             echo "❌ CodeQL encontrou $COUNT vulnerabilidade(s) High/Critical"
-            jq -r '.runs[].results[].message.text' "$SARIF_FILE"
+            jq -r '
+              .runs[] as $run |
+              $run.results[] |
+              . as $result |
+              ($run.tool.extensions[]?.rules[]? |
+                select(.id == $result.ruleId)
+              ) as $rule |
+              "\($rule.properties["security-severity"]) | \($result.ruleId) | \($result.message.text)"
+            ' "$SARIF_FILE"
             exit 1
           fi
 
