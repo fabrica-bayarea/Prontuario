@@ -45,8 +45,8 @@ jobs:
  
       - name: Rodar CodeQL
         uses: github/codeql-action/analyze@v4
-          with:
-            output: codeql-results 
+        with:
+          output: codeql-results 
  
       - name: Checar alertas do CodeQL via API
         env:
