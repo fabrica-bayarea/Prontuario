@@ -49,6 +49,15 @@ jobs:
         with:
           output: codeql-results
         
+      - name: Debug SARIF do CodeQL
+        run: |
+          SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
+          echo "📄 Arquivo: $SARIF_FILE"
+          echo "--- Estrutura dos results ---"
+          jq '.runs[].results[0]' "$SARIF_FILE"
+          echo "--- Total de results ---"
+          jq '[.runs[].results[]] | length' "$SARIF_FILE"
+
       - name: Checar severidade no SARIF do CodeQL
         run: |
           SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
