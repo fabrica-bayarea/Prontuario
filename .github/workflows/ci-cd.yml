@@ -62,9 +62,9 @@ jobs:
       - run: npm ci
       - run: npx tsc --noEmit
 
-  # ─── DOCKER BUILD ───────────────────────────────────
+  # ─── DOCKER BUILD (PROD) ─────────────────────────────
   docker-build:
-    name: "Docker: Build & Push"
+    name: "Docker: Build & Push (prod)"
     needs: [frontend-ci, backend-ci]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -91,14 +91,15 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: ./backEnd
+          file: ./backEnd/Dockerfile.prod
           push: true
           tags: |
             ${{ steps.meta.outputs.tags }}
             ${{ steps.meta.outputs.image }}:latest
 
-  # ─── DEPLOY ─────────────────────────────────────────
+  # ─── DEPLOY (PROD) ─────────────────────────────────
   deploy:
-    name: "Deploy to EKS"
+    name: "Deploy to EKS (prod)"
     needs: docker-build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -113,7 +114,81 @@ jobs:
 
       - run: |
           aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
-          kubectl set image deployment/bayarea-prontuario \
-            bayarea-prontuario=${{ needs.docker-build.outputs.image_tag }} \
+          kubectl set image deployment/bayarea-prontuario-backend \
+            backend=${{ needs.docker-build.outputs.image_tag }} \
             -n bayarea-web
-          kubectl rollout status deployment/bayarea-prontuario -n bayarea-web --timeout=300s
+          kubectl set image deployment/bayarea-prontuario-frontend \
+            frontend=${{ steps.ecr-login.outputs.registry }}/bayarea-prontuario-frontend:${GITHUB_SHA::7} \
+            -n bayarea-web
+          kubectl rollout status deployment/bayarea-prontuario-backend -n bayarea-web --timeout=300s
+          kubectl rollout status deployment/bayarea-prontuario-frontend -n bayarea-web --timeout=300s
+
+  # ─── DOCKER BUILD (DEV) ─────────────────────────────
+  docker-build-dev:
+    name: "Docker: Build & Push (dev)"
+    needs: [frontend-ci, backend-ci]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    outputs:
+      backend_tag: ${{ steps.meta.outputs.backend_tag }}
+      frontend_tag: ${{ steps.meta.outputs.frontend_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.BAYAREA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - id: meta
+        run: |
+          REG=${{ steps.ecr-login.outputs.registry }}
+          TAG=${GITHUB_SHA::7}
+          echo "backend_tag=${REG}/bayarea-prontuario-backend:dev-${TAG}" >> "$GITHUB_OUTPUT"
+          echo "frontend_tag=${REG}/bayarea-prontuario-frontend:dev-${TAG}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./backEnd
+          file: ./backEnd/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.backend_tag }}
+            ${{ steps.ecr-login.outputs.registry }}/bayarea-prontuario-backend:dev
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./frontEnd
+          file: ./frontEnd/Dockerfile.prod
+          push: true
+          build-args: |
+            VITE_API_URL=/prontuario-dev/api
+          tags: |
+            ${{ steps.meta.outputs.frontend_tag }}
+            ${{ steps.ecr-login.outputs.registry }}/bayarea-prontuario-frontend:dev
+
+  # ─── DEPLOY (DEV) ──────────────────────────────────
+  deploy-dev:
+    name: "Deploy to EKS (dev)"
+    needs: docker-build-dev
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.BAYAREA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - run: |
+          aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+          kubectl set image deployment/bayarea-prontuario-backend-dev \
+            backend=${{ needs.docker-build-dev.outputs.backend_tag }} \
+            -n bayarea-web
+          kubectl set image deployment/bayarea-prontuario-frontend-dev \
+            frontend=${{ needs.docker-build-dev.outputs.frontend_tag }} \
+            -n bayarea-web
+          kubectl rollout status deployment/bayarea-prontuario-backend-dev -n bayarea-web --timeout=300s
+          kubectl rollout status deployment/bayarea-prontuario-frontend-dev -n bayarea-web --timeout=300s
