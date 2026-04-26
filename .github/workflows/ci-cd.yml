@@ -1,0 +1,119 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: "20"
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  ECR_REPOSITORY: bayarea-prontuario
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  # ─── FRONT-END ───────────────────────────────────────
+  frontend-ci:
+    name: "FrontEnd: Lint + Build"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontEnd
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontEnd/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          name: frontend-dist
+          path: frontEnd/dist
+          retention-days: 7
+
+  # ─── BACK-END ────────────────────────────────────────
+  backend-ci:
+    name: "BackEnd: TypeCheck"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backEnd
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backEnd/package-lock.json
+
+      - run: npm ci
+      - run: npx tsc --noEmit
+
+  # ─── DOCKER BUILD ───────────────────────────────────
+  docker-build:
+    name: "Docker: Build & Push"
+    needs: [frontend-ci, backend-ci]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.BAYAREA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - id: meta
+        run: |
+          IMAGE=${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}
+          TAG=${GITHUB_SHA::7}
+          echo "tags=${IMAGE}:${TAG}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./backEnd
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ steps.meta.outputs.image }}:latest
+
+  # ─── DEPLOY ─────────────────────────────────────────
+  deploy:
+    name: "Deploy to EKS"
+    needs: docker-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.BAYAREA_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - run: |
+          aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+          kubectl set image deployment/bayarea-prontuario \
+            bayarea-prontuario=${{ needs.docker-build.outputs.image_tag }} \
+            -n bayarea-web
+          kubectl rollout status deployment/bayarea-prontuario -n bayarea-web --timeout=300s
