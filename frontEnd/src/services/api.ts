@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // 1. Criamos uma instância do Axios com o endereço base do seu Backend
 const api = axios.create({
-  baseURL: 'http://localhost:3001/api', // Lembra do prefixo que definimos no app.ts?
+  baseURL: import.meta.env.VITE_API_URL || '/api',
 });
 
 // 2. Definimos as funções que o Frontend vai usar
