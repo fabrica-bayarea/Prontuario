@@ -97,6 +97,7 @@ jobs:
           push: true
           build-args: |
             VITE_API_URL=/prontuario-dev/api
+            VITE_BASE=/prontuario-dev/
           tags: |
             ${{ steps.meta.outputs.frontend_tag }}
             ${{ steps.ecr-login.outputs.registry }}/bayarea-prontuario-frontend:dev
