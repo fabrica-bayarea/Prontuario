@@ -77,11 +77,22 @@ const toSnake = (body: any) => {
     outroFonteRedeSocio: 'outro_fonte_rede_socio', servicoIESB: 'servico_iesb',
     antesIESB: 'antes_iesb', encaminhamentoMedico: 'encaminhamento_medico',
   };
+  const arrayCols = new Set([
+    'quais_beneficios', 'residem_sua_casa', 'residencia_doenca_cronica',
+    'quais_deficiencia', 'gastos_saude', 'gastos_alimentacao',
+    'tipos_financiamento', 'como_soube_iesb', 'servico_iesb', 'antes_iesb',
+  ]);
   const out: any = {};
   for (const [k, v] of Object.entries(body)) {
     if (k === '_id' || k === 'id') continue;
     const col = map[k] || k;
-    out[col] = Array.isArray(v) ? v : (typeof v === 'object' && v !== null ? JSON.stringify(v) : v);
+    if (arrayCols.has(col)) {
+      out[col] = Array.isArray(v) ? v : [];
+    } else if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+      out[col] = JSON.stringify(v);
+    } else {
+      out[col] = v;
+    }
   }
   return out;
 };
