@@ -69,7 +69,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
+      backend_tag: ${{ steps.meta.outputs.backend_tag }}
+      frontend_tag: ${{ steps.meta.outputs.frontend_tag }}
     steps:
       - uses: actions/checkout@v4
 
@@ -83,10 +84,10 @@ jobs:
 
       - id: meta
         run: |
-          IMAGE=${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}
+          REG=${{ steps.ecr-login.outputs.registry }}
           TAG=${GITHUB_SHA::7}
-          echo "tags=${IMAGE}:${TAG}" >> "$GITHUB_OUTPUT"
-          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "backend_tag=${REG}/bayarea-prontuario-backend:${TAG}" >> "$GITHUB_OUTPUT"
+          echo "frontend_tag=${REG}/bayarea-prontuario-frontend:${TAG}" >> "$GITHUB_OUTPUT"
 
       - uses: docker/build-push-action@v6
         with:
@@ -94,8 +95,17 @@ jobs:
           file: ./backEnd/Dockerfile.prod
           push: true
           tags: |
-            ${{ steps.meta.outputs.tags }}
-            ${{ steps.meta.outputs.image }}:latest
+            ${{ steps.meta.outputs.backend_tag }}
+            ${{ steps.ecr-login.outputs.registry }}/bayarea-prontuario-backend:latest
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./frontEnd
+          file: ./frontEnd/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.frontend_tag }}
+            ${{ steps.ecr-login.outputs.registry }}/bayarea-prontuario-frontend:latest
 
   # ─── DEPLOY (PROD) ─────────────────────────────────
   deploy:
@@ -115,10 +125,10 @@ jobs:
       - run: |
           aws eks update-kubeconfig --name ${{ vars.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
           kubectl set image deployment/bayarea-prontuario-backend \
-            backend=${{ needs.docker-build.outputs.image_tag }} \
+            backend=${{ needs.docker-build.outputs.backend_tag }} \
             -n bayarea-web
           kubectl set image deployment/bayarea-prontuario-frontend \
-            frontend=${{ steps.ecr-login.outputs.registry }}/bayarea-prontuario-frontend:${GITHUB_SHA::7} \
+            frontend=${{ needs.docker-build.outputs.frontend_tag }} \
             -n bayarea-web
           kubectl rollout status deployment/bayarea-prontuario-backend -n bayarea-web --timeout=300s
           kubectl rollout status deployment/bayarea-prontuario-frontend -n bayarea-web --timeout=300s
