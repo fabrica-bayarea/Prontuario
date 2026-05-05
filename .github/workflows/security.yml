@@ -4,18 +4,107 @@ on:
   push:
     branches: [ "main", "develop" ]
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: [ "main", "develop" ]
+  workflow_dispatch:
 
-permissions:
-  contents: read
-  security-events: write
+permissions: read-all
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+
+  # =========================================
+  # CODEQL (SAST AVANÇADO)
+  # =========================================
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+ 
+    permissions:
+      contents: read
+      security-events: write
+ 
+    timeout-minutes: 30
+ 
+    strategy:
+      matrix:
+        language: [ 'javascript' ]
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+ 
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+ 
+      - name: Rodar CodeQL
+        uses: github/codeql-action/analyze@v4
+        with:
+          output: codeql-results
+
+      - name: Checar severidade no SARIF do CodeQL
+        run: |
+          SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
+
+          if [ -z "$SARIF_FILE" ]; then
+            echo "⚠️ Nenhum arquivo SARIF encontrado"
+            exit 1
+          fi
+
+          COUNT=$(jq '
+            .runs[] as $run |
+            $run.results[] |
+            . as $result |
+            ($run.tool.extensions[]?.rules[]? |
+              select(.id == $result.ruleId) |
+              .properties["security-severity"] // 0 | tonumber
+            ) |
+            select(. >= 7.0)
+          ' "$SARIF_FILE" | jq -s 'length')
+
+          echo "⚠️ Alertas High/Critical encontrados: $COUNT"
+
+          if [ "$COUNT" -gt "0" ]; then
+            echo "❌ CodeQL encontrou $COUNT vulnerabilidade(s) High/Critical"
+            jq -r '
+              .runs[] as $run |
+              $run.results[] |
+              . as $result |
+              ($run.tool.extensions[]?.rules[]? |
+                select(.id == $result.ruleId)
+              ) as $rule |
+              "\($rule.properties["security-severity"]) | \($result.ruleId) | \($result.message.text)"
+            ' "$SARIF_FILE"
+            exit 1
+          fi
+
+          echo "✅ Nenhuma vulnerabilidade High/Critical encontrada"
+
+  # =========================================
+  # SAST + SONAR + SEMGREP
+  # =========================================
   security:
     name: SAST + SonarQube
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      security-events: write
+
+    timeout-minutes: 30
+
+    needs: codeql
+    if: always()
+
     steps:
+
       # ------------------------
       # CHECKOUT
       # ------------------------
@@ -31,6 +120,22 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Cache node_modules (backEnd)
+        uses: actions/cache@v4
+        with:
+          path: ./backEnd/node_modules
+          key: ${{ runner.os }}-back-${{ hashFiles('backEnd/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-back-
+
+      - name: Cache node_modules (frontEnd)
+        uses: actions/cache@v4
+        with:
+          path: ./frontEnd/node_modules
+          key: ${{ runner.os }}-front-${{ hashFiles('frontEnd/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-front-
+
       # ------------------------
       # INSTALAR DEPENDÊNCIAS
       # ------------------------
@@ -43,9 +148,8 @@ jobs:
         run: npm install
 
       # ------------------------
-      # TESTES (BACKEND)
+      # TESTES
       # ------------------------
-      # ⚠️ Temporário
       - name: Rodar testes (backEnd)
         working-directory: ./backEnd
         run: npm test || true
@@ -59,7 +163,23 @@ jobs:
       - name: Rodar Semgrep
         id: semgrep
         continue-on-error: true
-        run: semgrep scan --config=p/owasp-top-ten --error
+        run: semgrep scan --config=p/owasp-top-ten --sarif --output=semgrep.sarif --error
+
+      - name: Registrar resultado do Semgrep
+        if: always()
+        run: |
+          if [ "${{ steps.semgrep.outcome }}" = "failure" ]; then
+            echo "SEMGREP_FAILED=true" >> $GITHUB_ENV
+          else
+            echo "SEMGREP_FAILED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
 
       # ------------------------
       # SONARQUBE
@@ -67,9 +187,10 @@ jobs:
       - name: SonarQube Scan
         id: sonar
         continue-on-error: true
-        uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4
+        uses: SonarSource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
         with:
           args: >
             -Dsonar.projectKey=fabrica-bayarea_Prontuario
@@ -81,13 +202,26 @@ jobs:
       # SECURITY GATE (FINAL)
       # ------------------------
       - name: Security Gate
+        if: always()
         run: |
-          echo "Semgrep result: ${{ steps.semgrep.outcome }}"
+          echo "Semgrep falhou: $SEMGREP_FAILED"
           echo "Sonar result: ${{ steps.sonar.outcome }}"
 
-          if [ "${{ steps.semgrep.outcome }}" != "success" ] || [ "${{ steps.sonar.outcome }}" != "success" ]; then
-            echo "❌ Falha de segurança detectada"
+          FAILED=0
+
+          if [ "$SEMGREP_FAILED" = "true" ]; then
+            echo "❌ Semgrep encontrou vulnerabilidades"
+            FAILED=1
+          fi
+
+          if [ "${{ steps.sonar.outcome }}" != "success" ]; then
+            echo "❌ SonarQube falhou"
+            FAILED=1
+          fi
+
+          if [ "$FAILED" = "1" ]; then
+            echo "❌ Falha de segurança detectada — pipeline bloqueada"
             exit 1
           fi
 
-          echo "✅ Pipeline seguro"
+          echo "✅ Semgrep e SonarQube sem vulnerabilidades"
