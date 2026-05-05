@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 248189947068.dkr.ecr.us-east-1.amazonaws.com/bayarea-frontend:latest
+          image: 248189947068.dkr.ecr.us-east-1.amazonaws.com/bayarea-prontuario-frontend-prod:latest
           ports:
             - containerPort: 80
 ---
