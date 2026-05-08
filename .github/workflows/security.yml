@@ -273,10 +273,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
           allow_issue_writing: true
+          artifact_name: 'zap_report.html'
 
       - name: Report
         if: always() 
         uses: actions/upload-artifact@v4
         with:
           name: zap-full-scan-report
-          path: zap_report.html
+          path: '*.html' #procura qualquer html só pra ver se acha o arquivo de report
