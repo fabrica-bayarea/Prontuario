@@ -245,7 +245,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/' 
-          cmd_options: '-j'
+          cmd_options: '-j -z "-config spider.maxDepth=2"'
           fail_action: true 
 
       - name: Upload Report
@@ -272,7 +272,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
-          cmd_options: '-j'
+          cmd_options: '-j -z "-config spider.maxDepth=2"'
           allow_issue_writing: false
           artifact_name: 'zap_report.html'
 
