@@ -229,13 +229,13 @@ jobs:
 
           echo "✅ Semgrep e SonarQube sem vulnerabilidades"
 
-          # =========================================  
+  # =========================================  
   # DAST BASELINE (Roda rápido apenas em PRs)
   # =========================================  
   dast_baseline_scan:
     name: DAST ZAP Baseline Scan
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' # Garante que só roda nos PRs
+    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -244,8 +244,8 @@ jobs:
         uses: zaproxy/action-baseline@v0.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Usando o link dev. Se quiser localhost, precisa subir o app antes!
           target: 'https://bayarea.dataiesb.com/prontuario-dev/' 
+          cmd_options: '-j'
           fail_action: true 
 
       - name: Upload Report
@@ -272,7 +272,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
-          allow_issue_writing: true
+          cmd_options: '-j'
+          allow_issue_writing: false
           artifact_name: 'zap_report.html'
 
       - name: Report
