@@ -6,16 +6,6 @@
 # Como o ZAP varre a raiz automaticamente ao resolver o target, esses
 # achados são tecnicamente fora do escopo do projeto Prontuario.
 
-# Headers/cache que aparecem na raiz https://bayarea.dataiesb.com/
-10015	IGNORE	^https://bayarea\.dataiesb\.com/$
-10020	IGNORE	^https://bayarea\.dataiesb\.com/$
-10021	IGNORE	^https://bayarea\.dataiesb\.com/$
-10035	IGNORE	^https://bayarea\.dataiesb\.com/$
-10038	IGNORE	^https://bayarea\.dataiesb\.com/$
-10049	IGNORE	^https://bayarea\.dataiesb\.com/$
-10063	IGNORE	^https://bayarea\.dataiesb\.com/$
-90004	IGNORE	^https://bayarea\.dataiesb\.com/$
-
 # Falsos positivos comuns mantidos do arquivo anterior
 10027	IGNORE	(Information Disclosure - Suspicious Comments)
 10049	IGNORE	(Storable and Cacheable Content)
