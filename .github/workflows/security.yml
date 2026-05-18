@@ -402,7 +402,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-m 5 -a'
+          cmd_options: >-
+            -m 5
+            -a
+            -z "-config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev).*$'
+                -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo prontuario-dev'
+                -config globalexcludeurl.url_list.url\(0\).enabled=true"
           fail_action: true
           allow_issue_writing: false
 
@@ -444,7 +449,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
           rules_file_name: '.zap/rules.tsv'
-          cmd_options: '-m 10 -j -a'
+          cmd_options: >-
+            -m 10
+            -j
+            -a
+            -z "-config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev).*$'
+                -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo prontuario-dev'
+                -config globalexcludeurl.url_list.url\(0\).enabled=true"
           allow_issue_writing: false
           artifact_name: 'zap_full_report'
 
