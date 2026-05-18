@@ -20,3 +20,6 @@
 10027	IGNORE	(Information Disclosure - Suspicious Comments)
 10049	IGNORE	(Storable and Cacheable Content)
 10054	WARN	(Cookie without SameSite Attribute)
+
+# Modern Web Application — meramente informativo, não é vulnerabilidade
+10109	IGNORE	(Modern Web Application)
