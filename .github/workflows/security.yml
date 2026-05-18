@@ -378,7 +378,7 @@ jobs:
 
   # =========================================================
   # DAST BASELINE — roda em PR, sem AJAX (rápido)
-  # Escopo restrito a /prontuario-dev/ via .zap/prontuario.context
+  # Escopo restrito a /prontuario-dev/ via globalexcludeurl
   # =========================================================
   dast_baseline_scan:
     name: DAST ZAP Baseline Scan
@@ -399,7 +399,12 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
-          cmd_options: '-m 5 -n .zap/prontuario.context -c .zap/rules.tsv'
+          cmd_options: >-
+            -m 5
+            -c .zap/rules.tsv
+            -z "-config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev).*$'
+                -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo prontuario-dev'
+                -config globalexcludeurl.url_list.url\(0\).enabled=true"
           fail_action: true
           allow_issue_writing: false
 
@@ -414,9 +419,9 @@ jobs:
             report_json.json
           retention-days: 30
 
-  # =========================================================
+# =========================================================
   # DAST FULL SCAN — domingo, push na main, ou manual
-  # Escopo restrito via context + AJAX Spider pra cobrir SPA React
+  # Escopo restrito via globalexcludeurl + AJAX Spider pra cobrir SPA React
   # =========================================================
   dast_full_scan:
     name: DAST ZAP Full Scan
@@ -439,7 +444,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
-          cmd_options: '-m 5 -n .zap/prontuario.context -c .zap/rules.tsv -j'
+          cmd_options: >-
+            -m 5
+            -c .zap/rules.tsv
+            -j
+            -z "-config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev).*$'
+                -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo prontuario-dev'
+                -config globalexcludeurl.url_list.url\(0\).enabled=true"
           allow_issue_writing: false
           artifact_name: 'zap_full_report'
 
