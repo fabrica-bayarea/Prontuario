@@ -405,7 +405,8 @@ jobs:
           cmd_options: >-
             -m 5
             -a
-            -z "-config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev).*$'
+            -z "-config spider.handleParameters=IGNORE_VALUE
+                -config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev(?:/|$)).*$'
                 -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo prontuario-dev'
                 -config globalexcludeurl.url_list.url\(0\).enabled=true"
           fail_action: true
@@ -453,7 +454,8 @@ jobs:
             -m 10
             -j
             -a
-            -z "-config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev).*$'
+            -z "-config spider.handleParameters=IGNORE_VALUE
+                -config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev(?:/|$)).*$'
                 -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo prontuario-dev'
                 -config globalexcludeurl.url_list.url\(0\).enabled=true"
           allow_issue_writing: false

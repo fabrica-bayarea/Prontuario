@@ -29,6 +29,7 @@
 10038	IGNORE	(Content Security Policy CSP Header Not Set)
 10063	IGNORE	(Permissions Policy Header Not Set)
 90004	IGNORE	(Cross-Origin-Embedder-Policy Header Missing or Invalid)
+90005	IGNORE	(Sec-Fetch-Dest Header is Missing)
 10027	IGNORE	(Information Disclosure - Suspicious Comments)
 10109	IGNORE	(Modern Web Application)
 10116	IGNORE	(ZAP is Out of Date)
