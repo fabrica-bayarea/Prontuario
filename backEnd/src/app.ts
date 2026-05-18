@@ -3,7 +3,7 @@ import cors from 'cors';
 import 'dotenv/config';
 import prontuarioRoutes from './routes/prontuarioRoutes'; 
 
-
+//teste AWS
 class App {
   public app: express.Application;
 

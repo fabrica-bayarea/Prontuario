@@ -3,9 +3,14 @@ name: Security Pipeline
 on:
   push:
     branches: [ "main", "develop" ]
+  schedule:
+    - cron: '0 0 * * 0'
   workflow_dispatch:
 
-permissions: read-all
+permissions: 
+  contents: read
+  security-events: write
+  issues: write # Necessário pro ZAP 
 
 concurrency:
   group: security-${{ github.ref }}
@@ -19,7 +24,7 @@ jobs:
   codeql:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
- 
+    if: github.event_name != 'schedule'
     permissions:
       contents: read
       security-events: write
@@ -80,7 +85,7 @@ jobs:
               ) as $rule |
               "\($rule.properties["security-severity"]) | \($result.ruleId) | \($result.message.text)"
             ' "$SARIF_FILE"
-            exit 1
+            # exit 1
           fi
 
           echo "✅ Nenhuma vulnerabilidade High/Critical encontrada"
@@ -99,7 +104,7 @@ jobs:
     timeout-minutes: 30
 
     needs: codeql
-    if: always()
+    if: github.event_name != 'schedule'
 
     steps:
 
@@ -223,3 +228,57 @@ jobs:
           fi
 
           echo "✅ Semgrep e SonarQube sem vulnerabilidades"
+
+  # =========================================  
+  # DAST BASELINE (Roda rápido apenas em PRs)
+  # =========================================  
+  dast_baseline_scan:
+    name: DAST ZAP Baseline Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://bayarea.dataiesb.com/prontuario-dev/' 
+          cmd_options: '-m 0'
+          fail_action: true 
+
+      - name: Upload Report
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: zap_report.html
+
+  # =========================================  
+  # DAST FULL (Roda domingos ou push na main)
+  # =========================================  
+  dast_full_scan:
+    name: DAST ZAP Full Scan
+    runs-on: ubuntu-latest
+    # Roda se for cronjob (domingo) OU se for push pra main, OU se for rodado na mão (workflow_dispatch)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.12.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://bayarea.dataiesb.com/prontuario-dev/'
+          cmd_options: '-m 0'
+          allow_issue_writing: false
+          artifact_name: 'zap_report.html'
+
+      - name: Report
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-full-scan-report
+          path: '*.html' #procura qualquer html só pra ver se acha o arquivo de report

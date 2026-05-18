@@ -47,7 +47,10 @@ function Etapa3({formData,handleChange,handleSubmit,anteriorEtapa}){
                 name="temEncaminhamento" 
                 value="sim" 
                 checked={formData.temEncaminhamento === "sim"} 
-                onChange={handleChange} 
+                onChange={(e) => {
+                    handleChange(e);
+                    handleChange({ target: { name: 'encaminhamentoMedico', value: '' } }); 
+                }} 
             />
             <label htmlFor="encaminhadoSim" style={{ margin: 0, cursor: 'pointer' }}>Sim</label>
         </div>
@@ -61,7 +64,7 @@ function Etapa3({formData,handleChange,handleSubmit,anteriorEtapa}){
                 checked={formData.temEncaminhamento === "nao"} 
                 onChange={(e) => {
                     handleChange(e);
-                    handleChange({ target: { name: 'encaminhamentoMedico', value: '' } }); 
+                    handleChange({ target: { name: 'encaminhamentoMedico', value: 'nao' } }); 
                 }} 
             />
             <label htmlFor="encaminhadoNao" style={{ margin: 0, cursor: 'pointer' }}>Não</label>
