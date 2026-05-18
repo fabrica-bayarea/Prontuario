@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+    Context do ZAP para o ambiente de dev do Prontuario.
+
+    Escopo:
+      - Limita o spider e o scanner ao path /prontuario-dev/
+      - Aceita variações de case (Prontuario-Dev, prontuario-dev) e com/sem trailing slash
+      - Exclui qualquer URL fora desse path (outras apps no mesmo host)
+
+    Tech:
+      - MongoDB no back-end, JavaScript/TypeScript no front (React) e back (Express)
+      - Sinaliza ao ZAP quais regras fazem sentido aplicar
+-->
+<configuration>
+    <context>
+        <name>prontuario-dev</name>
+        <desc>Escopo limitado ao path /prontuario-dev/ do ambiente bayarea.dataiesb.com</desc>
+        <inscope>true</inscope>
+
+        <!-- Inclui tudo dentro de /prontuario-dev (case-insensitive, com ou sem trailing slash) -->
+        <incregexes>(?i)https://bayarea\.dataiesb\.com/prontuario-dev(/.*)?</incregexes>
+
+        <!-- Exclui qualquer outra coisa no mesmo host -->
+        <excregexes>https://bayarea\.dataiesb\.com/(?!prontuario-dev(/|$)).*</excregexes>
+
+        <!-- Exclui arquivos estáticos pesados que não agregam pro scan -->
+        <excregexes>(?i).*\.(png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)(\?.*)?$</excregexes>
+
+        <tech>
+            <include>Db.MongoDB</include>
+            <include>Language.JavaScript</include>
+            <include>OS.Linux</include>
+            <include>WS.Nginx</include>
+        </tech>
+
+        <urlparser>
+            <class>org.zaproxy.zap.model.StandardParameterParser</class>
+            <config>{"kvps":"&amp;","kvs":"=","struct":[]}</config>
+        </urlparser>
+
+        <postparser>
+            <class>org.zaproxy.zap.model.StandardParameterParser</class>
+            <config>{"kvps":"&amp;","kvs":"=","struct":[]}</config>
+        </postparser>
+    </context>
+</configuration>

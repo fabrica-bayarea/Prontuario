@@ -2,57 +2,75 @@ name: Security Pipeline
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
   schedule:
     - cron: '0 0 * * 0'
   workflow_dispatch:
 
-permissions: 
+permissions:
   contents: read
   security-events: write
-  issues: write # Necessário pro ZAP 
+  issues: write          # necessário pra ZAP criar issues
+  pull-requests: write   # necessário pra ZAP comentar em PR
 
 concurrency:
-  group: security-${{ github.ref }}
+  group: security-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
 
-  # =========================================
-  # CODEQL (SAST AVANÇADO)
-  # =========================================
+  # =========================================================
+  # CODEQL — JavaScript + TypeScript
+  # backEnd usa TS (Express), frontEnd usa JS (React)
+  # =========================================================
   codeql:
-    name: CodeQL Analysis
+    name: CodeQL Analysis (${{ matrix.language }})
     runs-on: ubuntu-latest
     if: github.event_name != 'schedule'
+
     permissions:
       contents: read
       security-events: write
- 
+
     timeout-minutes: 30
- 
+
     strategy:
+      fail-fast: false
       matrix:
-        language: [ 'javascript' ]
- 
+        language: ['javascript', 'typescript']
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
- 
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: |
+            backEnd/package-lock.json
+            frontEnd/package-lock.json
+
       - name: Inicializar CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
- 
+          queries: security-and-quality
+
       - name: Autobuild
         uses: github/codeql-action/autobuild@v4
- 
+
       - name: Rodar CodeQL
         uses: github/codeql-action/analyze@v4
         with:
+          category: "/language:${{ matrix.language }}"
           output: codeql-results
 
       - name: Checar severidade no SARIF do CodeQL
+        shell: bash
         run: |
           SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
 
@@ -62,40 +80,44 @@ jobs:
           fi
 
           COUNT=$(jq '
-            .runs[] as $run |
-            $run.results[] |
-            . as $result |
-            ($run.tool.extensions[]?.rules[]? |
+            [
+              .runs[].results[]? as $result |
+              (
+                .runs[].tool.driver.rules[]?,
+                .runs[].tool.extensions[]?.rules[]?
+              ) |
               select(.id == $result.ruleId) |
-              .properties["security-severity"] // 0 | tonumber
-            ) |
-            select(. >= 7.0)
-          ' "$SARIF_FILE" | jq -s 'length')
+              (.properties["security-severity"] // "0") |
+              tonumber |
+              select(. >= 7.0)
+            ] | length
+          ' "$SARIF_FILE")
 
           echo "⚠️ Alertas High/Critical encontrados: $COUNT"
 
-          if [ "$COUNT" -gt "0" ]; then
+          if [ "$COUNT" -gt 0 ]; then
             echo "❌ CodeQL encontrou $COUNT vulnerabilidade(s) High/Critical"
             jq -r '
-              .runs[] as $run |
-              $run.results[] |
-              . as $result |
-              ($run.tool.extensions[]?.rules[]? |
-                select(.id == $result.ruleId)
-              ) as $rule |
-              "\($rule.properties["security-severity"]) | \($result.ruleId) | \($result.message.text)"
+              .runs[].results[]? as $result |
+              (
+                .runs[].tool.driver.rules[]?,
+                .runs[].tool.extensions[]?.rules[]?
+              ) |
+              select(.id == $result.ruleId) |
+              "\(.properties["security-severity"] // "?") | \($result.ruleId) | \($result.message.text)"
             ' "$SARIF_FILE"
-            # exit 1
+            exit 1
           fi
 
           echo "✅ Nenhuma vulnerabilidade High/Critical encontrada"
 
-  # =========================================
-  # SAST + SONAR + SEMGREP
-  # =========================================
+  # =========================================================
+  # SECURITY ANALYSIS — SCA + SAST + Secrets + Sonar
+  # =========================================================
   security:
-    name: SAST + SonarQube
+    name: Security Analysis
     runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
 
     permissions:
       contents: read
@@ -103,94 +125,175 @@ jobs:
 
     timeout-minutes: 30
 
-    needs: codeql
-    if: github.event_name != 'schedule'
-
     steps:
 
-      # ------------------------
-      # CHECKOUT
-      # ------------------------
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ------------------------
-      # SETUP NODE
-      # ------------------------
+      # =====================================================
+      # SETUP
+      # =====================================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: |
+            backEnd/package-lock.json
+            frontEnd/package-lock.json
 
+      # =====================================================
+      # CACHE
+      # =====================================================
       - name: Cache node_modules (backEnd)
         uses: actions/cache@v4
         with:
           path: ./backEnd/node_modules
           key: ${{ runner.os }}-back-${{ hashFiles('backEnd/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-back-
+          restore-keys: ${{ runner.os }}-back-
 
       - name: Cache node_modules (frontEnd)
         uses: actions/cache@v4
         with:
           path: ./frontEnd/node_modules
           key: ${{ runner.os }}-front-${{ hashFiles('frontEnd/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-front-
+          restore-keys: ${{ runner.os }}-front-
 
-      # ------------------------
-      # INSTALAR DEPENDÊNCIAS
-      # ------------------------
+      # =====================================================
+      # INSTALL
+      # =====================================================
       - name: Instalar dependências (backEnd)
         working-directory: ./backEnd
-        run: npm install
+        run: npm ci
 
       - name: Instalar dependências (frontEnd)
         working-directory: ./frontEnd
-        run: npm install
+        run: npm ci
 
-      # ------------------------
-      # TESTES
-      # ------------------------
+      # =====================================================
+      # TESTS COM COVERAGE
+      # =====================================================
       - name: Rodar testes (backEnd)
+        continue-on-error: true
         working-directory: ./backEnd
-        run: npm test || true
+        run: npm test -- --coverage --passWithNoTests
 
-      # ------------------------
-      # SEMGREP (SAST)
-      # ------------------------
+      # =====================================================
+      # SCA — npm audit
+      # =====================================================
+      - name: npm audit (backEnd)
+        id: audit_back
+        continue-on-error: true
+        working-directory: ./backEnd
+        run: npm audit --audit-level=high
+
+      - name: npm audit (frontEnd)
+        id: audit_front
+        continue-on-error: true
+        working-directory: ./frontEnd
+        run: npm audit --audit-level=high
+
+      # =====================================================
+      # SCA — Trivy filesystem (cobre OS-level + libs)
+      # =====================================================
+      - name: Trivy filesystem scan
+        id: trivy_fs
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-fs.sarif
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          skip-dirs: node_modules,dist,coverage,build
+
+      - name: Upload Trivy SARIF
+        if: always() && hashFiles('trivy-fs.sarif') != ''
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-fs.sarif
+          category: trivy-fs
+
+      # =====================================================
+      # SEMGREP — OWASP + Express + Node + React + secrets
+      # Stack: Express + TS no back, React + JS no front, MongoDB
+      # =====================================================
       - name: Instalar Semgrep
         run: pip install semgrep
 
       - name: Rodar Semgrep
         id: semgrep
         continue-on-error: true
-        run: semgrep scan --config=p/owasp-top-ten --sarif --output=semgrep.sarif --error
-
-      - name: Registrar resultado do Semgrep
-        if: always()
         run: |
-          if [ "${{ steps.semgrep.outcome }}" = "failure" ]; then
-            echo "SEMGREP_FAILED=true" >> $GITHUB_ENV
-          else
-            echo "SEMGREP_FAILED=false" >> $GITHUB_ENV
-          fi
+          semgrep scan \
+            --config "p/owasp-top-ten" \
+            --config "p/typescript" \
+            --config "p/javascript" \
+            --config "p/nodejsscan" \
+            --config "p/expressjs" \
+            --config "p/react" \
+            --config "p/secrets" \
+            --sarif \
+            --output=semgrep.sarif \
+            --timeout=120 \
+            --exclude="**/node_modules/**" \
+            --exclude="**/dist/**" \
+            --exclude="**/build/**" \
+            --exclude="**/coverage/**" \
+            --error \
+            .
+          echo "semgrep_generated=$(test -f semgrep.sarif && echo true || echo false)" >> $GITHUB_OUTPUT
 
       - name: Upload Semgrep SARIF
+        if: always() && steps.semgrep.outputs.semgrep_generated == 'true'
+        continue-on-error: true
         uses: github/codeql-action/upload-sarif@v4
-        if: always()
         with:
           sarif_file: semgrep.sarif
           category: semgrep
 
-      # ------------------------
-      # SONARQUBE
-      # ------------------------
-      - name: SonarQube Scan
+      # =====================================================
+      # SECRET SCANNING — Gitleaks (action oficial)
+      # =====================================================
+      - name: Gitleaks Scan
+        id: gitleaks
+        continue-on-error: true
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # =====================================================
+      # SBOM — CycloneDX (backEnd + frontEnd)
+      # =====================================================
+      - name: Gerar SBOM
+        id: sbom
+        continue-on-error: true
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom.cdx.json
+
+      - name: Upload SBOM artifact
+        if: always() && hashFiles('sbom.cdx.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.cdx.json
+          retention-days: 30
+
+      # =====================================================
+      # SONARCLOUD
+      # =====================================================
+      - name: SonarCloud Scan
         id: sonar
         continue-on-error: true
-        uses: SonarSource/sonarqube-scan-action@v2
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
@@ -199,43 +302,85 @@ jobs:
             -Dsonar.projectKey=fabrica-bayarea_Prontuario
             -Dsonar.organization=fabrica-bayarea
             -Dsonar.sources=backEnd,frontEnd
-            -Dsonar.exclusions=**/node_modules/**,**/*.test.ts
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**,**/*.test.ts,**/*.test.tsx,**/*.test.js,**/*.spec.ts,**/*.d.ts
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.test.js,**/*.spec.ts
+            -Dsonar.coverage.exclusions=frontEnd/**,**/*.test.ts,**/*.test.tsx,**/*.test.js,**/*.spec.ts,**/*.d.ts
+            -Dsonar.javascript.lcov.reportPaths=backEnd/coverage/lcov.info
+            -Dsonar.qualitygate.wait=true
 
-      # ------------------------
-      # SECURITY GATE (FINAL)
-      # ------------------------
+      # =====================================================
+      # DEPENDENCY REVIEW — só em PRs
+      # =====================================================
+      - name: Dependency Review
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+      # =====================================================
+      # FINAL SECURITY GATE
+      # failure  → bloqueia (se "block"), warning (se "warn")
+      # skipped  → aviso, não bloqueia
+      # =====================================================
       - name: Security Gate
         if: always()
+        shell: bash
         run: |
-          echo "Semgrep falhou: $SEMGREP_FAILED"
-          echo "Sonar result: ${{ steps.sonar.outcome }}"
-
           FAILED=0
 
-          if [ "$SEMGREP_FAILED" = "true" ]; then
-            echo "❌ Semgrep encontrou vulnerabilidades"
-            FAILED=1
-          fi
+          check_step() {
+            local name=$1
+            local outcome=$2
+            local blocking=$3
 
-          if [ "${{ steps.sonar.outcome }}" != "success" ]; then
-            echo "❌ SonarQube falhou"
-            FAILED=1
-          fi
+            if [ "$outcome" = "failure" ]; then
+              if [ "$blocking" = "block" ]; then
+                echo "❌ $name failed (BLOCKING)"
+                FAILED=1
+              else
+                echo "⚠️  $name failed (warning only)"
+              fi
+            elif [ "$outcome" = "skipped" ]; then
+              echo "⚠️  $name was skipped"
+            else
+              echo "✅ $name: $outcome"
+            fi
+          }
 
-          if [ "$FAILED" = "1" ]; then
-            echo "❌ Falha de segurança detectada — pipeline bloqueada"
+          # Bloqueantes
+          check_step "Semgrep"       "${{ steps.semgrep.outcome }}"     "block"
+          check_step "SonarCloud"    "${{ steps.sonar.outcome }}"       "block"
+          check_step "Gitleaks"      "${{ steps.gitleaks.outcome }}"    "block"
+
+          # Não-bloqueantes (warnings)
+          check_step "Trivy FS"      "${{ steps.trivy_fs.outcome }}"    "warn"
+          check_step "npm audit BE"  "${{ steps.audit_back.outcome }}"  "warn"
+          check_step "npm audit FE"  "${{ steps.audit_front.outcome }}" "warn"
+          check_step "SBOM"          "${{ steps.sbom.outcome }}"        "warn"
+
+          echo ""
+          if [ "$FAILED" -eq 1 ]; then
+            echo "❌ Security pipeline FAILED — revise os achados acima"
             exit 1
           fi
 
-          echo "✅ Semgrep e SonarQube sem vulnerabilidades"
+          echo "✅ Security pipeline APPROVED"
 
-  # =========================================  
-  # DAST BASELINE (Roda rápido apenas em PRs)
-  # =========================================  
+  # =========================================================
+  # DAST BASELINE — roda em PR, sem AJAX (rápido)
+  # Escopo restrito a /prontuario-dev/ via .zap/prontuario.context
+  # =========================================================
   dast_baseline_scan:
     name: DAST ZAP Baseline Scan
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -244,25 +389,38 @@ jobs:
         uses: zaproxy/action-baseline@v0.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          target: 'https://bayarea.dataiesb.com/prontuario-dev/' 
-          cmd_options: '-m 0'
-          fail_action: true 
+          target: 'https://bayarea.dataiesb.com/prontuario-dev/'
+          cmd_options: '-m 5 -n .zap/prontuario.context -c .zap/rules.tsv'
+          fail_action: true
+          allow_issue_writing: false
 
-      - name: Upload Report
-        if: always() 
+      - name: Upload Baseline Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: zap-baseline-report
-          path: zap_report.html
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          retention-days: 30
 
-  # =========================================  
-  # DAST FULL (Roda domingos ou push na main)
-  # =========================================  
+  # =========================================================
+  # DAST FULL SCAN — domingo, push na main, ou manual
+  # Escopo restrito via context + AJAX Spider pra cobrir SPA React
+  # =========================================================
   dast_full_scan:
     name: DAST ZAP Full Scan
     runs-on: ubuntu-latest
-    # Roda se for cronjob (domingo) OU se for push pra main, OU se for rodado na mão (workflow_dispatch)
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+
+    permissions:
+      contents: read
+      issues: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -272,13 +430,17 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
-          cmd_options: '-m 0'
+          cmd_options: '-m 5 -n .zap/prontuario.context -c .zap/rules.tsv -j'
           allow_issue_writing: false
-          artifact_name: 'zap_report.html'
+          artifact_name: 'zap_full_report'
 
-      - name: Report
-        if: always() 
+      - name: Upload Full Scan Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: zap-full-scan-report
-          path: '*.html' #procura qualquer html só pra ver se acha o arquivo de report
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          retention-days: 30

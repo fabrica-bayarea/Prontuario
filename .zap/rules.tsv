@@ -1,0 +1,19 @@
+# ZAP Rules File — Prontuario
+#
+# Formato: <rule_id>\t<action>\t<comment>
+# Actions: IGNORE | WARN | FAIL
+#
+# Lista de regras: https://www.zaproxy.org/docs/alerts/
+# Comente (#) ou ajuste conforme a equipe ganhar maturidade nos achados.
+
+# Comentários suspeitos em código — gera muito ruído em apps com source maps
+10027	IGNORE	(Information Disclosure - Suspicious Comments)
+
+# Cache de conteúdo estático — falso positivo comum em SPAs
+10049	IGNORE	(Storable and Cacheable Content)
+
+# Cookie sem SameSite — válido, mas trate como warn enquanto o time corrige
+10054	WARN	(Cookie without SameSite Attribute)
+
+# X-Content-Type-Options ausente — warn enquanto config do Nginx é ajustada
+10021	WARN	(X-Content-Type-Options Header Missing)
