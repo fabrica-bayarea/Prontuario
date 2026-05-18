@@ -1,19 +1,22 @@
 # ZAP Rules File — Prontuario
-#
-# Formato: <rule_id>\t<action>\t<comment>
+# Formato: <rule_id>\t<action>\t<url_regex>
 # Actions: IGNORE | WARN | FAIL
 #
-# Lista de regras: https://www.zaproxy.org/docs/alerts/
-# Comente (#) ou ajuste conforme a equipe ganhar maturidade nos achados.
+# Regra geral: ignorar QUALQUER achado em URLs fora de /prontuario-dev/
+# Como o ZAP varre a raiz automaticamente ao resolver o target, esses
+# achados são tecnicamente fora do escopo do projeto Prontuario.
 
-# Comentários suspeitos em código — gera muito ruído em apps com source maps
+# Headers/cache que aparecem na raiz https://bayarea.dataiesb.com/
+10015	IGNORE	^https://bayarea\.dataiesb\.com/$
+10020	IGNORE	^https://bayarea\.dataiesb\.com/$
+10021	IGNORE	^https://bayarea\.dataiesb\.com/$
+10035	IGNORE	^https://bayarea\.dataiesb\.com/$
+10038	IGNORE	^https://bayarea\.dataiesb\.com/$
+10049	IGNORE	^https://bayarea\.dataiesb\.com/$
+10063	IGNORE	^https://bayarea\.dataiesb\.com/$
+90004	IGNORE	^https://bayarea\.dataiesb\.com/$
+
+# Falsos positivos comuns mantidos do arquivo anterior
 10027	IGNORE	(Information Disclosure - Suspicious Comments)
-
-# Cache de conteúdo estático — falso positivo comum em SPAs
 10049	IGNORE	(Storable and Cacheable Content)
-
-# Cookie sem SameSite — válido, mas trate como warn enquanto o time corrige
 10054	WARN	(Cookie without SameSite Attribute)
-
-# X-Content-Type-Options ausente — warn enquanto config do Nginx é ajustada
-10021	WARN	(X-Content-Type-Options Header Missing)
