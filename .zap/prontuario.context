@@ -4,12 +4,10 @@
 
     Escopo:
       - Limita o spider e o scanner ao path /prontuario-dev/
-      - Aceita variações de case (Prontuario-Dev, prontuario-dev) e com/sem trailing slash
-      - Exclui qualquer URL fora desse path (outras apps no mesmo host)
-
-    Tech:
-      - MongoDB no back-end, JavaScript/TypeScript no front (React) e back (Express)
-      - Sinaliza ao ZAP quais regras fazem sentido aplicar
+      - Aceita variações de case e com/sem trailing slash
+      - Como inscope=true e só temos incregexes, qualquer URL fora
+        do path automaticamente NÃO entra no escopo (não precisa
+        de excregexes explícito, que estava causando URL_NOT_IN_CONTEXT)
 -->
 <configuration>
     <context>
@@ -17,14 +15,8 @@
         <desc>Escopo limitado ao path /prontuario-dev/ do ambiente bayarea.dataiesb.com</desc>
         <inscope>true</inscope>
 
-        <!-- Inclui tudo dentro de /prontuario-dev (case-insensitive, com ou sem trailing slash) -->
-        <incregexes>(?i)https://bayarea\.dataiesb\.com/prontuario-dev(/.*)?</incregexes>
-
-        <!-- Exclui qualquer outra coisa no mesmo host -->
-        <excregexes>https://bayarea\.dataiesb\.com/(?!prontuario-dev(/|$)).*</excregexes>
-
-        <!-- Exclui arquivos estáticos pesados que não agregam pro scan -->
-        <excregexes>(?i).*\.(png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)(\?.*)?$</excregexes>
+        <!-- Inclui tudo dentro de /prontuario-dev (com ou sem trailing slash, qualquer path filho) -->
+        <incregexes>https?://bayarea\.dataiesb\.com/[Pp]rontuario-[Dd]ev.*</incregexes>
 
         <tech>
             <include>Db.MongoDB</include>
