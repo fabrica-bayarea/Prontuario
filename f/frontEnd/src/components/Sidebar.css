@@ -1,0 +1,139 @@
+.sidebar {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 256px;
+  height: 100vh;
+  background: #FFFFFF;
+  border-right: 1px solid #E5E7EB;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transition: width 0.3s ease;
+  font-family: sans-serif;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 24px 20px;
+  gap: 12px;
+  border-bottom: 1px solid transparent;
+}
+
+.sidebar-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #432DD7;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  background-color: #eff6ff;
+  border-radius: 8px;
+}
+
+/* Navegação */
+.sidebar-nav {
+  flex: 1; /* Faz a navegação empurrar o footer para baixo */
+  padding: 16px 12px;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-nav span {
+  color: #4A5565;
+}
+
+.sidebar-nav li {
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6B7280;
+  transition: all 0.2s;
+}
+
+.sidebar-nav li a{
+  display: flex;
+  width: 100%;
+}
+
+.sidebar-nav li:hover {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+/* Item Ativo (Atendimento na sua imagem) */
+.sidebar-nav li.active {
+  background-color: #F3F4F6;
+  color: #111827;
+  font-weight: 500;
+}
+
+.nav-item-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-item-content span {
+  white-space: nowrap;
+}
+
+/* Centraliza os ícones quando a barra está encolhida */
+.sidebar.collapsed .sidebar-nav li {
+  justify-content: center;
+}
+
+.sidebar.collapsed .nav-item-content {
+  justify-content: center;
+}
+
+/* Rodapé (Botão Collapse) */
+.sidebar-footer {
+  padding: 16px 12px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.collapse-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6B7280;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.collapse-btn:hover {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+.sidebar.collapsed .collapse-btn {
+  justify-content: center;
+}
