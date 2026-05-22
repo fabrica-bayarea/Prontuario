@@ -1,6 +1,7 @@
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import Questionario from './features/questionario/components/Questionario';
+import Pacientes from './features/pacientes/components/Pacientes';
 import Sidebar from './components/Sidebar';
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
           <Route path="/" element={<h1 style={{ color: 'black' }}>Painel Inicial</h1>} />
           <Route
             path="/pacientes"
-            element={<h1 style={{ color: 'black' }}>Lista de Pacientes</h1>}
+            element={<Pacientes />}
           />
           <Route path="/triagem" element={<h1 style={{ color: 'black' }}>Triagem</h1>} />
           <Route
