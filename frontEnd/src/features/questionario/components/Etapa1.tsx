@@ -80,7 +80,6 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
             id="nome"
             {...register('nome')}
             placeholder="Digite seu nome completo"
-            style={{ backgroundColor: '#e9ecef' }}
           />
           {errors.nome && (
             <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.nome.message}</span>
@@ -96,7 +95,6 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
             id="email"
             {...register('email')}
             placeholder="seu@email.com"
-            style={{ backgroundColor: '#e9ecef' }}
           />
           {errors.email && (
             <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.email.message}</span>
@@ -105,7 +103,7 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
       </div>
 
       <div className="flex-row w-full">
-        <div className="input-group w-full">
+        <div className="input-group w-cpf">
           <label htmlFor="cpf">
             CPF<span className="required">*</span>
           </label>
@@ -131,14 +129,13 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
             id="dataNascimento"
             className="form-control"
             {...register('dataNascimento')}
-            style={{ backgroundColor: '#e9ecef' }}
           />
           {errors.dataNascimento && (
             <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.dataNascimento.message}</span>
           )}
         </div>
 
-        <div className="input-group w-half">
+        <div className="input-group w-custom">
           <label htmlFor="idade">
             Idade<span className="required">*</span>
           </label>
@@ -148,7 +145,6 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
             className="form-control"
             {...register('idade')}
             readOnly
-            style={{ backgroundColor: '#e9ecef' }}
           />
           {errors.idade && (
             <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.idade.message}</span>
@@ -157,6 +153,7 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
       </div>
 
       <div className="flex-row w-full">
+
         <div className="input-group">
           <label htmlFor="cep">
             CEP<span className="required">*</span>
@@ -177,8 +174,8 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
             <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.cep.message}</span>
           )}
         </div>
-
-        <div className="input-group">
+        
+        <div className="input-group estado">
           <label htmlFor="estado">
             Estado<span className="required">*</span>
           </label>
@@ -188,7 +185,6 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
             className="form-control"
             {...register('estado')}
             readOnly
-            style={{ backgroundColor: '#e9ecef' }}
           />
           {errors.estado && (
             <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.estado.message}</span>
@@ -203,7 +199,6 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
             className="form-control"
             {...register('logradouro')}
             readOnly
-            style={{ backgroundColor: '#e9ecef' }}
           />
         </div>
       </div>
@@ -217,7 +212,6 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
             className="form-control"
             {...register('bairro')}
             readOnly
-            style={{ backgroundColor: '#e9ecef' }}
           />
         </div>
 
@@ -231,7 +225,6 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
             className="form-control"
             {...register('cidade')}
             readOnly
-            style={{ backgroundColor: '#e9ecef' }}
           />
           {errors.cidade && (
             <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.cidade.message}</span>
@@ -381,43 +374,46 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
         </fieldset>
       </div>
 
-      <div className="input-group w-half">
-        <label htmlFor="telefone">
-          Telefone<span className="required">*</span>
-        </label>
-        <IMaskInput
-          className="form-control"
-          mask={[{ mask: '(00) 0000-00000' }, { mask: '(00) 00000-0000' }]}
-          dispatch={(appended, dynamicMasked) => {
-            if (!dynamicMasked || !dynamicMasked.compiledMasks)
-              return dynamicMasked.compiledMasks[0];
-            const unmaskedValue = dynamicMasked.unmaskedValue;
-            if (unmaskedValue.length <= 10) return dynamicMasked.compiledMasks[0];
-            return dynamicMasked.compiledMasks[1];
-          }}
-          id="telefone"
-          value={telefone || ''}
-          placeholder="(00) 00000-0000"
-          onAccept={(value: string) => setValue('telefone', value, { shouldValidate: true })}
-        />
-        <input type="hidden" {...register('telefone')} />
-        <small>Informe o tipo: residencial / celular / recado</small>
-        {errors.telefone && (
-          <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.telefone.message}</span>
-        )}
-      </div>
+      <div className='flex-row w-full'>
+        <div className="input-group w-half">
+          <label htmlFor="telefone">
+            Telefone<span className="required">*</span>
+          </label>
+          <IMaskInput
+            className="form-control"
+            mask={[{ mask: '(00) 0000-00000' }, { mask: '(00) 00000-0000' }]}
+            dispatch={(appended, dynamicMasked) => {
+              if (!dynamicMasked || !dynamicMasked.compiledMasks)
+                return dynamicMasked.compiledMasks[0];
+              const unmaskedValue = dynamicMasked.unmaskedValue;
+              if (unmaskedValue.length <= 10) return dynamicMasked.compiledMasks[0];
+              return dynamicMasked.compiledMasks[1];
+            }}
+            id="telefone"
+            value={telefone || ''}
+            placeholder="(00) 00000-0000"
+            onAccept={(value: string) => setValue('telefone', value, { shouldValidate: true })}
+          />
+          <input type="hidden" {...register('telefone')} />
+          <small>Informe o tipo: residencial / celular / recado</small>
+          {errors.telefone && (
+            <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.telefone.message}</span>
+          )}
+        </div>
 
-      <div className="input-group w-full">
-        <label>Faz faculdade particular?</label>
-        <div className="flex-row" style={{ gap: '20px' }}>
-          <label className="radio-option">
-            <input type="radio" value="sim" {...register('faculdadeParticular')} />
-            Sim
-          </label>
-          <label className="radio-option">
-            <input type="radio" value="não" {...register('faculdadeParticular')} />
-            Não
-          </label>
+        <div className="input-group w-FFP">
+          {/*FFP = faz faculdade particular*/}
+          <label>Faz faculdade particular?</label>
+          <div className="flex-row FFP" style={{ gap: '20px' }}>
+            <label className="radio-option">
+              <input type="radio" value="sim" {...register('faculdadeParticular')} />
+              Sim
+            </label>
+            <label className="radio-option">
+              <input type="radio" value="não" {...register('faculdadeParticular')} />
+              Não
+            </label>
+          </div>
         </div>
       </div>
 

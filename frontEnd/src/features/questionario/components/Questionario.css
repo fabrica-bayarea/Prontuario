@@ -22,7 +22,6 @@
 /* --- Cabeçalho e Título --- */
 .formulario-header {
   text-align: left;
-  margin-bottom: 2rem;
 }
 
 .formulario-header h1 {
@@ -83,19 +82,17 @@
 }
 
 .form-control {
-  display: flex;
-  flex-direction: column;
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
   color: #444;
-  background-color: #f0f0f0;
+  background-color: #F9FAFB;
   padding: 10px 12px;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 14px;
   font-size: 1rem;
   transition: border-color 0.2s;
   width: 100%;
   box-sizing: border-box;
+  height: 50px;
 }
 
 input[type='text'],
@@ -104,14 +101,23 @@ input[type='number'],
 input[type='date'],
 input[type='cpf'],
 select {
-  background-color: #f0f0f0;
+  background-color: #F9FAFB;
   padding: 10px 12px;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 14px;
   font-size: 1rem;
   transition: border-color 0.2s;
   width: 100%;
   box-sizing: border-box;
+  height: 50px;
+}
+
+input[type='number']{
+  width: 50px;
+}
+
+.estado{
+  width: 50px;
 }
 
 input:focus,
@@ -127,7 +133,7 @@ fieldset {
   border-radius: 8px;
   padding: 1rem;
   margin: 0;
-  background-color: #fafafa;
+  background-color: #F9FAFB;
 }
 
 legend {
@@ -197,7 +203,7 @@ button[type='submit'] {
 
 button[type='button']:last-child:hover,
 button[type='submit']:hover {
-  background-color: #a30000;
+  background-color: #009b39;
 }
 
 .layout-geral {
@@ -215,6 +221,7 @@ button[type='submit']:hover {
 .flex-row {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   gap: 1.5rem;
   width: 100%;
 }
@@ -224,6 +231,21 @@ button[type='submit']:hover {
   width: 100%;
 }
 
+.w-cpf{
+  width: 50%;
+}
+
 .w-half {
   flex: 1 1 calc(50% - 0.75rem);
+}
+
+.w-FFP{
+  width: 180px;
+  display: flex;
+}
+
+.FFP{
+  margin-top: 13px;
+  display: flex;
+  justify-content: center;
 }

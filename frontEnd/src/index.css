@@ -5,7 +5,7 @@
 
   color-scheme: light;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #F9FAFB;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,7 +23,6 @@ a:hover {
 }
 
 body {
-  background-color: #f8fafc;
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
