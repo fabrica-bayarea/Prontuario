@@ -21,39 +21,42 @@ function Sidebar() {
       <nav className="sidebar-nav">
         <ul>
           <li>
-              <NavLink to="/" className={({ isActive }) => isActive ? "active-link" : ""}>
-                <img src={painelIcon} alt="painel" className="nav-icon" />
-                <span>Painel</span>
-              </NavLink>
-          </li>
-          
-          <li>
-              <NavLink to="/pacientes" className={({ isActive }) => isActive ? "active-link" : ""}>
-                <img src={pacientesIcon} alt="pacientes" className="nav-icon" />
-                <span>Pacientes</span>
-              </NavLink>
+            <NavLink to="/" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+              <img src={painelIcon} alt="painel" className="nav-icon" />
+              <span className="texto">Painel</span>
+            </NavLink>
           </li>
 
           <li>
-              <NavLink to="/triagem" className={({ isActive }) => isActive ? "active-link" : ""}>
-                <img src={triagemIcon} alt="triagem" className="nav-icon" />
-                <span>Triagem</span>
-              </NavLink>
+            <NavLink to="/pacientes" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+              <img src={pacientesIcon} alt="pacientes" className="nav-icon" />
+              <span className="texto">Pacientes</span>
+            </NavLink>
           </li>
 
           <li>
-              <NavLink to="/validacao" className={({ isActive }) => isActive ? "active-link" : ""}>
-                <img src={validacaoIcon} alt="validação" className="nav-icon" />
-                <span>Validação (Professores)</span>
-              </NavLink>
+            <NavLink to="/triagem" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+              <img src={triagemIcon} alt="triagem" className="nav-icon" />
+              <span className="texto">Triagem</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink to="/validacao" className={({ isActive }) => (isActive ? 'active-link' : '')}>
+              <img src={validacaoIcon} alt="validação" className="nav-icon" />
+              <span className="texto">Validação (Professores)</span>
+            </NavLink>
           </li>
         </ul>
       </nav>
 
       <div className="sidebar-footer">
-        <NavLink to="/sair"   className={({ isActive }) => `collapse-btn ${isActive ? "active-link" : ""}`}>
+        <NavLink
+          to="/novoAcolhimento"
+          className={({ isActive }) => `collapse-btn ${isActive ? 'active-link' : ''}`}
+        >
           <img src={sairIcon} alt="sair" className="nav-icon" />
-          <span>Sair</span>
+          <span className="texto">Sair</span>
         </NavLink>
       </div>
     </aside>

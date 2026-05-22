@@ -1,114 +1,66 @@
- /* frontEnd/src/Formulario.css */
-
 /* --- Container Principal --- */
-.formulario-container {
-  margin: 2rem auto;
+.main-form {
   background-color: #ffffff;
   padding: 2.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
   text-align: left;
+  width: 65%;
+}
+
+.conteudo-principal {
+  display: flex;
+  padding: 5% 10%;
+  justify-content: space-between;
+}
+
+.etapa1-form {
+  display: flex;
 }
 
 /* --- Cabeçalho e Título --- */
 .formulario-header {
-  text-align: center;
+  text-align: left;
   margin-bottom: 2rem;
 }
 
 .formulario-header h1 {
-  font-size: 1.8rem;
-  color: #cc0000; /* Vermelho IESB aproximado */
+  font-size: 24px;
+  font-weight: 400;
+  color: #101828;
   margin: 0;
-  font-weight: 700;
-  text-transform: uppercase;
 }
-
-.formulario-header p {
-  color: #666;
-  font-size: 1rem;
-}
-
-/* --- Stepper (Passos 1-2-3) --- */
-.stepper {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 3rem;
-  position: relative;
-}
-
-.stepper::before {
-  content: '';
-  position: absolute;
-  top: 15px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #e0e0e0;
-  z-index: 0;
-}
-
-.step {
-  position: relative;
-  z-index: 1;
-  background: #fff;
-  padding: 0 10px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-}
-
-.step-circle {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  background-color: #e0e0e0;
-  color: #666;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin-bottom: 8px;
-  transition: all 0.3s ease;
-}
-
-.step.active .step-circle {
-  background-color: #cc0000;
-  color: #fff;
-}
-
-.step-label {
-  font-size: 0.85rem;
-  color: #999;
-  font-weight: 500;
-}
-
-.step.active .step-label {
-  color: #cc0000;
-  font-weight: 700;
-}
-
 /* --- Grid do Formulário --- */
 .form-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
 
 /* Classes utilitárias para largura dos campos */
-.col-12 { grid-column: span 12; }
-.col-8  { grid-column: span 8; }
-.col-6  { grid-column: span 6; }
-.col-4  { grid-column: span 4; }
-.col-3  { grid-column: span 3; }
+.col-12 {
+  grid-column: span 12;
+}
+.col-8 {
+  grid-column: span 8;
+}
+.col-6 {
+  grid-column: span 6;
+}
+.col-4 {
+  grid-column: span 4;
+}
+.col-3 {
+  grid-column: span 3;
+}
 
 /* Responsividade: em telas pequenas, tudo vira coluna única */
 @media (max-width: 768px) {
-  .col-8, .col-6, .col-4, .col-3 {
+  .col-8,
+  .col-6,
+  .col-4,
+  .col-3 {
     grid-column: span 12;
   }
 }
@@ -121,7 +73,6 @@
 
 .input-group label {
   font-size: 0.9rem;
-  font-weight: 600;
   margin-bottom: 0.5rem;
   color: #444;
 }
@@ -131,10 +82,27 @@
   margin-left: 4px;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="number"],
-input[type="date"],
+.form-control {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #444;
+  background-color: #f0f0f0;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='number'],
+input[type='date'],
+input[type='cpf'],
 select {
   background-color: #f0f0f0;
   padding: 10px 12px;
@@ -143,10 +111,11 @@ select {
   font-size: 1rem;
   transition: border-color 0.2s;
   width: 100%;
-  box-sizing: border-box; /* Garante que padding não estoure a largura */
+  box-sizing: border-box;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   border-color: #cc0000;
   outline: none;
   box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
@@ -163,19 +132,20 @@ fieldset {
 
 legend {
   font-size: 0.9rem;
-  font-weight: 700;
   color: #444444;
   padding: 0 5px;
 }
 
 /* Radio e Checkbox */
-.radio-group, .checkbox-group {
+.radio-group,
+.checkbox-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.radio-option, .checkbox-option {
+.radio-option,
+.checkbox-option {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -183,7 +153,8 @@ legend {
   cursor: pointer;
 }
 
-input[type="radio"], input[type="checkbox"] {
+input[type='radio'],
+input[type='checkbox'] {
   accent-color: #cc0000;
   width: 18px;
   height: 18px;
@@ -202,29 +173,30 @@ input[type="radio"], input[type="checkbox"] {
 button {
   padding: 10px 24px;
   font-size: 1rem;
-  font-weight: 600;
   border: none;
-  border-radius: 6px;
+  border-radius: 14px;
   cursor: pointer;
   transition: background 0.2s;
 }
 
-button[type="button"]:first-child {
+button[type='button']:first-child {
   background-color: #e0e0e0;
   color: #333;
 }
 
-button[type="button"]:first-child:hover {
+button[type='button']:first-child:hover {
   background-color: #d0d0d0;
 }
 
-button[type="button"]:last-child, button[type="submit"] {
-  background-color: #cc0000;
+button[type='button']:last-child,
+button[type='submit'] {
+  background-color: #00a63e;
   color: white;
-  margin-left: auto; /* Empurra para a direita se estiver sozinho */
+  margin-left: auto;
 }
 
-button[type="button"]:last-child:hover, button[type="submit"]:hover {
+button[type='button']:last-child:hover,
+button[type='submit']:hover {
   background-color: #a30000;
 }
 
@@ -233,10 +205,25 @@ button[type="button"]:last-child:hover, button[type="submit"]:hover {
   min-height: 100vh;
 }
 
-.conteudo-principal {
-  /* A margem esquerda deve ser igual à largura da Sidebar (250px) */
-  margin-left: 250px; 
-  flex: 1;
-  width: calc(100% - 250px);
-  padding: 20px;
+.flex-col-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.w-full {
+  flex: 1 1 100%;
+  width: 100%;
+}
+
+.w-half {
+  flex: 1 1 calc(50% - 0.75rem);
 }

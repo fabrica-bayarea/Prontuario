@@ -5,14 +5,49 @@ import { questionarioSchema, FormularioData } from '../schema';
 import Etapa1 from './Etapa1';
 import Etapa2 from './Etapa2';
 import Etapa3 from './Etapa3';
-import { useCriarProntuario } from '../api/api'; 
+import { useCriarProntuario } from '../api/api';
+import Header from './Header';
 import './Questionario.css';
 import Stepper from './Stepper';
 
 const camposPorEtapa: Record<number, any> = {
-  1: ['nome', 'email', 'cpf', 'dataNascimento', 'idade', 'cep', 'estadoCivil', 'genero', 'corRaca', 'clinicaAtendimento', 'areaAtendimento', 'classAtendimento', 'estado', 'cidade', 'telefone', 'atendimentoParaQuem', 'acompanhamentoOutroLugar'],
-  2: ['pessoasPorCasa', 'suaCasaE', 'rendaFamiliar', 'origemRenda', 'suaCasaEstuda', 'residemSuaCasa', 'residenciaDoencaCronica', 'residenciaDeficiencia'],
-  3: ['servicoIESB', 'antesIESB', 'encaminhamentoMedico']
+  1: [
+    /*
+    'nome',
+    'email',
+    'cpf',
+    'dataNascimento',
+    'idade',
+    'cep',
+    'estadoCivil',
+    'genero',
+    'corRaca',
+    'clinicaAtendimento',
+    'areaAtendimento',
+    'classAtendimento',
+    'estado',
+    'cidade',
+    'telefone',
+    'atendimentoParaQuem',
+    'acompanhamentoOutroLugar',*/
+  ],
+  2: [
+    /*
+    'pessoasPorCasa',
+    'suaCasaE',
+    'rendaFamiliar',
+    'origemRenda',
+    'suaCasaEstuda',
+    'residemSuaCasa',
+    'residenciaDoencaCronica',
+    'residenciaDeficiencia',*/
+  ],
+  3: [
+    /*
+    'servicoIESB', 
+    'antesIESB', 
+    'encaminhamentoMedico'*/
+  ],
 };
 
 function Questionario() {
@@ -20,16 +55,16 @@ function Questionario() {
 
   const { mutateAsync: criarProntuario, isPending } = useCriarProntuario();
 
-  const { 
-    register, 
-    handleSubmit, 
-    trigger, 
-    formState: { errors }, 
-    watch, 
-    setValue 
+  const {
+    register,
+    handleSubmit,
+    trigger,
+    formState: { errors },
+    watch,
+    setValue,
   } = useForm<FormularioData>({
     resolver: zodResolver(questionarioSchema),
-    mode: "onChange"
+    mode: 'onChange',
   });
 
   const proximaEtapa = async () => {
@@ -49,57 +84,59 @@ function Questionario() {
 
   const onSubmit = async (data: FormularioData) => {
     try {
-      console.log("A enviar dados...", data);
+      console.log('A enviar dados...', data);
       const resposta = await criarProntuario(data);
-      console.log("✅ Sucesso!", resposta);
+      console.log('✅ Sucesso!', resposta);
       alert(`Formulário salvo com sucesso! ID: ${resposta._id}`);
     } catch (error) {
-      console.error("❌ Erro ao enviar:", error);
-      alert("Houve um erro ao salvar os dados.");
+      console.error('❌ Erro ao enviar:', error);
+      alert('Houve um erro ao salvar os dados.');
     }
   };
 
   return (
     <div className="layout-geral">
-      <div className="formulario-container conteudo-principal">
-        <div className="formulario-header">
-          <h1>Prontuário BayArea</h1>
-          <p>Formulário de Prontuário</p>
+      <div style={{ flex: 1 }}>
+        <Header />
+        <div className="conteudo-principal">
+          <div className="stepper">
+            <Stepper etapaAtual={etapaAtual} />
+          </div>
+
+          <div className="main-form">
+            <form onSubmit={handleSubmit(onSubmit)} id="questionario-form">
+              {etapaAtual === 1 && (
+                <Etapa1
+                  register={register}
+                  errors={errors}
+                  watch={watch}
+                  setValue={setValue}
+                  proximaEtapa={proximaEtapa}
+                />
+              )}
+              {etapaAtual === 2 && (
+                <Etapa2
+                  register={register}
+                  errors={errors}
+                  watch={watch}
+                  setValue={setValue}
+                  proximaEtapa={proximaEtapa}
+                  anteriorEtapa={anteriorEtapa}
+                />
+              )}
+              {etapaAtual === 3 && (
+                <Etapa3
+                  register={register}
+                  errors={errors}
+                  watch={watch}
+                  setValue={setValue}
+                  anteriorEtapa={anteriorEtapa}
+                  isPending={isPending}
+                />
+              )}
+            </form>
+          </div>
         </div>
-
-        <Stepper etapaAtual={etapaAtual} />
-
-        <form onSubmit={handleSubmit(onSubmit)} id="questionario-form">
-          {etapaAtual === 1 && (
-            <Etapa1 
-              register={register} 
-              errors={errors} 
-              watch={watch} 
-              setValue={setValue} 
-              proximaEtapa={proximaEtapa} 
-            />
-          )}
-          {etapaAtual === 2 && (
-            <Etapa2 
-              register={register} 
-              errors={errors} 
-              watch={watch} 
-              setValue={setValue} 
-              proximaEtapa={proximaEtapa} 
-              anteriorEtapa={anteriorEtapa} 
-            />
-          )}
-          {etapaAtual === 3 && (
-            <Etapa3 
-              register={register} 
-              errors={errors} 
-              watch={watch} 
-              setValue={setValue} 
-              anteriorEtapa={anteriorEtapa} 
-              isPending={isPending}
-            />
-          )}
-        </form>
       </div>
     </div>
   );

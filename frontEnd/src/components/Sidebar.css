@@ -4,13 +4,11 @@
   flex-direction: column;
   width: 256px;
   height: 100vh;
-  background: #FFFFFF;
-  border-right: 1px solid #E5E7EB;
-  position: fixed;
-  left: 0;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  position: sticky;
   top: 0;
   transition: width 0.3s ease;
-  font-family: sans-serif;
 }
 
 .sidebar.collapsed {
@@ -27,8 +25,7 @@
 
 .sidebar-header h2 {
   font-size: 16px;
-  font-weight: 600;
-  color: #432DD7;
+  color: #432dd7;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -46,7 +43,7 @@
 
 /* Navegação */
 .sidebar-nav {
-  flex: 1; /* Faz a navegação empurrar o footer para baixo */
+  flex: 1;
   padding: 16px 12px;
 }
 
@@ -60,7 +57,7 @@
 }
 
 .sidebar-nav span {
-  color: #4A5565;
+  color: #4a5565;
 }
 
 .sidebar-nav li {
@@ -68,25 +65,24 @@
   padding: 10px 12px;
   border-radius: 6px;
   cursor: pointer;
-  color: #6B7280;
+  color: #6b7280;
   transition: all 0.2s;
 }
 
-.sidebar-nav li a{
+.sidebar-nav li a {
   display: flex;
   width: 100%;
 }
 
 .sidebar-nav li:hover {
-  background-color: #F3F4F6;
+  background-color: #f3f4f6;
   color: #111827;
 }
 
 /* Item Ativo (Atendimento na sua imagem) */
 .sidebar-nav li.active {
-  background-color: #F3F4F6;
+  background-color: #f3f4f6;
   color: #111827;
-  font-weight: 500;
 }
 
 .nav-item-content {
@@ -99,38 +95,29 @@
   white-space: nowrap;
 }
 
-/* Centraliza os ícones quando a barra está encolhida */
-.sidebar.collapsed .sidebar-nav li {
-  justify-content: center;
-}
-
-.sidebar.collapsed .nav-item-content {
-  justify-content: center;
-}
-
 /* Rodapé (Botão Collapse) */
 .sidebar-footer {
   padding: 16px 12px;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid #e5e7eb;
 }
 
 .collapse-btn {
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
+  width: 90%;
   padding: 10px 12px;
   background: none;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  color: #6B7280;
+  color: #6b7280;
   font-size: 14px;
   transition: all 0.2s;
 }
 
 .collapse-btn:hover {
-  background-color: #F3F4F6;
+  background-color: #f3f4f6;
   color: #111827;
 }
 

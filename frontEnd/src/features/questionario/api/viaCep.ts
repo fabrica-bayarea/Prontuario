@@ -1,8 +1,8 @@
 export const consultarCep = async (cep) => {
   const cepLimpo = cep.replace(/\D/g, '');
-  
+
   if (cepLimpo.length !== 8) {
-    throw new Error("CEP inválido");
+    throw new Error('CEP inválido');
   }
 
   try {
@@ -10,17 +10,17 @@ export const consultarCep = async (cep) => {
     const data = await response.json();
 
     if (data.erro) {
-      throw new Error("CEP não encontrado");
+      throw new Error('CEP não encontrado');
     }
 
     return {
       logradouro: data.logradouro,
       bairro: data.bairro,
       cidade: data.localidade,
-      estado: data.uf
+      estado: data.uf,
     };
   } catch (error) {
-    console.error("Erro na requisição do ViaCEP:", error);
+    console.error('Erro na requisição do ViaCEP:', error);
     throw error;
   }
 };
