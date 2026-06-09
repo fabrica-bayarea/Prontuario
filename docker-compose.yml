@@ -29,9 +29,9 @@ services:
       - PORT=3001
       - DB_HOST=postgres_db
       - DB_PORT=5432
-      - DB_NAME=bayarea
-      - DB_USER=prontuario_app
-      - DB_PASSWORD=prontuario123
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_SSL=false
     depends_on:
       postgres_db:
@@ -45,16 +45,16 @@ services:
     container_name: prontuario_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: bayarea
-      POSTGRES_USER: prontuario_app
-      POSTGRES_PASSWORD: prontuario123
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backEnd/src/config/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U prontuario_app -d bayarea"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
