@@ -47,6 +47,7 @@ Sistema de **Prontuário** da Fábrica BayArea para centralizar e gerenciar dado
 ```
 Prontuario/
 ├── docker-compose.yml          # Orquestra os 3 containers
+├── .env.example                # Variáveis globais do Docker Compose
 ├── .gitignore
 ├── README.md
 │
@@ -99,22 +100,18 @@ cd Prontuario
 
 ### 2. Configurar variáveis de ambiente
 
-Copie os arquivos `.env.example` para `.env` em cada pasta:
+Copie o arquivo de exemplo principal para `.env` na raiz do projeto:
 
 ```bash
-# Backend
-cp backEnd/.env.example backEnd/.env
-
-# Frontend
-cp frontEnd/.env.example frontEnd/.env
+cp .env.example .env
 ```
 
-Edite o `backEnd/.env` e defina sua senha do banco:
-```
-DB_PASSWORD=sua_senha_aqui
+Edite o arquivo `.env` gerado e defina uma senha segura para o banco de dados:
+```env
+POSTGRES_PASSWORD=sua_senha_aqui
 ```
 
-> ⚠️ Use a **mesma senha** no `backEnd/.env` e no campo `POSTGRES_PASSWORD` do `docker-compose.yml`.
+> 💡 **Nota:** Para rodar a aplicação localmente sem Docker (via `npm run dev`), você também pode copiar os arquivos `.env.example` presentes nas pastas `/backEnd` e `/frontEnd` para seus respectivos `.env`. Mas para rodar com Docker, apenas o `.env` da raiz é necessário!
 
 ### 3. Subir os containers
 
