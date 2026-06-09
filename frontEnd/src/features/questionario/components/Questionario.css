@@ -1,0 +1,345 @@
+/* --- Container Principal --- */
+.main-form {
+  background-color: #ffffff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  color: #333;
+  text-align: left;
+  width: 65%;
+}
+
+.conteudo-principal {
+  display: flex;
+  padding: 5% 10%;
+  justify-content: space-between;
+}
+
+.etapa1-form {
+  display: flex;
+}
+
+/* --- Cabeçalho e Título --- */
+.formulario-header {
+  text-align: left;
+}
+
+.formulario-header h1 {
+  font-size: 24px;
+  font-weight: 400;
+  color: #101828;
+  margin: 0;
+}
+/* --- Grid do Formulário --- */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Classes utilitárias para largura dos campos */
+.col-12 {
+  grid-column: span 12;
+}
+.col-8 {
+  grid-column: span 8;
+}
+.col-6 {
+  grid-column: span 6;
+}
+.col-4 {
+  grid-column: span 4;
+}
+.col-3 {
+  grid-column: span 3;
+}
+
+/* Responsividade: em telas pequenas, tudo vira coluna única */
+@media (max-width: 768px) {
+  .col-8,
+  .col-6,
+  .col-4,
+  .col-3 {
+    grid-column: span 12;
+  }
+}
+
+/* --- Estilo dos Campos --- */
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+
+.required {
+  color: #cc0000;
+  margin-left: 4px;
+}
+
+.form-control {
+  font-size: 0.9rem;
+  color: #444;
+  background-color: #F9FAFB;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 14px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  height: 50px;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='number'],
+input[type='date'],
+input[type='cpf'],
+select {
+  background-color: #F9FAFB;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 14px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  height: 50px;
+}
+
+input[type='number']{
+  width: 90px;
+}
+
+.estado{
+  width: 50px;
+}
+
+input:focus,
+select:focus {
+  border-color: #cc0000;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+}
+
+/* Fieldset e Legend */
+fieldset {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0;
+  background-color: #F9FAFB;
+}
+
+legend {
+  font-size: 0.9rem;
+  color: #444444;
+  padding: 0 5px;
+}
+
+/* Radio e Checkbox */
+.radio-group,
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.radio-option,
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+input[type='radio'],
+input[type='checkbox'] {
+  accent-color: #cc0000;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+/* --- Botões --- */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+button {
+  padding: 10px 24px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button[type='button']:first-child {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+button[type='button']:first-child:hover {
+  background-color: #d0d0d0;
+}
+
+button[type='button']:last-child,
+button[type='submit'] {
+  background-color: #00a63e;
+  color: white;
+  margin-left: auto;
+}
+
+button[type='button']:last-child:hover,
+button[type='submit']:hover {
+  background-color: #009b39;
+}
+
+.layout-geral {
+  display: flex;
+  min-height: 100vh;
+}
+
+.flex-col-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.w-full {
+  flex: 1 1 100%;
+  width: 100%;
+}
+
+.w-cpf{
+  width: 50%;
+}
+
+
+.w-half {
+  flex: 1 1 calc(50% - 0.75rem);
+}
+
+.w-FFP{
+  width: 180px;
+  display: flex;
+}
+
+.FFP{
+  margin-top: 13px;
+  display: flex;
+  justify-content: center;
+}
+
+.input-error {
+  border: 1px solid #d92d20 !important;
+  outline: none !important;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.1) !important;
+}
+
+.error-message {
+  display: flex;
+  align-items: flex-start; /* Mantém o ícone no topo caso o texto tenha duas linhas */
+  gap: 4px;
+  color: #d92d20 !important;
+  font-size: 13px !important;
+  margin-top: 6px;
+  font-weight: 500;
+  line-height: 1.4; /* Melhora a legibilidade se o texto quebrar */
+}
+
+.error-message svg {
+  display: block;
+  flex-shrink: 0; /* Evita que o ícone fique esmagado por falta de espaço */
+  margin-top: 2px; /* Ajuste ótico fino para o ícone bater exatamente com o centro das letras */
+}
+
+/* --- Grid de Serviços (Cards) --- */
+.servicos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.servico-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  gap: 12px;
+  min-height: 120px;
+}
+
+.servico-card:hover {
+  border-color: #432dd7;
+  background-color: #F8FAFC;
+}
+
+.servico-card.selected {
+  border-color: #432dd7;
+  background-color: #eff6ff; /* Fundo azul claro do layout */
+  box-shadow: 0 0 0 1px #432dd7;
+}
+
+.servico-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.servico-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Esconde o checkbox real, mas mantém acessível para leitores de tela e navegação por teclado */
+.hidden-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Responsividade do grid */
+@media (max-width: 1024px) {
+  .servicos-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .servicos-grid {
+    grid-template-columns: 1fr;
+  }
+}

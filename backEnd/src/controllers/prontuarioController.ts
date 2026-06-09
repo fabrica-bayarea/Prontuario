@@ -10,6 +10,7 @@ const toCamel = (row: any) => {
     data_nascimento: 'dataNascimento', estado_civil: 'estadoCivil', cor_raca: 'corRaca',
     clinica_atendimento: 'clinicaAtendimento', area_atendimento: 'areaAtendimento',
     class_atendimento: 'classAtendimento', faculdade_particular: 'faculdadeParticular',
+    bolsa_faculdade: 'bolsaFaculdade',
     atendimento_para_quem: 'atendimentoParaQuem', nome_outra_pessoa: 'nomeOutraPessoa',
     acompanhamento_outro_lugar: 'acompanhamentoOutroLugar',
     atendimento_para_outra_pessoa: 'atendimentoParaOutraPessoa',
@@ -51,6 +52,7 @@ const toSnake = (body: any) => {
     dataNascimento: 'data_nascimento', estadoCivil: 'estado_civil', corRaca: 'cor_raca',
     clinicaAtendimento: 'clinica_atendimento', areaAtendimento: 'area_atendimento',
     classAtendimento: 'class_atendimento', faculdadeParticular: 'faculdade_particular',
+    bolsaFaculdade: 'bolsa_faculdade',
     atendimentoParaQuem: 'atendimento_para_quem', nomeOutraPessoa: 'nome_outra_pessoa',
     acompanhamentoOutroLugar: 'acompanhamento_outro_lugar',
     atendimentoParaOutraPessoa: 'atendimento_para_outra_pessoa',
@@ -82,12 +84,16 @@ const toSnake = (body: any) => {
     'quais_deficiencia', 'gastos_saude', 'gastos_alimentacao',
     'tipos_financiamento', 'como_soube_iesb', 'servico_iesb', 'antes_iesb',
   ]);
+  // Colunas JSONB (arrays de objetos ou objetos complexos)
+  const jsonbCols = new Set(['dependentes']);
   const out: any = {};
   for (const [k, v] of Object.entries(body)) {
     if (k === '_id' || k === 'id') continue;
     const col = map[k] || k;
     if (arrayCols.has(col)) {
       out[col] = Array.isArray(v) ? v : [];
+    } else if (jsonbCols.has(col)) {
+      out[col] = JSON.stringify(Array.isArray(v) ? v : []);
     } else if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
       out[col] = JSON.stringify(v);
     } else {

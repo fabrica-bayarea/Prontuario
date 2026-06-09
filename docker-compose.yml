@@ -1,0 +1,63 @@
+
+services:
+  # =============================================
+  # Container 1: Frontend (React + Nginx)
+  # =============================================
+  frontend:
+    build:
+      context: ./frontEnd
+      dockerfile: Dockerfile
+    container_name: prontuario_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+  # =============================================
+  # Container 2: Backend (Express + TypeScript)
+  # =============================================
+  api:
+    build:
+      context: ./backEnd
+      dockerfile: Dockerfile
+    container_name: prontuario_api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DB_HOST=postgres_db
+      - DB_PORT=5432
+      - DB_NAME=bayarea
+      - DB_USER=prontuario_app
+      - DB_PASSWORD=prontuario123
+      - DB_SSL=false
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+  # =============================================
+  # Container 3: Banco de Dados (PostgreSQL 16)
+  # =============================================
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: prontuario_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bayarea
+      POSTGRES_USER: prontuario_app
+      POSTGRES_PASSWORD: prontuario123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backEnd/src/config/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prontuario_app -d bayarea"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
