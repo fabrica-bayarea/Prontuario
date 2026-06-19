@@ -6,13 +6,41 @@ import { apiClient } from '../../../libs/api-client';
 import PacientesModal from './PacientesModal';
 import './Pacientes.css';
 
+const STATUS_OPCOES = {
+  APROVADO: 'Aprovado',
+  REPROVADO: 'Reprovado',
+  EM_ANALISE: 'Em Análise'
+} as const;
+
+const CLINICA_OPCOES = {
+  CEILANDIA: 'Clínica Escola Ceilândia',
+  ASA_SUL: 'Clínica Escola Asa Sul'
+} as const;
+
 function Pacientes() {
   const navigate = useNavigate();
   const [pacienteSelecionado, setPacienteSelecionado] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [clinicaFilter, setClinicaFilter] = useState('');
 
   const { data: pacientes = [], isLoading, isError } = useQuery({
     queryKey: ['pacientes'],
     queryFn: () => apiClient.get('/prontuarios'),
+  });
+
+  const pacientesFiltrados = pacientes.filter((paciente: any) => {
+    const query = searchQuery.toLowerCase();
+    const nomeMatch = paciente.nome?.toLowerCase().includes(query) || false;
+    const cpfMatch = paciente.cpf?.includes(query) || false;
+    const matchesSearch = !searchQuery || nomeMatch || cpfMatch;
+
+    const pacienteStatus = paciente.status || STATUS_OPCOES.EM_ANALISE;
+    const matchesStatus = !statusFilter || pacienteStatus === statusFilter;
+
+    const matchesClinica = !clinicaFilter || paciente.clinicaAtendimento === clinicaFilter;
+
+    return matchesSearch && matchesStatus && matchesClinica;
   });
 
   const getIniciais = (nome: string) => {
@@ -45,18 +73,36 @@ function Pacientes() {
         <div className="search-input-container">
           <div className="filter-bar">
           <Search size={20} className="search-icon" />
-          <input type="text" placeholder="Pesquisar por Nome ou CPF..." className="search-input bar" />
+          <input 
+            type="text" 
+            placeholder="Pesquisar por Nome ou CPF..." 
+            className="search-input bar" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           </div>
 
           <div className="filter-buttons">
-            <button className="btn-filter">
-              <Filter size={18} />
-              Status (Todos)
-            </button>
-            <button className="btn-filter">
-              <Filter size={18} />
-              Clínica (Todas)
-            </button>
+            <select 
+              className="btn-filter select-filter" 
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">Status (Todos)</option>
+              <option value={STATUS_OPCOES.APROVADO}>{STATUS_OPCOES.APROVADO}</option>
+              <option value={STATUS_OPCOES.REPROVADO}>{STATUS_OPCOES.REPROVADO}</option>
+              <option value={STATUS_OPCOES.EM_ANALISE}>{STATUS_OPCOES.EM_ANALISE}</option>
+            </select>
+
+            <select 
+              className="btn-filter select-filter" 
+              value={clinicaFilter} 
+              onChange={(e) => setClinicaFilter(e.target.value)}
+            >
+              <option value="">Clínica (Todas)</option>
+              <option value={CLINICA_OPCOES.CEILANDIA}>Ceilândia</option>
+              <option value={CLINICA_OPCOES.ASA_SUL}>Asa Sul</option>
+            </select>
           </div>
         </div>
       </div>
@@ -78,7 +124,11 @@ function Pacientes() {
               </tr>
             </thead>
             <tbody>
-              {pacientes.map((paciente: any) => (
+              {pacientesFiltrados.map((paciente: any) => {
+                const status = paciente.status || STATUS_OPCOES.EM_ANALISE;
+                const statusClass = status === STATUS_OPCOES.APROVADO ? 'aprovado' : status === STATUS_OPCOES.REPROVADO ? 'reprovado' : 'analise';
+                
+                return (
                 <tr key={paciente.id}>
                   <td>
                     <div className="paciente-info">
@@ -92,7 +142,7 @@ function Pacientes() {
                   <td className="text-secondary">{paciente.cpf}</td>
                   <td className="text-secondary">{formatarData(paciente.createdAt)}</td>
                   <td>
-                    <span className="status-badge analise">Em Análise</span>
+                    <span className={`status-badge ${statusClass}`}>{status}</span>
                   </td>
                   <td>
                     <div className="acoes-container">
@@ -109,8 +159,9 @@ function Pacientes() {
                     </div>
                   </td>
                 </tr>
-              ))}
-              {pacientes.length === 0 && (
+                );
+              })}
+              {pacientesFiltrados.length === 0 && (
                 <tr>
                   <td colSpan={5} style={{ textAlign: 'center', padding: '32px' }}>
                     Nenhum paciente encontrado.

@@ -122,6 +122,7 @@ CREATE TABLE IF NOT EXISTS prontuario (
     servico_iesb                TEXT[] DEFAULT '{}',            -- array: servico_direito, servico_psicologia, etc.
     antes_iesb                  TEXT[] DEFAULT '{}',            -- array: antes_nao, antes_caps, etc.
     encaminhamento_medico       VARCHAR(10) NOT NULL,          -- Sim / Não
+    status                      VARCHAR(50) DEFAULT 'Em Análise', -- Status da triagem
 
     -- ========================================================
     -- Campos legados (existem no controller mas não no frontend atual)
