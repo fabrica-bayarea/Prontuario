@@ -2,12 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { registrarLog } from '../helpers/logHelper';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
+if (!process.env.JWT_SECRET) {
   console.error('FATAL: JWT_SECRET não definido no .env');
   process.exit(1);
 }
+
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 export interface JwtPayload {
   sub: number;
@@ -35,7 +35,7 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
   }
 
   try {
-    const decoded = jwt.verify(parts[1], JWT_SECRET!) as JwtPayload;
+    const decoded = jwt.verify(parts[1]!, JWT_SECRET) as unknown as JwtPayload;
 
     // BLOQUEAR tokens temporários de primeiro acesso em rotas normais
     if (decoded.tipo === 'PRIMEIRO_ACESSO') {

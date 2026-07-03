@@ -108,7 +108,7 @@ class AuthController {
         return;
       }
 
-      const tokenStr = authHeader.split(' ')[1];
+      const tokenStr = authHeader.split(' ')[1]!;
       let decoded: any;
       try {
         decoded = jwt.verify(tokenStr, JWT_SECRET);
