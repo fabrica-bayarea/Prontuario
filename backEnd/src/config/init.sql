@@ -15,6 +15,89 @@
 -- \c bayarea
 
 -- ============================================================
+-- Tabela de usuários (autenticação)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS usuarios (
+    id                SERIAL PRIMARY KEY,
+    matricula         VARCHAR(50)  NOT NULL UNIQUE,
+    email             VARCHAR(255) NOT NULL UNIQUE,
+    senha_hash        VARCHAR(255) NOT NULL,
+    nome              VARCHAR(255) NOT NULL,
+    perfil            VARCHAR(10)  NOT NULL CHECK (perfil IN ('ADM','COO','PRO','ATE','COM')),
+    ativo             BOOLEAN      DEFAULT true,
+    primeiro_acesso   BOOLEAN      DEFAULT true,
+    tentativas_login  INTEGER      DEFAULT 0,
+    bloqueado_ate     TIMESTAMPTZ  DEFAULT NULL,
+    created_at        TIMESTAMPTZ  DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ  DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_usuarios_matricula ON usuarios (matricula);
+CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios (email);
+
+-- Seed: usuário admin (senha: 123456) — hash gerado com bcryptjs cost 12
+INSERT INTO usuarios (matricula, email, senha_hash, nome, perfil, primeiro_acesso)
+VALUES (
+  'admin',
+  'admin@iesb.edu.br',
+  '$2b$12$sHe0eBc5wDaxn3OqlWkH1.9jWv3zmC8Mq6jM7lhjn/08OTs6OkaFy',
+  'Administrador',
+  'ADM',
+  true
+)
+ON CONFLICT (matricula) DO NOTHING;
+
+COMMENT ON TABLE usuarios IS 'Tabela de usuários para autenticação e controle de acesso';
+
+-- ============================================================
+-- Tabela de Recuperação de Senha
+-- ============================================================
+CREATE TABLE IF NOT EXISTS tokens_recuperacao (
+    id          SERIAL PRIMARY KEY,
+    usuario_id  INTEGER      NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    token       VARCHAR(64)  NOT NULL UNIQUE,
+    expira_em   TIMESTAMPTZ  NOT NULL,
+    usado       BOOLEAN      DEFAULT false,
+    created_at  TIMESTAMPTZ  DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_tokens_recuperacao_token ON tokens_recuperacao (token);
+CREATE INDEX IF NOT EXISTS idx_tokens_recuperacao_usuario_id ON tokens_recuperacao (usuario_id);
+
+GRANT ALL PRIVILEGES ON TABLE tokens_recuperacao TO prontuario_app;
+GRANT USAGE, SELECT ON SEQUENCE tokens_recuperacao_id_seq TO prontuario_app;
+
+-- ============================================================
+-- Tabela de Logs de Acesso
+-- ============================================================
+CREATE TABLE IF NOT EXISTS logs_acesso (
+    id          SERIAL PRIMARY KEY,
+    usuario_id  INTEGER      REFERENCES usuarios(id) ON DELETE SET NULL,
+    tipo        VARCHAR(30)  NOT NULL CHECK (tipo IN (
+                    'LOGIN_SUCESSO',
+                    'LOGIN_FALHA',
+                    'LOGOUT',
+                    'TOKEN_EXPIRADO',
+                    'SENHA_RECUPERADA',
+                    'SENHA_REDEFINIDA',
+                    'PRIMEIRO_ACESSO',
+                    'CONTA_BLOQUEADA',
+                    'CONTA_DESBLOQUEADA'
+                )),
+    ip          VARCHAR(45),
+    user_agent  TEXT,
+    detalhes    JSONB        DEFAULT '{}'::jsonb,
+    created_at  TIMESTAMPTZ  DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_logs_acesso_usuario_id ON logs_acesso (usuario_id);
+CREATE INDEX IF NOT EXISTS idx_logs_acesso_tipo ON logs_acesso (tipo);
+CREATE INDEX IF NOT EXISTS idx_logs_acesso_created_at ON logs_acesso (created_at DESC);
+
+-- Apenas INSERT e SELECT (tabela imutável — LGPD)
+GRANT INSERT, SELECT ON TABLE logs_acesso TO prontuario_app;
+GRANT USAGE, SELECT ON SEQUENCE logs_acesso_id_seq TO prontuario_app;
+-- ============================================================
 -- Tabela principal: prontuario
 -- ============================================================
 CREATE TABLE IF NOT EXISTS prontuario (
@@ -122,7 +205,13 @@ CREATE TABLE IF NOT EXISTS prontuario (
     servico_iesb                TEXT[] DEFAULT '{}',            -- array: servico_direito, servico_psicologia, etc.
     antes_iesb                  TEXT[] DEFAULT '{}',            -- array: antes_nao, antes_caps, etc.
     encaminhamento_medico       VARCHAR(10) NOT NULL,          -- Sim / Não
-    status                      VARCHAR(50) DEFAULT 'Em Análise', -- Status da triagem
+    status                      VARCHAR(50) DEFAULT 'Aguardando Validação', -- Status da triagem
+
+    -- ========================================================
+    -- Validação do Professor
+    -- ========================================================
+    aluno_id                    INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+    feedback_professor          TEXT,
 
     -- ========================================================
     -- Campos legados (existem no controller mas não no frontend atual)

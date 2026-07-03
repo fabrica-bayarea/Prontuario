@@ -4,7 +4,7 @@
   font-weight: 400;
 
   color-scheme: light;
-  color: rgba(255, 255, 255, 0.87);
+  color: #213547;
   background-color: #F9FAFB;
 
   font-synthesis: none;
@@ -68,4 +68,42 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* --- PADRÃO GLOBAL DE UI (Baseado em Pacientes) --- */
+
+.page-container {
+  padding: 32px;
+  background-color: #fafbfc;
+  min-height: calc(100vh - 4rem);
+  font-family: 'Inter', system-ui, sans-serif;
+  text-align: left;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f1b3b;
+  margin: 0 0 8px 0;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #8b8d97;
+  margin: 0;
+}
+
+.panel-container {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eaeaea;
+  overflow: hidden;
 }

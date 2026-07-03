@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors'; 
 import 'dotenv/config';
 import prontuarioRoutes from './routes/prontuarioRoutes'; 
+import authRoutes from './routes/authRoutes';
+import usuarioRoutes from './routes/usuarioRoutes';
 
 //teste AWS
 class App {
@@ -23,7 +25,9 @@ class App {
       return res.json({ message: 'API BayArea está funcionando!' });
     });
 
+    this.app.use('/api/auth', authRoutes);
     this.app.use('/api/prontuarios', prontuarioRoutes); 
+    this.app.use('/api/usuarios', usuarioRoutes); 
   }
 }
 

@@ -25,8 +25,19 @@ interface EtapaProps {
 }
 
 function Etapa4({ register, errors, watch, setValue, anteriorEtapa}: EtapaProps) {
-  const servicoIESB = watch('servicoIESB') || [];
-  const antesIESB = watch('antesIESB') || [];
+  const servicoIESBVal = watch('servicoIESB');
+  const servicoIESB = Array.isArray(servicoIESBVal) ? servicoIESBVal : [];
+
+  const antesIESBVal = watch('antesIESB');
+  const antesIESB = Array.isArray(antesIESBVal) ? antesIESBVal : [];
+
+  const getErrorMessage = (error: any) => {
+    if (!error) return undefined;
+    if (typeof error === 'string') return error;
+    if (typeof error.message === 'string') return error.message;
+    if (Array.isArray(error) && error.length > 0 && typeof error[0]?.message === 'string') return error[0].message;
+    return undefined;
+  };
 
   const handleCheckboxArray = (e: React.ChangeEvent<HTMLInputElement>, campo: keyof FormularioData, valoresAtuais: string[]) => {
     const { value, checked } = e.target;
@@ -77,7 +88,7 @@ function Etapa4({ register, errors, watch, setValue, anteriorEtapa}: EtapaProps)
             </label>
           ))}
         </div>
-        <ErrorMessage message={errors.servicoIESB?.message} />
+        <ErrorMessage message={getErrorMessage(errors.servicoIESB)} />
       </div>
 
       <div className="w-full">
@@ -109,7 +120,7 @@ function Etapa4({ register, errors, watch, setValue, anteriorEtapa}: EtapaProps)
               </div>
             ))}
           </div>
-          <ErrorMessage message={errors.antesIESB?.message} />
+          <ErrorMessage message={getErrorMessage(errors.antesIESB)} />
         </fieldset>
       </div>
 
@@ -129,7 +140,7 @@ function Etapa4({ register, errors, watch, setValue, anteriorEtapa}: EtapaProps)
               Não
             </label>
           </div>
-          <ErrorMessage message={errors.encaminhamentoMedico?.message} />
+          <ErrorMessage message={getErrorMessage(errors.encaminhamentoMedico)} />
         </fieldset>
       </div>
 

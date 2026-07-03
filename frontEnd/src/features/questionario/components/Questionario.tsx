@@ -14,15 +14,17 @@ import Stepper from './Stepper';
 const camposPorEtapa: Record<number, any> = {
   1: [
       'nome','email','cpf','dataNascimento','idade','cep','estadoCivil','genero','corRaca','clinicaAtendimento','areaAtendimento','classAtendimento','estado','cidade','telefone','atendimentoParaQuem','acompanhamentoOutroLugar',
+      'complemento', 'logradouro', 'bairro', 'faculdadeParticular', 'bolsaFaculdade', 'atendimentoParaOutraPessoa'
      ],
   2: [
       'dependentes'
      ],  
   3: [
       'pessoasPorCasa','suaCasaE','rendaFamiliar','origemRenda','suaCasaEstuda','residemSuaCasa','residenciaDoencaCronica','residenciaDeficiencia',
+      'outroTipoCasa', 'valorAluguel', 'outroOrigemRenda', 'CADUnico', 'beneficioSocial', 'outroBeneficio', 'outroBeneficioValor', 'quaisBeneficios', 'valoresBeneficios', 'valorMensalidade', 'quaisDeficiencia', 'outraDeficienciaEspecifique', 'acompanhamentoMedico', 'outroAcompanhamento', 'tipoAcompanhamento', 'especialidadeMedica', 'outraEspecialidade', 'gastosSaude', 'valoresGastosSaude', 'gastosAlimentacao', 'valoresGastosAlimentacao', 'possuiFinanciamento', 'tiposFinanciamento', 'gastoAgua', 'gastoEnergia', 'gastoInternet', 'gastoCondominio'
      ],
   4: [
-      'servicoIESB', 'antesIESB', 'encaminhamentoMedico'
+      'servicoIESB', 'antesIESB', 'encaminhamentoMedico', 'comoSoubeIESB', 'fonteRedeSocio', 'outroFonteRedeSocio'
      ],
 };
 
@@ -73,9 +75,11 @@ function Questionario() {
       const resposta = await criarProntuario(data);
       console.log('✅ Resposta do Banco (JSON):\n', JSON.stringify(resposta, null, 2));
       alert(`Formulário salvo com sucesso! ID: ${resposta.id}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Erro ao enviar:', error);
-      alert('Houve um erro ao salvar os dados.');
+      const dataError = error.response?.data?.error;
+      const msg = typeof dataError === 'string' ? dataError : (dataError?.message || error.message || 'Erro desconhecido');
+      alert(`Houve um erro ao enviar para o servidor:\n\n${msg}`);
     }
   };
 
@@ -92,7 +96,11 @@ function Questionario() {
             <form 
               onSubmit={handleSubmit(
                 onSubmit, 
-                (erros) => console.log('❌ O Zod bloqueou o envio! Campos com erro:', erros)
+                (erros) => {
+                  console.log('❌ O Zod bloqueou o envio! Campos com erro:', erros);
+                  const camposComErro = Object.keys(erros).map(key => `- ${key}`).join('\n');
+                  alert(`O formulário não pôde ser enviado pois contém erros ou campos obrigatórios vazios.\n\nCampos pendentes:\n${camposComErro}\n\nPor favor, volte nas etapas anteriores e preencha-os.`);
+                }
               )} 
               id="questionario-form"
             >

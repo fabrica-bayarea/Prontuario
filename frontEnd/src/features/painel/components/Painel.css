@@ -1,0 +1,194 @@
+/* Painel.css */
+
+.kpi-container {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.kpi-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: white;
+  border: 1px solid #eaeaea;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.kpi-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-icon-wrapper.purple {
+  background-color: #F3E8FF;
+  color: #9333EA;
+}
+
+.kpi-icon-wrapper.green {
+  background-color: #DCFCE7;
+  color: #16A34A;
+}
+
+.kpi-icon-wrapper.yellow {
+  background-color: #FEF3C7;
+  color: #D97706;
+}
+
+.kpi-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-label {
+  font-size: 14px;
+  color: #6B7280;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+
+.recentes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.recentes-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.ver-todos-btn {
+  background: none;
+  border: none;
+  color: #6366F1;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ver-todos-btn:hover {
+  text-decoration: underline;
+}
+
+.recentes-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.recente-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recente-item:last-child {
+  border-bottom: none;
+}
+
+.recente-item:hover {
+  background-color: #f9fafb;
+}
+
+.recente-info-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.recente-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #F3F4F6;
+  color: #4B5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.recente-details h4 {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.recente-meta {
+  margin: 0;
+  font-size: 13px;
+  color: #6B7280;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recente-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-badge-pill {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge-pill.andamento {
+  background-color: #FFF7ED;
+  color: #C2410C;
+}
+
+.status-badge-pill.aprovado {
+  background-color: #F0FDF4;
+  color: #15803D;
+}
+
+.status-badge-pill.aguardando {
+  background-color: #EFF6FF;
+  color: #1D4ED8;
+}
+
+.status-badge-pill.reprovado {
+  background-color: #FEF2F2;
+  color: #B91C1C;
+}
+
+.arrow-icon {
+  color: #9CA3AF;
+}
+
+/* Responsividade Básica */
+@media (max-width: 1024px) {
+  .kpi-container {
+    flex-direction: column;
+  }
+}

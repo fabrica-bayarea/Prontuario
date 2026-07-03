@@ -9,7 +9,10 @@ import './Pacientes.css';
 const STATUS_OPCOES = {
   APROVADO: 'Aprovado',
   REPROVADO: 'Reprovado',
-  EM_ANALISE: 'Em Análise'
+  EM_ANALISE: 'Em Análise',
+  AGUARDANDO_VALIDACAO: 'Aguardando Validação',
+  AJUSTE_NECESSARIO: 'Ajuste Necessário',
+  AGUARDANDO_TRIAGEM: 'Aguardando Triagem'
 } as const;
 
 const CLINICA_OPCOES = {
@@ -57,11 +60,11 @@ function Pacientes() {
   };
 
   return (
-    <div className="pacientes-container">
-      <header className="pacientes-header">
+    <div className="page-container">
+      <header className="page-header">
         <div>
-          <h1 className="pacientes-title">Gestão de Pacientes</h1>
-          <p className="pacientes-subtitle">Visualize e gerencie os acolhimentos da comunidade.</p>
+          <h1 className="page-title">Gestão de Pacientes</h1>
+          <p className="page-subtitle">Visualize e gerencie os acolhimentos da comunidade.</p>
         </div>
         <button className="btn-novo-acolhimento" onClick={() => navigate('/novoAcolhimento')}>
           <Plus size={20} className="icon-plus" />
@@ -89,9 +92,12 @@ function Pacientes() {
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="">Status (Todos)</option>
+              <option value={STATUS_OPCOES.AGUARDANDO_VALIDACAO}>{STATUS_OPCOES.AGUARDANDO_VALIDACAO}</option>
+              <option value={STATUS_OPCOES.AJUSTE_NECESSARIO}>{STATUS_OPCOES.AJUSTE_NECESSARIO}</option>
+              <option value={STATUS_OPCOES.EM_ANALISE}>{STATUS_OPCOES.EM_ANALISE}</option>
+              <option value={STATUS_OPCOES.AGUARDANDO_TRIAGEM}>{STATUS_OPCOES.AGUARDANDO_TRIAGEM}</option>
               <option value={STATUS_OPCOES.APROVADO}>{STATUS_OPCOES.APROVADO}</option>
               <option value={STATUS_OPCOES.REPROVADO}>{STATUS_OPCOES.REPROVADO}</option>
-              <option value={STATUS_OPCOES.EM_ANALISE}>{STATUS_OPCOES.EM_ANALISE}</option>
             </select>
 
             <select 
@@ -107,7 +113,7 @@ function Pacientes() {
         </div>
       </div>
 
-      <div className="pacientes-table-container">
+      <div className="panel-container">
         {isLoading ? (
           <div style={{ padding: '32px', textAlign: 'center', color: '#555' }}>Carregando pacientes...</div>
         ) : isError ? (
@@ -126,7 +132,9 @@ function Pacientes() {
             <tbody>
               {pacientesFiltrados.map((paciente: any) => {
                 const status = paciente.status || STATUS_OPCOES.EM_ANALISE;
-                const statusClass = status === STATUS_OPCOES.APROVADO ? 'aprovado' : status === STATUS_OPCOES.REPROVADO ? 'reprovado' : 'analise';
+                let statusClass = 'analise'; // default fallback for 'Em Análise', 'Aguardando Triagem', 'Aguardando Validação'
+                if (status === STATUS_OPCOES.APROVADO) statusClass = 'aprovado';
+                if (status === STATUS_OPCOES.REPROVADO || status === 'Recusado' || status === STATUS_OPCOES.AJUSTE_NECESSARIO) statusClass = 'reprovado';
                 
                 return (
                 <tr key={paciente.id}>
