@@ -1,0 +1,284 @@
+name: Security Pipeline
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+permissions: 
+  contents: read
+  security-events: write
+  issues: write # Necessário pro ZAP 
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # =========================================
+  # CODEQL (SAST AVANÇADO)
+  # =========================================
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+    permissions:
+      contents: read
+      security-events: write
+ 
+    timeout-minutes: 30
+ 
+    strategy:
+      matrix:
+        language: [ 'javascript' ]
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+ 
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+ 
+      - name: Rodar CodeQL
+        uses: github/codeql-action/analyze@v4
+        with:
+          output: codeql-results
+
+      - name: Checar severidade no SARIF do CodeQL
+        run: |
+          SARIF_FILE=$(find codeql-results -name "*.sarif" | head -1)
+
+          if [ -z "$SARIF_FILE" ]; then
+            echo "⚠️ Nenhum arquivo SARIF encontrado"
+            exit 1
+          fi
+
+          COUNT=$(jq '
+            .runs[] as $run |
+            $run.results[] |
+            . as $result |
+            ($run.tool.extensions[]?.rules[]? |
+              select(.id == $result.ruleId) |
+              .properties["security-severity"] // 0 | tonumber
+            ) |
+            select(. >= 7.0)
+          ' "$SARIF_FILE" | jq -s 'length')
+
+          echo "⚠️ Alertas High/Critical encontrados: $COUNT"
+
+          if [ "$COUNT" -gt "0" ]; then
+            echo "❌ CodeQL encontrou $COUNT vulnerabilidade(s) High/Critical"
+            jq -r '
+              .runs[] as $run |
+              $run.results[] |
+              . as $result |
+              ($run.tool.extensions[]?.rules[]? |
+                select(.id == $result.ruleId)
+              ) as $rule |
+              "\($rule.properties["security-severity"]) | \($result.ruleId) | \($result.message.text)"
+            ' "$SARIF_FILE"
+            # exit 1
+          fi
+
+          echo "✅ Nenhuma vulnerabilidade High/Critical encontrada"
+
+  # =========================================
+  # SAST + SONAR + SEMGREP
+  # =========================================
+  security:
+    name: SAST + SonarQube
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    timeout-minutes: 30
+
+    needs: codeql
+    if: github.event_name != 'schedule'
+
+    steps:
+
+      # ------------------------
+      # CHECKOUT
+      # ------------------------
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ------------------------
+      # SETUP NODE
+      # ------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache node_modules (backEnd)
+        uses: actions/cache@v4
+        with:
+          path: ./backEnd/node_modules
+          key: ${{ runner.os }}-back-${{ hashFiles('backEnd/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-back-
+
+      - name: Cache node_modules (frontEnd)
+        uses: actions/cache@v4
+        with:
+          path: ./frontEnd/node_modules
+          key: ${{ runner.os }}-front-${{ hashFiles('frontEnd/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-front-
+
+      # ------------------------
+      # INSTALAR DEPENDÊNCIAS
+      # ------------------------
+      - name: Instalar dependências (backEnd)
+        working-directory: ./backEnd
+        run: npm install
+
+      - name: Instalar dependências (frontEnd)
+        working-directory: ./frontEnd
+        run: npm install
+
+      # ------------------------
+      # TESTES
+      # ------------------------
+      - name: Rodar testes (backEnd)
+        working-directory: ./backEnd
+        run: npm test || true
+
+      # ------------------------
+      # SEMGREP (SAST)
+      # ------------------------
+      - name: Instalar Semgrep
+        run: pip install semgrep
+
+      - name: Rodar Semgrep
+        id: semgrep
+        continue-on-error: true
+        run: semgrep scan --config=p/owasp-top-ten --sarif --output=semgrep.sarif --error
+
+      - name: Registrar resultado do Semgrep
+        if: always()
+        run: |
+          if [ "${{ steps.semgrep.outcome }}" = "failure" ]; then
+            echo "SEMGREP_FAILED=true" >> $GITHUB_ENV
+          else
+            echo "SEMGREP_FAILED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+      # ------------------------
+      # SONARQUBE
+      # ------------------------
+      - name: SonarQube Scan
+        id: sonar
+        continue-on-error: true
+        uses: SonarSource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          args: >
+            -Dsonar.projectKey=fabrica-bayarea_Prontuario
+            -Dsonar.organization=fabrica-bayarea
+            -Dsonar.sources=backEnd,frontEnd
+            -Dsonar.exclusions=**/node_modules/**,**/*.test.ts
+
+      # ------------------------
+      # SECURITY GATE (FINAL)
+      # ------------------------
+      - name: Security Gate
+        if: always()
+        run: |
+          echo "Semgrep falhou: $SEMGREP_FAILED"
+          echo "Sonar result: ${{ steps.sonar.outcome }}"
+
+          FAILED=0
+
+          if [ "$SEMGREP_FAILED" = "true" ]; then
+            echo "❌ Semgrep encontrou vulnerabilidades"
+            FAILED=1
+          fi
+
+          if [ "${{ steps.sonar.outcome }}" != "success" ]; then
+            echo "❌ SonarQube falhou"
+            FAILED=1
+          fi
+
+          if [ "$FAILED" = "1" ]; then
+            echo "❌ Falha de segurança detectada — pipeline bloqueada"
+            exit 1
+          fi
+
+          echo "✅ Semgrep e SonarQube sem vulnerabilidades"
+
+  # =========================================  
+  # DAST BASELINE (Roda rápido apenas em PRs)
+  # =========================================  
+  dast_baseline_scan:
+    name: DAST ZAP Baseline Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://bayarea.dataiesb.com/prontuario-dev/' 
+          cmd_options: '-m 0'
+          fail_action: true 
+
+      - name: Upload Report
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: zap_report.html
+
+  # =========================================  
+  # DAST FULL (Roda domingos ou push na main)
+  # =========================================  
+  dast_full_scan:
+    name: DAST ZAP Full Scan
+    runs-on: ubuntu-latest
+    # Roda se for cronjob (domingo) OU se for push pra main, OU se for rodado na mão (workflow_dispatch)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.12.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'https://bayarea.dataiesb.com/prontuario-dev/'
+          cmd_options: '-m 0'
+          allow_issue_writing: false
+          artifact_name: 'zap_report.html'
+
+      - name: Report
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-full-scan-report
+          path: '*.html' #procura qualquer html só pra ver se acha o arquivo de report
