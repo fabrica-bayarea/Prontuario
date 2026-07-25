@@ -1,22 +1,3 @@
--- ============================================================
--- Schema PostgreSQL para o sistema Prontuário - Fábrica BayArea
--- Gerado a partir da análise do frontend (schema.ts + Etapas)
--- e do backend (prontuarioController.ts mapeamento snake_case)
--- ============================================================
-
--- Criar o banco de dados (executar como superuser se necessário)
--- CREATE DATABASE bayarea;
-
--- Criar o usuário da aplicação (executar como superuser se necessário)
--- CREATE USER prontuario_app WITH PASSWORD 'sua_senha_aqui';
--- GRANT ALL PRIVILEGES ON DATABASE bayarea TO prontuario_app;
-
--- Conectar ao banco bayarea antes de executar o restante
--- \c bayarea
-
--- ============================================================
--- Tabela de usuários (autenticação)
--- ============================================================
 CREATE TABLE IF NOT EXISTS usuarios (
     id                SERIAL PRIMARY KEY,
     matricula         VARCHAR(50)  NOT NULL UNIQUE,
@@ -35,7 +16,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE INDEX IF NOT EXISTS idx_usuarios_matricula ON usuarios (matricula);
 CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios (email);
 
--- Seed: usuário admin (senha: 123456) — hash gerado com bcryptjs cost 12
+-- Seed: usuário admin (senha) — hash gerado com bcryptjs cost 12
 INSERT INTO usuarios (matricula, email, senha_hash, nome, perfil, primeiro_acesso)
 VALUES (
   'admin',

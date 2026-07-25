@@ -109,6 +109,7 @@ export const criarProntuario = async (req: any, res: Response) => {
   try {
     const body = { 
       ...req.body, 
+      clinicaAtendimento: req.body.clinicaAtendimento || 'Clínica Escola IESB',
       status: 'Aguardando Validação',
     };
     if (req.user?.sub) {
@@ -151,7 +152,20 @@ export const criarProntuario = async (req: any, res: Response) => {
 
     res.status(201).json(toCamel(novoProntuario));
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    console.error('Erro ao criar prontuário:', error);
+    let msg = error.message;
+    if (error.code === '23505') {
+      if (error.constraint === 'prontuario_cpf_key') {
+        msg = 'Este CPF já possui um acolhimento registrado.';
+      } else if (error.constraint === 'usuarios_email_key') {
+        msg = 'Este e-mail já está cadastrado por outro usuário.';
+      } else if (error.constraint === 'usuarios_matricula_key') {
+        msg = 'Esta matrícula/CPF já está cadastrada por outro usuário.';
+      } else {
+        msg = 'Cadastro duplicado: um registro com estes dados já existe.';
+      }
+    }
+    res.status(400).json({ error: msg });
   }
 };
 

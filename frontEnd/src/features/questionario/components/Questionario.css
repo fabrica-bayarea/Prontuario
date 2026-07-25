@@ -224,6 +224,7 @@ button[type='submit']:hover {
   justify-content: space-between;
   gap: 1.5rem;
   width: 100%;
+  align-items: flex-start;
 }
 
 .w-full {

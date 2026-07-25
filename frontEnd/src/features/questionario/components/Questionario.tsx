@@ -13,18 +13,19 @@ import Stepper from './Stepper';
 
 const camposPorEtapa: Record<number, any> = {
   1: [
-      'nome','email','cpf','dataNascimento','idade','cep','estadoCivil','genero','corRaca','clinicaAtendimento','areaAtendimento','classAtendimento','estado','cidade','telefone','atendimentoParaQuem','acompanhamentoOutroLugar',
-      'complemento', 'logradouro', 'bairro', 'faculdadeParticular', 'bolsaFaculdade', 'atendimentoParaOutraPessoa'
+      'nome','email','cpf','dataNascimento','idade','cep','estadoCivil','genero','corRaca','estado','cidade','telefone','atendimentoParaQuem',
+      'complemento', 'logradouro', 'bairro', 'atendimentoParaOutraPessoa'
      ],
   2: [
       'dependentes'
      ],  
   3: [
-      'pessoasPorCasa','suaCasaE','rendaFamiliar','origemRenda','suaCasaEstuda','residemSuaCasa','residenciaDoencaCronica','residenciaDeficiencia',
-      'outroTipoCasa', 'valorAluguel', 'outroOrigemRenda', 'CADUnico', 'beneficioSocial', 'outroBeneficio', 'outroBeneficioValor', 'quaisBeneficios', 'valoresBeneficios', 'valorMensalidade', 'quaisDeficiencia', 'outraDeficienciaEspecifique', 'acompanhamentoMedico', 'outroAcompanhamento', 'tipoAcompanhamento', 'especialidadeMedica', 'outraEspecialidade', 'gastosSaude', 'valoresGastosSaude', 'gastosAlimentacao', 'valoresGastosAlimentacao', 'possuiFinanciamento', 'tiposFinanciamento', 'gastoAgua', 'gastoEnergia', 'gastoInternet', 'gastoCondominio'
+      'pessoasPorCasa','suaCasaE','rendaFamiliar','origemRenda','beneficioSocial','suaCasaEstuda','residemSuaCasa','residenciaDoencaCronica','residenciaDeficiencia',
+      'outroTipoCasa', 'valorAluguel', 'outroOrigemRenda', 'CADUnico', 'outroBeneficio', 'outroBeneficioValor', 'quaisBeneficios', 'valoresBeneficios', 'valorMensalidade', 'quaisDeficiencia', 'outraDeficienciaEspecifique', 'acompanhamentoMedico', 'outroAcompanhamento', 'tipoAcompanhamento', 'especialidadeMedica', 'outraEspecialidade', 'gastosSaude', 'valoresGastosSaude', 'gastosAlimentacao', 'valoresGastosAlimentacao', 'possuiFinanciamento', 'tiposFinanciamento', 'gastoAgua', 'gastoEnergia', 'gastoInternet', 'gastoCondominio'
      ],
   4: [
-      'servicoIESB', 'antesIESB', 'encaminhamentoMedico', 'comoSoubeIESB', 'fonteRedeSocio', 'outroFonteRedeSocio'
+      'servicoIESB', 'antesIESB', 'encaminhamentoMedico', 'comoSoubeIESB', 'fonteRedeSocio', 'outroFonteRedeSocio',
+      'classAtendimento','faculdadeParticular','bolsaFaculdade','acompanhamentoOutroLugar'
      ],
 };
 
@@ -48,6 +49,26 @@ function Questionario() {
 
   const atendimentoParaQuem = watch('atendimentoParaQuem');
 
+  const scrollParaPrimeiroErro = () => {
+    setTimeout(() => {
+      // 1. Procurar elemento com classe de erro no input
+      let firstErrorEl = document.querySelector('.input-error');
+      
+      // 2. Se não encontrar, procurar a mensagem de erro
+      if (!firstErrorEl) {
+        firstErrorEl = document.querySelector('.error-message');
+      }
+
+      // 3. Centralizar a tela no campo com erro
+      if (firstErrorEl) {
+        firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if ('focus' in firstErrorEl && typeof (firstErrorEl as HTMLElement).focus === 'function') {
+          (firstErrorEl as HTMLElement).focus();
+        }
+      }
+    }, 100);
+  };
+
   const proximaEtapa = async () => {
     const camposParaValidar = camposPorEtapa[etapaAtual] as (keyof FormularioData)[];
     const isEtapaValida = await trigger(camposParaValidar);
@@ -58,6 +79,9 @@ function Questionario() {
       } else {
         setEtapaAtual((prev) => prev + 1);
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      scrollParaPrimeiroErro();
     }
   };
 
@@ -67,6 +91,7 @@ function Questionario() {
     } else if (etapaAtual > 1) {
       setEtapaAtual((prev) => prev - 1);
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const onSubmit = async (data: FormularioData) => {
@@ -98,6 +123,7 @@ function Questionario() {
                 onSubmit, 
                 (erros) => {
                   console.log('❌ O Zod bloqueou o envio! Campos com erro:', erros);
+                  scrollParaPrimeiroErro();
                   const camposComErro = Object.keys(erros).map(key => `- ${key}`).join('\n');
                   alert(`O formulário não pôde ser enviado pois contém erros ou campos obrigatórios vazios.\n\nCampos pendentes:\n${camposComErro}\n\nPor favor, volte nas etapas anteriores e preencha-os.`);
                 }

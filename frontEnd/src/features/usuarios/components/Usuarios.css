@@ -97,7 +97,6 @@
   border-radius: 8px;
   padding: 2rem;
   width: 100%;
-  max-width: 500px;
   position: relative;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }

@@ -6,6 +6,7 @@ import GestaoUsuarios from './features/usuarios/components/GestaoUsuarios';
 import MeusDados from './features/meusDados/components/MeusDados';
 import Painel from './features/painel/components/Painel';
 import Validacao from './features/validacao/components/Validacao';
+import Triagem from './features/triagem/components/Triagem';
 import Login from './features/auth/components/Login';
 import RecuperarSenha from './features/auth/components/RecuperarSenha';
 import RedefinirSenha from './features/auth/components/RedefinirSenha';
@@ -38,19 +39,7 @@ function App() {
         
         <Route 
           path="/triagem" 
-          element={['ADM', 'COO', 'ATE'].includes(usuario?.perfil || '') ? (
-            <div className="page-container">
-              <header className="page-header">
-                <div>
-                  <h1 className="page-title">Triagem</h1>
-                  <p className="page-subtitle">Gerenciamento de triagens de pacientes.</p>
-                </div>
-              </header>
-              <div className="panel-container" style={{ padding: '32px' }}>
-                <p>Módulo de triagem em desenvolvimento.</p>
-              </div>
-            </div>
-          ) : <Navigate to="/" replace />} 
+          element={['ADM', 'COO', 'ATE'].includes(usuario?.perfil || '') ? <Triagem /> : <Navigate to="/" replace />} 
         />
         
         <Route 

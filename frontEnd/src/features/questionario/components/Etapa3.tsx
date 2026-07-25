@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue, Control } from 'react-hook-form';
 import { FormularioData } from '../schema';
+import { ErrorMessage } from './ErrorMessage';
 
 interface EtapaProps {
   register: UseFormRegister<FormularioData>;
@@ -15,6 +16,7 @@ interface EtapaProps {
 }
 
 function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa }: EtapaProps) {
+
   const formatarMoeda = (valor: string) => {
     if (!valor) return '';
     let somenteNumeros = String(valor).replace(/\D/g, '');
@@ -88,17 +90,15 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
           <label htmlFor="pessoasPorCasa">
             Quantas pessoas residem na sua casa? <span className="required">*</span>
           </label>
-          <input type="number" id="pessoasPorCasa" {...register('pessoasPorCasa')} min="1" />
-          {errors.pessoasPorCasa && (
-            <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.pessoasPorCasa.message}</span>
-          )}
+          <input type="number" id="pessoasPorCasa" className={errors.pessoasPorCasa ? 'input-error' : ''} {...register('pessoasPorCasa')} min="1" />
+          <ErrorMessage message={errors.pessoasPorCasa?.message} />
         </div>
 
         <div className="input-group w-half">
           <label htmlFor="suaCasaE">
             Sua casa é: <span className="required">*</span>
           </label>
-          <select id="suaCasaE" {...register('suaCasaE')}>
+          <select id="suaCasaE" className={errors.suaCasaE ? 'input-error' : ''} {...register('suaCasaE')}>
             <option value="">Selecione</option>
             <option value="Quitada">Própria (Quitada)</option>
             <option value="Financiada">Própria (Financiada)</option>
@@ -106,9 +106,7 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
             <option value="Alugada">Alugada</option>
             <option value="Outro">Outro</option>
           </select>
-          {errors.suaCasaE && (
-            <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.suaCasaE.message}</span>
-          )}
+          <ErrorMessage message={errors.suaCasaE?.message} />
 
           {suaCasaE === 'Alugada' && (
             <input
@@ -133,7 +131,7 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
           <label htmlFor="rendaFamiliar">
             Qual é sua renda familiar? <span className="required">*</span>
           </label>
-          <select id="rendaFamiliar" {...register('rendaFamiliar')}>
+          <select id="rendaFamiliar" className={errors.rendaFamiliar ? 'input-error' : ''} {...register('rendaFamiliar')}>
             <option value="">Selecione</option>
             <option value="Nenhuma">Nenhuma</option>
             <option value="MeioUm">De 1/2 até 1 salário mínimo.</option>
@@ -141,9 +139,7 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
             <option value="DeTresAteQuatro">De 3 a 4 salários mínimos.</option>
             <option value="AcimaDeQuatro">Acima de 4 salários mínimos.</option>
           </select>
-          {errors.rendaFamiliar && (
-            <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.rendaFamiliar.message}</span>
-          )}
+          <ErrorMessage message={errors.rendaFamiliar?.message} />
         </div>
       </div>
 
@@ -152,7 +148,7 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
           <label htmlFor="origemRenda">
             Origem principal de sua renda: <span className="required">*</span>
           </label>
-          <select id="origemRenda" {...register('origemRenda')}>
+          <select id="origemRenda" className={errors.origemRenda ? 'input-error' : ''} {...register('origemRenda')}>
             <option value="">Selecione</option>
             <option value="SeguroDesemprego">Seguro desemprego.</option>
             <option value="Empregaticio">Trabalho com vínculo empregatício</option>
@@ -164,9 +160,7 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
             <option value="BeneficioSocial">Programa/Benefício social</option>
             <option value="Outro">Outro</option>
           </select>
-          {errors.origemRenda && (
-            <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.origemRenda.message}</span>
-          )}
+          <ErrorMessage message={errors.origemRenda?.message} />
           {origemRenda === 'Outro' && (
             <input
               type="text"
@@ -185,17 +179,18 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
       </div>
 
       <div className="w-full">
-        <fieldset>
+        <fieldset className={errors.beneficioSocial || errors.quaisBeneficios ? 'input-error' : ''}>
           <legend>Benefícios Sociais</legend>
           <div className="input-group">
             <label htmlFor="beneficioSocial">
               Sua família recebe algum benefício social? <span className="required">*</span>
             </label>
-            <select id="beneficioSocial" {...register('beneficioSocial')}>
+            <select id="beneficioSocial" className={errors.beneficioSocial ? 'input-error' : ''} {...register('beneficioSocial')}>
               <option value="">Selecione</option>
               <option value="Nao">Não</option>
               <option value="Sim">Sim</option>
             </select>
+            <ErrorMessage message={errors.beneficioSocial?.message} />
           </div>
 
           {beneficioSocial === 'Sim' && (
@@ -251,6 +246,7 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
                   )}
                 </div>
               ))}
+              <ErrorMessage message={errors.quaisBeneficios?.message} />
               <div
                 style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}
               >
@@ -291,11 +287,12 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
             Entre as pessoas que residem em sua casa, alguma estuda em escola ou faculdade
             particular? <span className="required">*</span>
           </label>
-          <select id="suaCasaEstuda" {...register('suaCasaEstuda')}>
+          <select id="suaCasaEstuda" className={errors.suaCasaEstuda ? 'input-error' : ''} {...register('suaCasaEstuda')}>
             <option value="">Selecione</option>
             <option value="Nao">Não</option>
             <option value="Sim">Sim</option>
           </select>
+          <ErrorMessage message={errors.suaCasaEstuda?.message} />
         </div>
         {suaCasaEstuda === 'Sim' && (
           <div className="input-group" style={{ marginTop: '10px' }}>
@@ -305,10 +302,12 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
             <input
               type="text"
               id="valorMensalidade"
+              className={errors.valorMensalidade ? 'input-error' : ''}
               value={watch('valorMensalidade') || ''}
               onChange={(e) => setValue('valorMensalidade', formatarMoeda(e.target.value))}
               placeholder="Valor da mensalidade (R$)"
             />
+            <ErrorMessage message={errors.valorMensalidade?.message} />
           </div>
         )}
       </div>
@@ -338,14 +337,12 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
               </div>
             ))}
           </div>
-          {errors.residemSuaCasa && (
-            <span style={{ color: 'red', fontSize: '0.8em' }}>{errors.residemSuaCasa.message}</span>
-          )}
+          <ErrorMessage message={errors.residemSuaCasa?.message} />
         </fieldset>
       </div>
 
       <div className="w-full">
-        <fieldset>
+        <fieldset className={errors.residenciaDoencaCronica ? 'input-error' : ''}>
           <legend>Doenças Crônicas</legend>
           <div className="checkbox-group flex-row" style={{ flexWrap: 'wrap' }}>
             {[
@@ -377,26 +374,28 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
               </div>
             ))}
           </div>
+          <ErrorMessage message={errors.residenciaDoencaCronica?.message} />
         </fieldset>
       </div>
 
       <div className="w-full">
-        <fieldset>
+        <fieldset className={errors.residenciaDeficiencia ? 'input-error' : ''}>
           <legend>Deficiências</legend>
           <div className="input-group">
             <label>
               Alguém em sua residência possui deficiência física ou mental?{' '}
               <span className="required">*</span>
             </label>
-            <select id="residenciaDeficiencia" {...register('residenciaDeficiencia')}>
+            <select id="residenciaDeficiencia" className={errors.residenciaDeficiencia ? 'input-error' : ''} {...register('residenciaDeficiencia')}>
               <option value="">Selecione</option>
               <option value="Nao">Não</option>
               <option value="Sim">Sim</option>
             </select>
+            <ErrorMessage message={errors.residenciaDeficiencia?.message} />
           </div>
           {residenciaDeficiencia === 'Sim' && (
             <div className="checkbox-group" style={{ marginTop: '15px' }}>
-              <label>Quais?</label>
+              <label>Quais? <span className="required">*</span></label>
               <div className="flex-row" style={{ flexWrap: 'wrap' }}>
                 {[
                   { id: 'def_fisica', label: 'Física (motora)' },
@@ -422,13 +421,16 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
                   </div>
                 ))}
               </div>
+              <ErrorMessage message={errors.quaisDeficiencia?.message} />
               {quaisDeficiencia.includes('def_outra') && (
                 <div className="input-group w-full" style={{ marginTop: '10px' }}>
                   <input
                     type="text"
+                    className={errors.outraDeficienciaEspecifique ? 'input-error' : ''}
                     {...register('outraDeficienciaEspecifique')}
                     placeholder="Especifique"
                   />
+                  <ErrorMessage message={errors.outraDeficienciaEspecifique?.message} />
                 </div>
               )}
             </div>
@@ -437,19 +439,20 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
       </div>
 
       <div className="w-full">
-        <fieldset>
+        <fieldset className={errors.acompanhamentoMedico ? 'input-error' : ''}>
           <legend>Acompanhamento Médico</legend>
           <div className="input-group">
             <label>
               Você ou alguém da sua família faz acompanhamento médico?{' '}
               <span className="required">*</span>
             </label>
-            <select id="acompanhamentoMedico" {...register('acompanhamentoMedico')}>
+            <select id="acompanhamentoMedico" className={errors.acompanhamentoMedico ? 'input-error' : ''} {...register('acompanhamentoMedico')}>
               <option value="">Selecione</option>
               <option value="Nao">Não</option>
               <option value="Sim">Sim</option>
               <option value="Outro">Outro</option>
             </select>
+            <ErrorMessage message={errors.acompanhamentoMedico?.message} />
           </div>
           {acompanhamentoMedico === 'Sim' && (
             <div style={{ marginTop: '15px' }}>
@@ -465,9 +468,10 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
                   Particular
                 </label>
               </div>
+              <ErrorMessage message={errors.tipoAcompanhamento?.message} />
               <div className="input-group">
                 <label>Especialidade:</label>
-                <select id="especialidadeMedica" {...register('especialidadeMedica')}>
+                <select id="especialidadeMedica" className={errors.especialidadeMedica ? 'input-error' : ''} {...register('especialidadeMedica')}>
                   <option value="">Selecione</option>
                   {[
                     'Cardiologia',
@@ -489,24 +493,31 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
                     </option>
                   ))}
                 </select>
+                <ErrorMessage message={errors.especialidadeMedica?.message} />
               </div>
               {especialidadeMedica === 'Outra' && (
-                <input
-                  type="text"
-                  {...register('outraEspecialidade')}
-                  placeholder="Especifique"
-                  style={{ marginTop: '10px' }}
-                />
+                <div className="input-group w-full" style={{ marginTop: '10px' }}>
+                  <input
+                    type="text"
+                    className={errors.outraEspecialidade ? 'input-error' : ''}
+                    {...register('outraEspecialidade')}
+                    placeholder="Especifique"
+                  />
+                  <ErrorMessage message={errors.outraEspecialidade?.message} />
+                </div>
               )}
             </div>
           )}
           {acompanhamentoMedico === 'Outro' && (
-            <input
-              type="text"
-              {...register('outroAcompanhamento')}
-              placeholder="Especifique"
-              style={{ marginTop: '10px' }}
-            />
+            <div className="input-group w-full" style={{ marginTop: '10px' }}>
+              <input
+                type="text"
+                className={errors.outroAcompanhamento ? 'input-error' : ''}
+                {...register('outroAcompanhamento')}
+                placeholder="Especifique"
+              />
+              <ErrorMessage message={errors.outroAcompanhamento?.message} />
+            </div>
           )}
         </fieldset>
       </div>

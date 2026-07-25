@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue, Control } from 'react-hook-form';
 import { FormularioData } from '../schema';
 import { ErrorMessage } from './ErrorMessage';
@@ -25,6 +25,14 @@ interface EtapaProps {
 }
 
 function Etapa4({ register, errors, watch, setValue, anteriorEtapa}: EtapaProps) {
+  const faculdadeParticular = watch('faculdadeParticular');
+
+  useEffect(() => {
+    if (faculdadeParticular === 'não') {
+      setValue('bolsaFaculdade', '', { shouldValidate: true });
+    }
+  }, [faculdadeParticular, setValue]);
+
   const servicoIESBVal = watch('servicoIESB');
   const servicoIESB = Array.isArray(servicoIESBVal) ? servicoIESBVal : [];
 
@@ -142,6 +150,88 @@ function Etapa4({ register, errors, watch, setValue, anteriorEtapa}: EtapaProps)
           </div>
           <ErrorMessage message={getErrorMessage(errors.encaminhamentoMedico)} />
         </fieldset>
+      </div>
+
+
+
+      <div className="w-full">
+        <fieldset className={errors.classAtendimento ? 'input-error' : ''}>
+          <legend>
+            Classificação do atendimento<span className="required">*</span>
+          </legend>
+          <div className="radio-group">
+            {[
+              '1 - Atendimentos não urgentes',
+              '2 - Atendimento urgente ou mediato (mais rápido possível, não correm risco de vida)',
+              '3 - Atendimento urgente ou imediato (coloca em risco a própria vida)',
+              '4 - Atendimento urgente e imediato (coloca em risco a própria vida e de terceiros)',
+              '5 - Outro',
+            ].map((c) => (
+              <label key={c} className="radio-option">
+                <input type="radio" value={c} {...register('classAtendimento')} />
+                {c}
+              </label>
+            ))}
+          </div>
+          <ErrorMessage message={errors.classAtendimento?.message} />
+        </fieldset>
+      </div>
+
+      <div className="input-group w-full">
+        <label>Faz faculdade particular?<span className="required">*</span></label>
+        <div className="flex-row FFP" style={{ gap: '20px' }}>
+          <label className="radio-option">
+            <input type="radio" value="sim" {...register('faculdadeParticular')} />
+            Sim
+          </label>
+          <label className="radio-option">
+            <input type="radio" value="não" {...register('faculdadeParticular')} />
+            Não
+          </label>
+        </div>
+        <ErrorMessage message={errors.faculdadeParticular?.message} />
+
+        {faculdadeParticular === 'sim' && (
+          <div style={{ marginTop: '15px' }}>
+            <label htmlFor="bolsaFaculdade">Programa de bolsa<span className="required">*</span></label>
+            <select
+              id="bolsaFaculdade"
+              className={errors.bolsaFaculdade ? 'input-error form-control' : 'form-control'}
+              {...register('bolsaFaculdade')}
+              defaultValue=""
+            >
+              <option value="">Selecione a bolsa</option>
+              <option value="ProUni">ProUni</option>
+              <option value="FIES">FIES</option>
+              <option value="Bolsa Institucional">Bolsa Institucional (IESB, etc.)</option>
+              <option value="Convênio Empresa">Convênio Empresa</option>
+              <option value="Nenhuma">Nenhuma / Pagamento Integral</option>
+              <option value="Outro">Outro</option>
+            </select>
+            <ErrorMessage message={errors.bolsaFaculdade?.message} />
+          </div>
+        )}
+      </div>
+
+      <div className="input-group w-full">
+        <label htmlFor="acompanhamentoOutroLugar">
+          Você faz acompanhamento em algum outro local?<span className="required">*</span>
+        </label>
+        <select 
+          id="acompanhamentoOutroLugar" 
+          className={errors.acompanhamentoOutroLugar ? 'input-error' : ''}
+          {...register('acompanhamentoOutroLugar')}
+        >
+          <option value="">Selecione</option>
+          <option value="Não">Não</option>
+          <option value="Sim, no Conselho Tutelar">Sim, no Conselho Tutelar</option>
+          <option value="Sim, no CAPS">Sim, no CAPS</option>
+          <option value="Sim, no CRAS">Sim, no CRAS</option>
+          <option value="Sim, no Hospital Público">Sim, no Hospital Público</option>
+          <option value="Sim, no Hospital Particular">Sim, no Hospital Particular</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <ErrorMessage message={errors.acompanhamentoOutroLugar?.message} />
       </div>
 
       <div className="w-full button-group flex-row">
