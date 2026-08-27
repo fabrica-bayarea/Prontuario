@@ -62,7 +62,7 @@ export default function Triagem() {
           setPacientes([]);
           setSelectedPatientId(null);
         }
-      } catch (err) {
+      } catch {
         console.warn('Erro ao carregar prontuários do banco de dados.');
       }
     }
@@ -229,27 +229,24 @@ export default function Triagem() {
   );
 
   // Ações Backend
-  const handleValidarModelo = async () => {
+  const handleValidarModelo = () => {
     if (!selectedPatientData) return;
 
-    try {
-      await apiClient.put(`/prontuarios/${selectedPatientData.id}`, { status: 'Aprovado' });
-      setPacientes(prev => prev.map(p => p.id === selectedPatientData.id ? { ...p, status: 'Aprovado' } : p));
-      showToast(`✅ Modelo validado! Status de ${selectedPatientData.nome} atualizado para "Aprovado".`);
-    } catch (err) {
-      showToast(`✅ Modelo validado para ${selectedPatientData.nome}!`);
-    }
+    // A confirmação da classificação automática ainda não é persistida: a triagem
+    // configurável é o EP-03, de outra sprint. Aprovar prontuário é do professor
+    // (RN-09, RBAC §3.7), por POST /prontuarios/:id/validar.
+    showToast(`Classificação de ${selectedPatientData.nome} conferida.`);
   };
 
   const handleAgendamento = async () => {
     if (!selectedPatientData) return;
 
     try {
-      await apiClient.put(`/prontuarios/${selectedPatientData.id}`, { status: 'Agendado' });
+      await apiClient.patch(`/prontuarios/${selectedPatientData.id}/status`, { status: 'Agendado' });
       setPacientes(prev => prev.map(p => p.id === selectedPatientData.id ? { ...p, status: 'Agendado' } : p));
       showToast(`📅 ${selectedPatientData.nome} encaminhado para Agendamento com sucesso!`);
-    } catch (err) {
-      showToast(`📅 Encaminhando ${selectedPatientData.nome} para agendamento...`);
+    } catch {
+      showToast(`Não foi possível atualizar o status de ${selectedPatientData.nome}. Tente novamente.`);
     }
   };
 
