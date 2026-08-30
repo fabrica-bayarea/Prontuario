@@ -30,19 +30,8 @@ const calcularIdade = (dataNascimento: string): number => {
 };
 
 function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps) {
-  const areasAtendimento = [
-    '',
-    'Psicologia',
-    'Nutrição',
-    'Odontologia',
-    'Enfermagem',
-    'Contabilidade',
-    'Direito',
-  ];
-
   const dataNascimento = watch('dataNascimento');
   const clinicaAtendimento = watch('clinicaAtendimento');
-  const atendimentoParaQuem = watch('atendimentoParaQuem');
   const cpf = watch('cpf');
   const cep = watch('cep');
   const telefone = watch('telefone');
@@ -73,7 +62,7 @@ function Etapa1({ register, errors, watch, setValue, proximaEtapa }: EtapaProps)
       setValue('bairro', endereco.bairro, { shouldValidate: true });
       setValue('cidade', endereco.cidade, { shouldValidate: true });
       setValue('estado', endereco.estado, { shouldValidate: true });
-    } catch (error) {
+    } catch {
       alert('CEP não encontrado ou inválido.');
     }
   };
