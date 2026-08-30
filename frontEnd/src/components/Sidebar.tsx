@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import iesbemacaoIcon from '../assets/iesbemacao_icon.svg';
@@ -11,7 +10,6 @@ import usuariosIcon from '../assets/usuarios_icon.svg';
 import './Sidebar.css';
 
 function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const { logout, usuario } = useAuth();
   const navigate = useNavigate();
 
@@ -21,7 +19,7 @@ function Sidebar() {
   }
 
   return (
-    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <aside className="sidebar">
       <div className="sidebar-header">
         <img src={iesbemacaoIcon} alt="Dashboard" className="nav-icon" />
         <h2>IESB em Ação</h2>

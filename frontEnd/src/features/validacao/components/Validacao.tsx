@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { 
   useProntuariosPendentes, 
   useValidarProntuario, 
-  useDevolverProntuario, 
-  ProntuarioValidacao 
+  useDevolverProntuario
 } from '../api/api';
 import './Validacao.css';
 

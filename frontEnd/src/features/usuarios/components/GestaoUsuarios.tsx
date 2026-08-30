@@ -27,7 +27,7 @@ function GestaoUsuarios() {
       setLoading(true);
       const res = await apiClient.get('/usuarios');
       setUsuarios(res.usuarios);
-    } catch (err: any) {
+    } catch {
       setError('Erro ao carregar usuários.');
     } finally {
       setLoading(false);

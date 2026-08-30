@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, FileText, Calendar, Plus } from 'lucide-react';
+import { Search, FileText, Calendar, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../../libs/api-client';

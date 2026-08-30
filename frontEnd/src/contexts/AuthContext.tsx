@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (token) {
       try {
         await apiClient.post('/auth/logout');
-      } catch (err) {
+      } catch {
         // Ignora falha no logout da API, limpa localmente
       }
     }

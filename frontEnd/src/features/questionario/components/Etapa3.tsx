@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue, Control } from 'react-hook-form';
 import { FormularioData } from '../schema';
@@ -19,15 +19,15 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
 
   const formatarMoeda = (valor: string) => {
     if (!valor) return '';
-    let somenteNumeros = String(valor).replace(/\D/g, '');
+    const somenteNumeros = String(valor).replace(/\D/g, '');
     if (somenteNumeros === '') return '';
-    let numero = Number(somenteNumeros) / 100;
+    const numero = Number(somenteNumeros) / 100;
     return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   const desformatarMoeda = (valor: string) => {
     if (!valor) return 0;
-    let somenteNumeros = String(valor).replace(/\D/g, '');
+    const somenteNumeros = String(valor).replace(/\D/g, '');
     if (somenteNumeros === '') return 0;
     return parseFloat(somenteNumeros) / 100;
   };
@@ -48,9 +48,6 @@ function Etapa3({ register, errors, watch, setValue, proximaEtapa, anteriorEtapa
   const valoresGastosSaude = watch('valoresGastosSaude') || {};
   const gastosAlimentacao = watch('gastosAlimentacao') || [];
   const valoresGastosAlimentacao = watch('valoresGastosAlimentacao') || {};
-  const comoSoubeIESB = watch('comoSoubeIESB') || [];
-  const fonteRedeSocio = watch('fonteRedeSocio');
-
   const handleCheckboxArray = (e: React.ChangeEvent<HTMLInputElement>, campo: keyof FormularioData, valoresAtuais: string[]) => {
     const { value, checked } = e.target;
     if (checked) {
