@@ -1,15 +1,11 @@
-
 import appInstance from './app'; 
-import database from './config/Database'
+import database from './config/Database';
 
 const PORT = process.env.PORT || 3001;
 
-
 async function startServer() {
   try {
-   
     await database.connect();
-    
     
     appInstance.app.listen(PORT, () => {
       console.log(` Servidor rodando na porta ${PORT}`);

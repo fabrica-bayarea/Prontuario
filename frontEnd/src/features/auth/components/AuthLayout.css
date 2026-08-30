@@ -1,0 +1,345 @@
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #F1F5F9;
+  padding: 24px;
+}
+
+.auth-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 440px;
+  padding: 40px;
+  animation: authFadeIn 0.4s ease-out;
+}
+
+@keyframes authFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Icon container no topo do card */
+.auth-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.auth-icon img {
+  width: 80px;
+  height: 80px;
+}
+
+.auth-icon--small img {
+  width: 56px;
+  height: 56px;
+}
+
+.auth-icon--large img {
+  width: 96px;
+  height: 96px;
+}
+
+/* Header com logo + nome (tela de login) */
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.auth-brand img {
+  width: 32px;
+  height: 32px;
+}
+
+.auth-brand span {
+  font-size: 16px;
+  font-weight: 600;
+  color: #432DD7;
+}
+
+/* Títulos */
+.auth-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0 0 8px 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.auth-title--left {
+  text-align: left;
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: #64748B;
+  margin: 0 0 32px 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.auth-subtitle--left {
+  text-align: left;
+}
+
+/* Formulário */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Grupo de input */
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.auth-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #1E293B;
+  background: #ffffff;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.auth-input::placeholder {
+  color: #94A3B8;
+}
+
+.auth-input:focus {
+  border-color: #432DD7;
+  box-shadow: 0 0 0 3px rgba(67, 45, 215, 0.08);
+}
+
+.auth-input--has-toggle {
+  padding-right: 48px;
+}
+
+/* Toggle de senha (olho) */
+.auth-toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94A3B8;
+  transition: color 0.2s;
+}
+
+.auth-toggle-password:hover {
+  color: #64748B;
+}
+
+/* Link de "Esqueceu a senha" */
+.auth-forgot-link {
+  font-size: 14px;
+  color: #432DD7;
+  text-decoration: none;
+  font-weight: 500;
+  align-self: flex-start;
+  transition: color 0.2s;
+}
+
+.auth-forgot-link:hover {
+  color: #3621B0;
+}
+
+/* Botão principal */
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #ffffff;
+  background: #16A34A;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-btn:hover {
+  background: #15803D;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.auth-btn:active {
+  transform: scale(0.98);
+}
+
+.auth-btn:disabled {
+  background: #86EFAC;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Botão de aviso amarelo pastel (usado na tela de e-mail enviado) */
+.auth-btn.auth-btn--warning {
+  background: #FEFCE8;
+  color: #713F12;
+  border: 1px solid #FDE68A;
+  font-weight: 400;
+  font-size: 13px;
+  padding: 12px 14px;
+}
+
+.auth-btn.auth-btn--warning:hover {
+  background: #FEF9C3;
+  box-shadow: none;
+}
+
+/* Link de voltar */
+.auth-back-link {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  color: #432DD7;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 16px;
+  transition: color 0.2s;
+}
+
+.auth-back-link:hover {
+  color: #3621B0;
+}
+
+/* Indicador de força da senha */
+.password-strength {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.password-strength-bars {
+  display: flex;
+  gap: 6px;
+}
+
+.password-strength-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #E2E8F0;
+  transition: background-color 0.3s;
+}
+
+.password-strength-bar.active-weak {
+  background: #EF4444;
+}
+
+.password-strength-bar.active-medium {
+  background: #F59E0B;
+}
+
+.password-strength-bar.active-strong {
+  background: #16A34A;
+}
+
+.password-strength-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.password-strength-label.weak {
+  color: #EF4444;
+}
+
+.password-strength-label.medium {
+  color: #F59E0B;
+}
+
+.password-strength-label.strong {
+  color: #16A34A;
+}
+
+/* Texto de confirmação (e-mail enviado) */
+.auth-confirmation-text {
+  font-size: 14px;
+  color: #64748B;
+  text-align: center;
+  line-height: 1.6;
+  margin: 0 0 32px 0;
+}
+
+/* Espaçamento entre botões na tela de confirmação */
+.auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Mensagem de erro */
+.auth-error {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #DC2626;
+  animation: authShake 0.3s ease-out;
+}
+
+@keyframes authShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 28px 20px;
+    border-radius: 12px;
+  }
+
+  .auth-title {
+    font-size: 24px;
+  }
+}

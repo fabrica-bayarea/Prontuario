@@ -1,94 +1,179 @@
-# 🏥 Prontuário - Fábrica BayArea
+# 🏥 Prontuário — Fábrica BayArea
 
 **Back-End (`/backEnd`)**
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
+![Express](https://img.shields.io/badge/Express_5-000000?logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
-![Jest](https://img.shields.io/badge/Jest-C21325?logo=jest&logoColor=white)
 
 **Front-End (`/frontEnd`)**
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
-![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React_19-61DAFB?logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite_7-646CFF?logo=vite&logoColor=white)
 ![CSS](https://img.shields.io/badge/CSS-1572B6?logo=css3&logoColor=white)
 
-Bem-vindo ao repositório oficial do sistema de **Prontuário** da Fábrica BayArea. 
-
-Este projeto tem como objetivo centralizar, organizar e facilitar a gestão de dados de saúde e registros de pacientes, garantindo segurança, escalabilidade e uma interface amigável para os profissionais da área.
+Sistema de **Prontuário** da Fábrica BayArea para centralizar e gerenciar dados de acolhimento e registros de pacientes.
 
 ---
 
 ## 💻 Tecnologias Utilizadas
 
-O projeto está dividido em duas frentes principais (Front-End e Back-End), utilizando as seguintes tecnologias:
+### Back-End (`/backEnd`)
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| **TypeScript** | 5.x | Linguagem principal |
+| **Express** | 5.x | Framework HTTP / API REST |
+| **PostgreSQL** | 16 | Banco de dados relacional |
+| **node-postgres (pg)** | 8.x | Driver de conexão com o banco |
+| **Docker** | — | Containerização |
 
-**Back-End (`/backEnd`)**
-* **Linguagem:** TypeScript
-* **Framework:** Express
-* **Banco de Dados:** MongoDB
-* **Ferramentas:** Docker, Jest para testes
+### Front-End (`/frontEnd`)
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| **TypeScript** | 6.x | Linguagem principal |
+| **React** | 19 | Biblioteca de UI |
+| **Vite** | 7.x | Bundler e dev server |
+| **React Hook Form + Zod** | — | Gerenciamento e validação de formulários |
+| **TanStack React Query** | 5.x | Estado assíncrono e cache |
+| **Axios** | — | Cliente HTTP |
+| **Lucide React** | — | Ícones SVG |
+| **React IMask** | — | Máscaras de input (CPF, telefone, CEP) |
+| **Nginx** | Alpine | Servidor web + proxy reverso (Docker) |
 
-**Front-End (`/frontEnd`)**
-* **Linguagem:** JavaScript
-* **Framework:** React 
-* **Estilização:** CSS
 ---
 
-## ⚙️ Como Rodar o Projeto Localmente
+## 📁 Estrutura do Projeto
 
-Para rodar este projeto na sua máquina, você precisará do **Node.js (v20+)**, do **NPM/Yarn** e do **Git** instalados. 
+```
+Prontuario/
+├── docker-compose.yml          # Orquestra os 3 containers
+├── .env.example                # Variáveis globais do Docker Compose
+├── .gitignore
+├── README.md
+│
+├── frontEnd/                   # Aplicação React (SPA)
+│   ├── Dockerfile              # Build multi-stage: Node → Nginx
+│   ├── nginx.conf              # Proxy reverso /api → backend
+│   ├── .env.example            # Template de variáveis de ambiente
+│   ├── package.json
+│   └── src/
+│       ├── App.tsx
+│       ├── main.tsx
+│       ├── components/         # Componentes compartilhados (Sidebar)
+│       ├── features/           # Módulos de funcionalidade
+│       │   ├── questionario/   # Formulário de acolhimento (4 etapas)
+│       │   └── pacientes/      # Gestão de pacientes
+│       └── libs/               # API client (Axios)
+│
+└── backEnd/                    # API Express
+    ├── Dockerfile
+    ├── .env.example            # Template de variáveis de ambiente
+    ├── package.json
+    └── src/
+        ├── server.ts           # Entrypoint
+        ├── app.ts              # Configuração Express + rotas
+        ├── config/
+        │   ├── Database.ts     # Pool de conexão PostgreSQL
+        │   └── init.sql        # Schema SQL (executado pelo Docker)
+        ├── controllers/        # Lógica de negócio
+        └── routes/             # Definição das rotas REST
+```
 
-### 1. Clonando o repositório
+---
+
+## ⚙️ Como Rodar o Projeto
+
+### Pré-requisitos
+
+Você precisa ter instalado:
+- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** (inclui Docker Compose)
+- **[Git](https://git-scm.com/)**
+
+> 💡 Não é necessário instalar Node.js, PostgreSQL ou qualquer outra dependência — tudo roda dentro dos containers Docker.
+
+### 1. Clonar o repositório
+
 ```bash
-git clone -b main https://github.com/fabrica-bayarea/Prontuario.git
+git clone -b prototipo https://github.com/fabrica-bayarea/Prontuario.git
 cd Prontuario
 ```
 
-### 2. Rodando o Back-End
-Abra um terminal, acesse a pasta do servidor, instale as dependências e inicie o projeto:
+### 2. Configurar variáveis de ambiente
+
+Copie o arquivo de exemplo principal para `.env` na raiz do projeto:
+
 ```bash
-cd backEnd
-npm install
+cp .env.example .env
 ```
-# Crie um arquivo .env baseado no .env.example
+
+Edite o arquivo `.env` gerado e defina uma senha segura para o banco de dados:
+```env
+POSTGRES_PASSWORD=sua_senha_aqui
+```
+
+> 💡 **Nota:** Para rodar a aplicação localmente sem Docker (via `npm run dev`), você também pode copiar os arquivos `.env.example` presentes nas pastas `/backEnd` e `/frontEnd` para seus respectivos `.env`. Mas para rodar com Docker, apenas o `.env` da raiz é necessário!
+
+### 3. Subir os containers
+
 ```bash
-npm run start:dev
+docker compose up --build -d
 ```
-(O servidor Back-End estará rodando em http://localhost:3000)
 
-### 3. Rodando o Front-End
-Abra um novo terminal, acesse a pasta da interface, instale as dependências e inicie o projeto:
+Isso criará **3 containers**:
+
+| Container | Porta | Descrição |
+|---|---|---|
+| `prontuario_frontend` | `80` | Interface React servida pelo Nginx |
+| `prontuario_api` | `3001` | API Express |
+| `prontuario_db` | `5432` | PostgreSQL (schema criado automaticamente) |
+
+### 4. Acessar a aplicação
+
+- 🌐 **Site:** http://localhost
+- 📝 **Formulário:** http://localhost/novoAcolhimento
+- 👥 **Pacientes:** http://localhost/pacientes
+- ⚙️ **API direta:** http://localhost:3001/api/prontuarios
+
+### 5. Comandos úteis
+
 ```bash
-cd frontEnd
-npm install
-npm run start
+# Ver logs de todos os containers
+docker compose logs -f
+
+# Ver logs de um container específico
+docker compose logs -f api
+
+# Parar todos os containers
+docker compose down
+
+# Parar e apagar dados do banco (reset completo)
+docker compose down -v
 ```
-- A aplicação Front-End estará disponível em http://localhost:3001 ou porta similar
 
-- !! 🐳 Dica de Docker: Se você prefere rodar via containers, consulte o arquivo docker-compose.yml (se disponível) e rode docker-compose up -d.
+---
 
+## 🤝 Como Contribuir
 
-### 🤝 Como Contribuir (Nosso Fluxo de Trabalho)
-Nós levamos a organização muito a sério! Ninguém realiza commits diretos nas branches main ou develop. Todo código novo deve passar por um Pull Request e Code Review.
+Ninguém realiza commits diretos nas branches `main` ou `develop`. Todo código novo deve passar por um **Pull Request** e **Code Review**.
 
-### Para entender exatamente como puxar uma tarefa, criar sua branch e interagir com o nosso quadro Kanban, leia obrigatoriamente o nosso manual de regras:
-👉 Ler o Workflow e Regras do Kanban
+### Padrão de Commits (Conventional Commits)
 
-### 📝 Padrão de Commits (Conventional Commits)
-Nossos commits devem contar a história do projeto. Use sempre os prefixos abaixo antes da sua mensagem:
+Use sempre os prefixos abaixo:
 
-- feat: Novas funcionalidades
-- fix: Correção de bugs
-- docs: Mudanças na documentação
-- style: "Formatação (espaços, lint)"
-- chore: Tarefas de manutenção
-- test: Adição ou ajuste de testes
+| Prefixo | Uso |
+|---|---|
+| `feat:` | Novas funcionalidades |
+| `fix:` | Correção de bugs |
+| `docs:` | Mudanças na documentação |
+| `style:` | Formatação (espaços, lint) |
+| `chore:` | Tarefas de manutenção |
+| `refactor:` | Refatoração de código |
 
-### 📚 Política de Documentação
-Temos um compromisso com a qualidade do código. Toda primeira semana do mês, a equipe deve dedicar um tempo para revisar o código recém-adicionado e garantir que as funções complexas e rotas da API estão devidamente documentadas.
+---
 
-📞 Suporte / Tech Leads
-Em caso de dúvidas sobre a arquitetura, regras de negócio ou code review, procure os principais responsáveis técnicos:
+## 📞 Tech Leads
 
-Sofia Vaz (@sofidocx)
-Luan (@Rinosifterino)
+Em caso de dúvidas sobre a arquitetura ou code review:
+
+- Sofia Vaz ([@sofidocx](https://github.com/sofidocx))
+- Luan ([@Rinosifterino](https://github.com/Rinosifterino))

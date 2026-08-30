@@ -1,24 +1,26 @@
-import { Router } from 'express'; 
+import { Router } from 'express';
 import {
-    criarProntuario, 
-    listarProntuario, 
+    criarProntuario,
+    listarProntuario,
     listarPorIdProntuario,
+    listarMeuProntuario,
     atualizarProntuarioPorId,
-    deletarProntuarioPorId
-} from '../controllers/prontuarioController'; 
+    deletarProntuarioPorId,
+    validarProntuario,
+    devolverProntuario
+} from '../controllers/prontuarioController';
+import { authMiddleware } from '../middlewares/authMiddleware';
+import { rbacMiddleware } from '../middlewares/rbacMiddleware';
 
-const router = Router(); 
+const router = Router();
 
-router.get('/', (req, res) => {
-  return res.json({ message: 'API BayArea está funcionando!' });
-});
+router.post('/',    authMiddleware, rbacMiddleware(['ADM','ATE']),                          criarProntuario);
+router.get('/',     authMiddleware, rbacMiddleware(['ADM','COO','PRO','ATE']),        listarProntuario);
+router.get('/me',   authMiddleware, rbacMiddleware(['COM']),                          listarMeuProntuario);
+router.get('/:id',  authMiddleware, rbacMiddleware(['ADM','COO','PRO','ATE','COM']), listarPorIdProntuario);
+router.post('/:id/validar', authMiddleware, rbacMiddleware(['ADM','COO','PRO']),     validarProntuario);
+router.post('/:id/devolver', authMiddleware, rbacMiddleware(['ADM','COO','PRO']),    devolverProntuario);
+router.put('/:id',  authMiddleware, rbacMiddleware(['ADM','ATE']),                          atualizarProntuarioPorId);
+router.delete('/:id', authMiddleware, rbacMiddleware(['ADM']),                        deletarProntuarioPorId);
 
-router.post('/', criarProntuario); 
-router.get('/', listarProntuario); 
-router.get('/:id', listarPorIdProntuario); 
-router.put('/:id', atualizarProntuarioPorId); 
-router.delete('/:id', deletarProntuarioPorId); 
-
-
-
-export default router; 
+export default router;
