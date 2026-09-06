@@ -30,7 +30,7 @@ function PrivateRoute() {
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className="app-shell">
       <Sidebar />
       <main style={{ flex: 1 }}>
         <Outlet />

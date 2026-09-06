@@ -43,3 +43,15 @@
   display: flex;
   min-height: 100vh;
 }
+
+/* Shell do PrivateRoute. Abaixo de 768px a Sidebar vira topbar + drawer, então empilha. */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    flex-direction: column;
+  }
+}
