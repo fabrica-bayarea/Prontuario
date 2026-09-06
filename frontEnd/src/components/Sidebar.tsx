@@ -1,17 +1,15 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { itensMenuPara } from '../config/permissions';
 import iesbemacaoIcon from '../assets/iesbemacao_icon.svg';
-import painelIcon from '../assets/painel_icon.svg';
-import pacientesIcon from '../assets/pacientes_icon.svg';
-import triagemIcon from '../assets/triagem_icon.svg';
-import validacaoIcon from '../assets/validacao_icon.svg';
 import sairIcon from '../assets/sair_icon.svg';
-import usuariosIcon from '../assets/usuarios_icon.svg';
 import './Sidebar.css';
 
 function Sidebar() {
   const { logout, usuario } = useAuth();
   const navigate = useNavigate();
+
+  const itens = itensMenuPara(usuario?.perfil);
 
   function handleLogout() {
     logout();
@@ -27,48 +25,14 @@ function Sidebar() {
 
       <nav className="sidebar-nav">
         <ul>
-          <li>
-            <NavLink to="/" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-              <img src={painelIcon} alt="painel" className="nav-icon" />
-              <span className="texto">{usuario?.perfil === 'COM' ? 'Meus Dados' : 'Painel'}</span>
-            </NavLink>
-          </li>
-
-          {['ADM', 'COO', 'PRO', 'ATE'].includes(usuario?.perfil || '') && (
-            <li>
-              <NavLink to="/pacientes" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-                <img src={pacientesIcon} alt="pacientes" className="nav-icon" />
-                <span className="texto">Pacientes</span>
+          {itens.map(({ path, menu }) => (
+            <li key={`${path}:${menu.rotulo}`}>
+              <NavLink to={path} className={({ isActive }) => (isActive ? 'active-link' : '')}>
+                <img src={menu.icone} alt={menu.rotulo} className="nav-icon" />
+                <span className="texto">{menu.rotulo}</span>
               </NavLink>
             </li>
-          )}
-
-          {['ADM', 'COO', 'ATE'].includes(usuario?.perfil || '') && (
-            <li>
-              <NavLink to="/triagem" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-                <img src={triagemIcon} alt="triagem" className="nav-icon" />
-                <span className="texto">Triagem</span>
-              </NavLink>
-            </li>
-          )}
-
-          {['ADM', 'COO', 'PRO'].includes(usuario?.perfil || '') && (
-            <li>
-              <NavLink to="/validacao" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-                <img src={validacaoIcon} alt="validação" className="nav-icon" />
-                <span className="texto">Validação (Professores)</span>
-              </NavLink>
-            </li>
-          )}
-
-          {usuario?.perfil === 'ADM' && (
-            <li>
-              <NavLink to="/usuarios" className={({ isActive }) => (isActive ? 'active-link' : '')}>
-                <img src={usuariosIcon} alt="usuários" className="nav-icon" />
-                <span className="texto">Usuários</span>
-              </NavLink>
-            </li>
-          )}
+          ))}
         </ul>
       </nav>
 

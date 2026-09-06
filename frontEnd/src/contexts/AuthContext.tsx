@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../libs/api-client';
+import type { Perfil } from '../config/permissions';
 
 interface Usuario {
   id: number;
   matricula: string;
   email: string;
   nome: string;
-  perfil: string;
+  perfil: Perfil;
 }
 
 interface AuthContextType {
@@ -53,12 +54,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Ignora falha no logout da API, limpa localmente
       }
     }
-    
+
     setToken(null);
     setUsuario(null);
     setTokenTemporario(null);
     setMustChangePassword(false);
-    
+
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
     sessionStorage.removeItem('tokenTemporario');
@@ -89,12 +90,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function login(identificador: string, senha: string): Promise<{ primeiroAcesso: boolean }> {
     const response: any = await apiClient.post('/auth/login', { matricula: identificador, senha });
-    
+
     if (response.primeiroAcesso) {
       setTokenTemporario(response.tokenTemporario);
       setMustChangePassword(true);
       sessionStorage.setItem('tokenTemporario', response.tokenTemporario);
-      
+
       // Também guardamos temporariamente os dados do usuário se vieram na requisição
       if (response.usuario) {
         setUsuario(response.usuario);
@@ -108,12 +109,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUsuario(newUsuario);
     localStorage.setItem('token', newToken);
     localStorage.setItem('usuario', JSON.stringify(newUsuario));
-    
+
     // Limpa estado de primeiro acesso caso estivesse sujo
     setTokenTemporario(null);
     setMustChangePassword(false);
     sessionStorage.removeItem('tokenTemporario');
-    
+
     return { primeiroAcesso: false };
   }
 
