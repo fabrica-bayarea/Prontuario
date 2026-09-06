@@ -80,8 +80,9 @@
   color: #111827;
 }
 
-/* Item Ativo (Atendimento na sua imagem) */
-.sidebar-nav li.active {
+/* Item ativo: o NavLink aplica `active-link` no <a>, então o <li> é
+   selecionado via :has(). Mesmo cinza do hover. */
+.sidebar-nav li:has(> a.active-link) {
   background-color: #f3f4f6;
   color: #111827;
 }
