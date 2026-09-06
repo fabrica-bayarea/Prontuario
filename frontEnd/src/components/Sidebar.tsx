@@ -109,10 +109,14 @@ function Sidebar() {
         className="sidebar-drawer"
         aria-label="Menu de navegação"
         onClose={fecharDrawer}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) fecharDrawer();
-        }}
       >
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          aria-label="Fechar menu"
+          tabIndex={-1}
+          onClick={fecharDrawer}
+        />
         {aside}
       </dialog>
     </>
