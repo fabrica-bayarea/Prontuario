@@ -144,60 +144,103 @@
   margin: 0;
 }
 
-.sidebar-toggle,
-.sidebar-close {
+/* Seletores com 3 classes de propósito: precisam vencer o `button` global do
+   index.css e o `button[type='button']:first/last-child` do Questionario.css,
+   que o Vite carrega globalmente. */
+.sidebar-topbar .sidebar-toggle[aria-expanded],
+.sidebar-drawer .sidebar-header .sidebar-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   width: 44px;
   height: 44px;
+  padding: 0;
   background: none;
   border: none;
   border-radius: 6px;
   color: #4a5565;
   cursor: pointer;
+  transition: none;
+}
+
+.sidebar-toggle svg,
+.sidebar-close svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
 }
 
 .sidebar-close {
   margin-left: auto;
 }
 
-.sidebar-toggle:hover,
-.sidebar-close:hover {
+.sidebar-topbar .sidebar-toggle[aria-expanded]:hover,
+.sidebar-drawer .sidebar-header .sidebar-close:hover {
   background-color: #f3f4f6;
   color: #111827;
 }
 
-.sidebar-toggle:focus-visible,
-.sidebar-close:focus-visible {
+.sidebar-topbar .sidebar-toggle[aria-expanded]:focus,
+.sidebar-drawer .sidebar-header .sidebar-close:focus {
+  outline: none;
+}
+
+.sidebar-topbar .sidebar-toggle[aria-expanded]:focus-visible,
+.sidebar-drawer .sidebar-header .sidebar-close:focus-visible {
   outline: 2px solid #432dd7;
   outline-offset: 2px;
 }
 
-/* O UA centraliza o <dialog>; aqui ele cola na esquerda. */
+/* O <dialog> cobre a viewport; o painel é a .sidebar e o fundo é um botão
+   (clicar fora fecha sem handler em elemento não interativo). */
 .sidebar-drawer {
   margin: 0;
   padding: 0;
   border: none;
   background: transparent;
-  inset: 0 auto 0 0;
-  width: 256px;
-  max-width: 85vw;
+  inset: 0;
+  width: 100vw;
+  max-width: none;
   height: 100vh;
   height: 100dvh;
   max-height: none;
 }
 
 .sidebar-drawer::backdrop {
-  background: rgba(17, 24, 39, 0.45);
+  background: transparent;
+}
+
+.sidebar-drawer[open] > .sidebar-backdrop {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background-color: rgba(17, 24, 39, 0.45);
+  cursor: default;
+}
+
+.sidebar-drawer[open] > .sidebar-backdrop:hover,
+.sidebar-drawer[open] > .sidebar-backdrop:active {
+  background-color: rgba(17, 24, 39, 0.45);
+}
+
+.sidebar-drawer[open] > .sidebar-backdrop:focus {
+  outline: none;
 }
 
 .sidebar-drawer .sidebar {
-  position: static;
+  position: relative;
   height: 100%;
+  max-width: 85vw;
 }
 
-.sidebar-drawer[open] {
+.sidebar-drawer[open] .sidebar {
   animation: sidebar-slide-in 0.2s ease-out;
 }
 
@@ -211,7 +254,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sidebar-drawer[open] {
+  .sidebar-drawer[open] .sidebar {
     animation: none;
   }
 }
