@@ -1,0 +1,171 @@
+{{/*
+  .github/security/gitleaks-report.tmpl
+  Relatorio HTML do Gitleaks alinhado ao padrao visual do
+  "Relatorio de Seguranca - Time de Seguranca Bay Area / IESB".
+
+  Paleta oficial (Detalhes da Documentacao, item 3):
+    Critical      #980000 / #e6b8af
+    High          #ff0000 / #f4cccc
+    Medium        #ff9900 / #fce5cd
+    Low           #00ff00 / #d9ead3
+    Informational #3d85c6 / #cfe2f3
+    Cinza         #666666 / #efefef
+
+  Uso:
+    gitleaks dir . --redact --report-format template \
+      --report-template .github/security/gitleaks-report.tmpl \
+      --report-path reports/gitleaks-report.html
+  Ref: https://github.com/gitleaks/gitleaks (secao "Report Templates")
+*/}}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Relatorio de Seguranca - SCA / Gitleaks</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+         margin:0; background:#fff; color:#1f2328; }
+  header { background:#000; color:#fff; padding:28px 40px; }
+  header h1 { margin:0; font-size:22px; font-weight:600; }
+  header .sub { color:#efefef; font-size:13px; margin-top:6px; }
+  .wrap { padding:32px 40px; max-width:1100px; }
+  h2 { font-size:17px; margin:32px 0 12px; font-weight:600; }
+  .meta { border:1px solid #efefef; border-collapse:collapse; width:100%;
+          margin-bottom:28px; font-size:13px; }
+  .meta td { padding:8px 12px; border:1px solid #efefef; }
+  .meta td:first-child { background:#efefef; width:180px; font-weight:600; }
+
+  /* EXPOSURE ANALYSIS */
+  .exposure { border-collapse:collapse; width:420px; font-size:13px; }
+  .exposure th { text-align:left; padding:6px 12px; font-size:12px;
+                 text-transform:uppercase; color:#666666; }
+  .exposure td { padding:8px 12px; }
+  .exposure td.count { text-align:right; font-weight:600; }
+  .bar { width:10px; padding:0 !important; }
+  .r-critical      { background:#e6b8af; } .b-critical      { background:#980000; }
+  .r-high          { background:#f4cccc; } .b-high          { background:#ff0000; }
+  .r-medium        { background:#fce5cd; } .b-medium        { background:#ff9900; }
+  .r-low           { background:#d9ead3; } .b-low           { background:#00ff00; }
+  .r-info          { background:#cfe2f3; } .b-info          { background:#3d85c6; }
+
+  /* SUMARIO DE VULNERABILIDADES */
+  table.findings { width:100%; border-collapse:collapse; font-size:13px;
+                   border:1px solid #efefef; }
+  table.findings th { background:#efefef; text-align:left; padding:9px 12px;
+                      font-size:12px; text-transform:uppercase; color:#666666; }
+  table.findings td { padding:9px 12px; border-top:1px solid #efefef;
+                      vertical-align:top; }
+  code { background:#efefef; padding:1px 5px; border-radius:3px; font-size:12px; }
+  .ok { border:1px solid #d9ead3; background:#d9ead3; padding:24px;
+        border-left:10px solid #00ff00; font-size:14px; }
+  .nota { font-size:12px; color:#666666; margin-top:20px; line-height:1.6; }
+  footer { border-top:1px solid #efefef; margin-top:40px; padding:16px 40px;
+           font-size:11px; color:#666666; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Relatorio de Seguranca &mdash; SCA / Deteccao de Segredos</h1>
+  <div class="sub">Gitleaks &middot; Projeto Prontuario &middot; Time de Seguranca Bay Area (IESB)</div>
+</header>
+
+<div class="wrap">
+
+  <table class="meta">
+    <tr><td>Ferramenta</td><td>Gitleaks (SCA &mdash; Secret Scanning)</td></tr>
+    <tr><td>Categoria</td><td>Data Exposure &mdash; Exposicao de informacoes sensiveis</td></tr>
+    <tr><td>Total de achados</td><td>{{ len . }}</td></tr>
+  </table>
+
+{{ if eq (len .) 0 }}
+
+  <div class="ok"><strong>Nenhum segredo detectado.</strong><br>
+  O repositorio passou na verificacao de credenciais expostas.</div>
+
+{{ else }}
+
+  <h2>Exposure Analysis</h2>
+  <table class="exposure">
+    <tr><th>Severity</th><th style="text-align:right">Count</th></tr>
+    <tr><td class="bar b-critical"></td><td class="r-critical">Critical</td><td class="r-critical count">{{ len . }}</td></tr>
+    <tr><td class="bar b-high"></td><td class="r-high">High</td><td class="r-high count">0</td></tr>
+    <tr><td class="bar b-medium"></td><td class="r-medium">Medium</td><td class="r-medium count">0</td></tr>
+    <tr><td class="bar b-low"></td><td class="r-low">Low</td><td class="r-low count">0</td></tr>
+    <tr><td class="bar b-info"></td><td class="r-info">Informational</td><td class="r-info count">0</td></tr>
+  </table>
+
+  <h2>Sumario de Vulnerabilidades</h2>
+  <table class="findings">
+    <thead>
+      <tr>
+        <th>ID</th><th>Title</th><th>Type</th><th>Severity</th>
+        <th>Dificuldade</th><th>Arquivo</th><th>Linha</th><th>Fingerprint</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{ range $i, $f := . }}
+      <tr>
+        <td><code>PRONT-BAY-SEC-{{ printf "%02d" (add $i 1) }}</code></td>
+        <td>{{ $f.Description }}</td>
+        <td>Data Exposure</td>
+        <td class="r-critical"><strong>Critical</strong></td>
+        <td class="r-high">Low</td>
+        <td><code>{{ $f.File }}</code></td>
+        <td>{{ $f.StartLine }}</td>
+        <td><code>{{ $f.Fingerprint }}</code></td>
+      </tr>
+    {{ end }}
+    </tbody>
+  </table>
+
+  <h2>Detalhes das Vulnerabilidades</h2>
+  {{ range $i, $f := . }}
+    <table class="findings" style="margin-bottom:20px;">
+      <tr><th colspan="2">{{ add $i 1 }}. {{ $f.Description }}</th></tr>
+      <tr class="r-critical"><td><strong>Severity:</strong> Critical</td>
+          <td><strong>Dificuldade:</strong> Low</td></tr>
+      <tr><td><strong>Type:</strong> Data Exposure</td>
+          <td><strong>Finding ID:</strong> PRONT-BAY-SEC-{{ printf "%02d" (add $i 1) }}</td></tr>
+      <tr><td colspan="2"><strong>Target:</strong>
+          <code>{{ $f.File }}:{{ $f.StartLine }}</code>
+          {{ if $f.Commit }} &middot; commit <code>{{ substr 0 8 $f.Commit }}</code>{{ end }}
+          {{ if $f.Author }} &middot; {{ $f.Author }}{{ end }}</td></tr>
+      <tr><td colspan="2">
+          <strong>Descricao</strong><br>
+          Credencial detectada pela regra <code>{{ $f.RuleID }}</code>.
+          Valor redigido conforme politica de privilegio minimo.<br><br>
+          <strong>Exploit Scenario</strong><br>
+          Qualquer pessoa com acesso de leitura ao repositorio (ou ao historico de
+          commits, caso o segredo tenha sido removido depois) obtem a credencial em
+          texto claro e a reutiliza contra o servico correspondente.<br><br>
+          <strong>Recomendacoes</strong><br>
+          1. Revogar e rotacionar a credencial no provedor de origem &mdash; remover o
+          arquivo do repositorio nao invalida um segredo ja exposto.<br>
+          2. Migrar o valor para GitHub Secrets ou variavel de ambiente.<br>
+          3. Purgar do historico com <code>git filter-repo</code> ou BFG Repo-Cleaner.<br>
+          4. Adicionar o padrao ao <code>.gitignore</code>.
+      </td></tr>
+    </table>
+  {{ end }}
+
+  <p class="nota">
+    <strong>Sobre a classificacao de severidade:</strong> o Gitleaks nao emite CVSS.
+    A classificacao <em>Critical</em> (9.0&ndash;10, "requer fix imediato") e atribuida
+    pelo time, nao calculada pela ferramenta: a exposicao de credencial ja representa
+    comprometimento direto de confidencialidade. A dificuldade <em>Low</em> segue a
+    definicao do padrao &mdash; a falha e bem conhecida e ferramentas publicas de
+    varredura de segredos existem e sao trivialmente acessiveis.
+  </p>
+
+{{ end }}
+
+</div>
+
+<footer>
+  Gerado automaticamente pelo pipeline de CI/CD &middot; Time de Seguranca Bay Area &middot;
+  Instituto de Educacao Superior de Brasilia (IESB)
+</footer>
+
+</body>
+</html>
