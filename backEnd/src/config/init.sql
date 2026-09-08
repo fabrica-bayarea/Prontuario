@@ -212,6 +212,9 @@ CREATE TABLE IF NOT EXISTS prontuario (
 CREATE INDEX IF NOT EXISTS idx_prontuario_cpf ON prontuario (cpf);
 CREATE INDEX IF NOT EXISTS idx_prontuario_nome ON prontuario (nome);
 CREATE INDEX IF NOT EXISTS idx_prontuario_created_at ON prontuario (created_at DESC);
+-- Suporta o filtro de escopo do perfil ATE (WHERE aluno_id = $1 OR aluno_id IS NULL)
+-- na listagem paginada de GET /api/prontuarios.
+CREATE INDEX IF NOT EXISTS idx_prontuario_aluno_id ON prontuario (aluno_id);
 
 -- ============================================================
 -- Conceder permissões ao usuário da aplicação
