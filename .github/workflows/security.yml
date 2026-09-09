@@ -87,15 +87,6 @@ jobs:
             --report-path reports/gitleaks.sarif \
             --exit-code 0
 
-      - name: Gitleaks · Relatório HTML
-        run: |
-          gitleaks dir . \
-            --redact \
-            --report-format template \
-            --report-template .github/security/gitleaks-report.tmpl \
-            --report-path reports/gitleaks-report.html \
-            --exit-code 0
-
       - name: Upload SARIF (Code Scanning)
         if: always()
         continue-on-error: true
@@ -281,26 +272,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
-          rules_file_name: '.zap/rules.tsv'
           cmd_options: >-
-            -m 10
+            -m 60
             -j
-            -a
-            -z "-config spider.handleParameters=IGNORE_VALUE
-                -config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev(?:/|$)).*$'
-                -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo prontuario-dev'
-                -config globalexcludeurl.url_list.url\(0\).enabled=true"
+            -z "-config scanner.attackStrength=INSANE
+                -config spider.handleParameters=IGNORE_VALUE"
           allow_issue_writing: false
           artifact_name: 'zap_full_report'
-
-      - name: Upload Full Scan Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-full-scan-report
-          path: |
-            report_html.html
-            report_md.md
-            report_json.json
-          retention-days: 30
-
