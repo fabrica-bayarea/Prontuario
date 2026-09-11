@@ -231,25 +231,12 @@ jobs:
           target: 'https://bayarea.dataiesb.com/prontuario-dev/'
           rules_file_name: '.zap/rules.tsv'
           cmd_options: >-
-            -m 5
-            -a
-            -z "-config spider.handleParameters=IGNORE_VALUE
-                -config globalexcludeurl.url_list.url\(0\).regex='^https?://bayarea\.dataiesb\.com/(?!prontuario-dev(?:/|$)).*$'
-                -config globalexcludeurl.url_list.url\(0\).description='Fora do escopo prontuario-dev'
-                -config globalexcludeurl.url_list.url\(0\).enabled=true"
+            -m 10
+            -j
+            -z "-config scanner.attackStrength=INSANE
+                -config spider.handleParameters=IGNORE_VALUE"
           fail_action: true
           allow_issue_writing: false
-
-      - name: Upload Baseline Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-baseline-report
-          path: |
-            report_html.html
-            report_md.md
-            report_json.json
-          retention-days: 30
 
   # ==================================
   # DAST FULL SCAN 
