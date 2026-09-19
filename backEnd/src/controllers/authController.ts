@@ -3,12 +3,18 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import database from '../config/Database';
 import { AuthRequest } from '../middlewares/authMiddleware';
-import { registrarLog } from '../helpers/logHelper';
-import { validarPoliticaSenha, hashSenha, compararSenha } from '../helpers/senhaHelper';
+import { registrarLog, obterIpRequisicao } from '../helpers/logHelper';
+import { validarPoliticaSenha, hashSenha, compararSenha, HASH_DESCARTAVEL } from '../helpers/senhaHelper';
 import { enviarEmailRecuperacao } from '../helpers/emailHelper';
+import { ipEstaBloqueado, registrarFalhaIp, resetarIp } from '../helpers/ipBloqueioHelper';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_EXPIRES_IN = '8h';
+
+// Mensagem única para toda credencial inválida (matrícula/e-mail inexistente,
+// senha errada ou conta inativa). Não diferenciar o motivo impede que alguém
+// descubra, tentando login, quais matrículas/e-mails existem no sistema.
+const MENSAGEM_CREDENCIAIS_INVALIDAS = 'Matrícula, e-mail ou senha incorretos.';
 
 class AuthController {
   public async login(req: Request, res: Response): Promise<void> {
@@ -21,23 +27,32 @@ class AuthController {
         return;
       }
 
+      const ip = obterIpRequisicao(req);
+
+      if (ipEstaBloqueado(ip)) {
+        await registrarLog('LOGIN_BLOQUEADO', null, req, { motivo: 'ip_bloqueado' });
+        res.status(429).json({ error: { code: 'AUTH_005', message: 'Muitas tentativas de login. Tente novamente mais tarde.' } });
+        return;
+      }
+
       const pool = database.getPool();
       const result = await pool.query(
         'SELECT * FROM usuarios WHERE matricula = $1 OR email = $1',
         [login]
       );
+      const usuario = result.rows[0];
 
-      if (result.rows.length === 0) {
-        await registrarLog('LOGIN_FALHA', null, req, { login_tentado: login, motivo: 'usuario_nao_encontrado' });
-        res.status(401).json({ error: { code: 'AUTH_002', message: 'Matrícula/Email ou senha inválidos.' } });
+      // Compara a senha sempre, mesmo sem usuário encontrado (contra um hash
+      // descartável), para o tempo de resposta não denunciar se a conta existe.
+      const senhaValida = await compararSenha(senha, usuario ? usuario.senha_hash : HASH_DESCARTAVEL);
+
+      if (!usuario) {
+        await this.negarLogin(null, req, res, ip, 'usuario_nao_encontrado');
         return;
       }
 
-      const usuario = result.rows[0];
-
       if (!usuario.ativo) {
-        await registrarLog('LOGIN_FALHA', usuario.id, req, { motivo: 'conta_inativa' });
-        res.status(403).json({ error: { code: 'AUTH_003', message: 'Usuário desativado. Contate o administrador.' } });
+        await this.negarLogin(usuario.id, req, res, ip, 'conta_inativa');
         return;
       }
 
@@ -47,8 +62,6 @@ class AuthController {
         return;
       }
 
-      const senhaValida = await compararSenha(senha, usuario.senha_hash);
-
       if (!senhaValida) {
         const novasTentativas = (usuario.tentativas_login || 0) + 1;
         if (novasTentativas >= 5) {
@@ -56,16 +69,16 @@ class AuthController {
           await pool.query('UPDATE usuarios SET tentativas_login = $1, bloqueado_ate = $2 WHERE id = $3', [novasTentativas, bloqueadoAte, usuario.id]);
           await registrarLog('CONTA_BLOQUEADA', usuario.id, req);
           res.status(429).json({ error: { code: 'AUTH_004', message: 'Conta bloqueada temporariamente devido a múltiplas falhas. Tente novamente mais tarde.' } });
-        } else {
-          await pool.query('UPDATE usuarios SET tentativas_login = $1 WHERE id = $2', [novasTentativas, usuario.id]);
-          await registrarLog('LOGIN_FALHA', usuario.id, req, { motivo: 'senha_invalida', tentativas: novasTentativas });
-          res.status(401).json({ error: { code: 'AUTH_002', message: 'Matrícula/Email ou senha inválidos.' } });
+          return;
         }
+        await pool.query('UPDATE usuarios SET tentativas_login = $1 WHERE id = $2', [novasTentativas, usuario.id]);
+        await this.negarLogin(usuario.id, req, res, ip, 'senha_invalida', { tentativas: novasTentativas });
         return;
       }
 
-      // Senha correta: resetar falhas
+      // Senha correta: resetar falhas por usuário e por IP
       await pool.query('UPDATE usuarios SET tentativas_login = 0, bloqueado_ate = NULL WHERE id = $1', [usuario.id]);
+      resetarIp(ip);
 
       const usuarioRetorno = {
         id: usuario.id,
@@ -91,13 +104,40 @@ class AuthController {
         JWT_SECRET,
         { expiresIn: JWT_EXPIRES_IN }
       );
-      
+
       await registrarLog('LOGIN_SUCESSO', usuario.id, req);
       res.json({ token, usuario: usuarioRetorno });
     } catch (error: any) {
       console.error('Erro no login:', error);
       res.status(500).json({ error: { code: 'AUTH_500', message: 'Erro interno do servidor.' } });
     }
+  }
+
+  /**
+   * Resposta única para matrícula/e-mail inexistente, senha errada e conta
+   * inativa (AUTH_002), além de contar a falha por IP. Se esta falha for a
+   * que atinge o limite de tentativas do IP, responde com o bloqueio (AUTH_005)
+   * em vez da mensagem genérica.
+   * O motivo real (para auditoria) vai só no log interno, nunca na resposta.
+   */
+  private async negarLogin(
+    usuarioId: number | null,
+    req: Request,
+    res: Response,
+    ip: string,
+    motivo: string,
+    detalhesExtra?: Record<string, unknown>
+  ): Promise<void> {
+    await registrarLog('LOGIN_FALHA', usuarioId, req, { motivo, ...detalhesExtra });
+
+    const { bloqueouAgora } = registrarFalhaIp(ip);
+    if (bloqueouAgora) {
+      await registrarLog('LOGIN_BLOQUEADO', usuarioId, req, { motivo: 'limite_tentativas_ip' });
+      res.status(429).json({ error: { code: 'AUTH_005', message: 'Muitas tentativas de login. Tente novamente mais tarde.' } });
+      return;
+    }
+
+    res.status(401).json({ error: { code: 'AUTH_002', message: MENSAGEM_CREDENCIAIS_INVALIDAS } });
   }
 
   public async primeiroAcesso(req: AuthRequest, res: Response): Promise<void> {

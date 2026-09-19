@@ -63,7 +63,9 @@ CREATE TABLE IF NOT EXISTS logs_acesso (
                     'SENHA_REDEFINIDA',
                     'PRIMEIRO_ACESSO',
                     'CONTA_BLOQUEADA',
-                    'CONTA_DESBLOQUEADA'
+                    'CONTA_DESBLOQUEADA',
+                    'ACESSO_NEGADO',
+                    'LOGIN_BLOQUEADO'
                 )),
     ip          VARCHAR(45),
     user_agent  TEXT,
