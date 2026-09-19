@@ -4,42 +4,65 @@ import triagemIcon from '../assets/triagem_icon.svg';
 import validacaoIcon from '../assets/validacao_icon.svg';
 import usuariosIcon from '../assets/usuarios_icon.svg';
 
-// Gating de UX (menu e rotas). A autorização real é o `rbacMiddleware` do back;
-// mantenha esta tabela alinhada com `backEnd/src/routes/*`.
+// Gating de UX (menu e rotas). A autorização real é o `rbacMiddleware` do back.
 
 export const PERFIS = ['ADM', 'COO', 'PRO', 'ATE', 'COM'] as const;
 export type Perfil = (typeof PERFIS)[number];
 
-export interface RotaProtegida {
+export const CHAVES_TELA = [
+  'painel',
+  'pacientes',
+  'triagem',
+  'validacao',
+  'novoAcolhimento',
+  'usuarios',
+  'meusDados',
+] as const;
+export type ChaveTela = (typeof CHAVES_TELA)[number];
+
+export interface Telas {
+  chave: ChaveTela;
   path: string;
-  perfis: readonly Perfil[];
-  /** Ausente em rotas que não aparecem na Sidebar. */
+  /** Ausente em telas que não aparecem na Sidebar. */
   menu?: {
     rotulo: string;
     icone: string;
   };
 }
 
-// `/` aparece duas vezes de propósito: o rótulo muda por perfil e os conjuntos são disjuntos.
-export const ROTAS_PROTEGIDAS: readonly RotaProtegida[] = [
-  { path: '/', perfis: ['COM'], menu: { rotulo: 'Meus Dados', icone: painelIcon } },
-  { path: '/', perfis: ['ADM', 'COO', 'PRO', 'ATE'], menu: { rotulo: 'Painel', icone: painelIcon } },
-  { path: '/pacientes', perfis: ['ADM', 'COO', 'PRO', 'ATE'], menu: { rotulo: 'Pacientes', icone: pacientesIcon } },
-  { path: '/triagem', perfis: ['ADM', 'COO', 'ATE'], menu: { rotulo: 'Triagem', icone: triagemIcon } },
-  { path: '/validacao', perfis: ['ADM', 'COO', 'PRO'], menu: { rotulo: 'Validação (Professores)', icone: validacaoIcon } },
-  { path: '/novoAcolhimento', perfis: ['ADM', 'COO', 'ATE'] },
-  { path: '/usuarios', perfis: ['ADM'], menu: { rotulo: 'Usuários', icone: usuariosIcon } },
+export const TELAS: readonly Telas[] = [
+  { chave: 'painel', path: '/', menu: { rotulo: 'Painel', icone: painelIcon } },
+  { chave: 'meusDados', path: '/meus-dados', menu: { rotulo: 'Meus Dados', icone: painelIcon } },
+  { chave: 'pacientes', path: '/pacientes', menu: { rotulo: 'Pacientes', icone: pacientesIcon } },
+  { chave: 'triagem', path: '/triagem', menu: { rotulo: 'Triagem', icone: triagemIcon } },
+  { chave: 'validacao', path: '/validacao', menu: { rotulo: 'Validação (Professores)', icone: validacaoIcon } },
+  { chave: 'novoAcolhimento', path: '/novoAcolhimento' },
+  { chave: 'usuarios', path: '/usuarios', menu: { rotulo: 'Usuários', icone: usuariosIcon } },
 ];
 
-export function podeAcessar(perfil: Perfil | null | undefined, path: string): boolean {
-  if (!perfil) return false;
-  return ROTAS_PROTEGIDAS.some((rota) => rota.path === path && rota.perfis.includes(perfil));
-}
+// PROVISÓRIO até o BE-06 devolver `permissoes` e `rotaInicial` no login e no /me.
+// Montado a partir do card do BE-06 e do CLAUDE.md; conferir contra
+// docs/specs/sprint-1/contrato-permissoes-rbac.md quando o arquivo existir.
+// Incógnitas: rotaInicial do ATE e se COO tem novoAcolhimento.
+export const PERMISSOES_POR_PERFIL: Record<Perfil, readonly ChaveTela[]> = {
+  ADM: ['painel', 'pacientes', 'triagem', 'validacao', 'novoAcolhimento', 'usuarios'],
+  COO: ['painel', 'pacientes', 'triagem', 'validacao', 'novoAcolhimento'],
+  PRO: ['painel', 'pacientes', 'validacao'],
+  ATE: ['pacientes', 'triagem', 'novoAcolhimento'],
+  COM: ['meusDados'],
+};
 
-export function itensMenuPara(perfil: Perfil | null | undefined) {
-  if (!perfil) return [];
-  return ROTAS_PROTEGIDAS.filter(
-    (rota): rota is RotaProtegida & { menu: NonNullable<RotaProtegida['menu']> } =>
-      rota.menu !== undefined && rota.perfis.includes(perfil),
+export const ROTA_INICIAL_POR_PERFIL: Record<Perfil, string> = {
+  ADM: '/',
+  COO: '/',
+  PRO: '/',
+  ATE: '/pacientes',
+  COM: '/meus-dados',
+};
+
+export function itensMenuPara(permissoes: readonly ChaveTela[]) {
+  return TELAS.filter(
+    (tela): tela is Telas & { menu: NonNullable<Telas['menu']> } =>
+      tela.menu !== undefined && permissoes.includes(tela.chave),
   );
 }

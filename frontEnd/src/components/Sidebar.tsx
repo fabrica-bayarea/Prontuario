@@ -11,7 +11,7 @@ import './Sidebar.css';
 const MEDIA_MOBILE = '(max-width: 767px)';
 
 function Sidebar() {
-  const { logout, usuario } = useAuth();
+  const { logout, permissoes } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isMobile = useMediaQuery(MEDIA_MOBILE);
@@ -20,7 +20,7 @@ function Sidebar() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const botaoAbrirRef = useRef<HTMLButtonElement>(null);
 
-  const itens = itensMenuPara(usuario?.perfil);
+  const itens = itensMenuPara(permissoes);
 
   // showModal() já entrega Esc, backdrop e foco preso; nada de focus trap manual.
   useEffect(() => {
