@@ -189,19 +189,27 @@ export const criarProntuario = async (req: AuthRequest, res: Response) => {
     res.status(201).json(toCamel(novoProntuario));
   } catch (error: any) {
     console.error('Erro ao criar prontuário:', error);
-    let msg = error.message;
     if (error.code === '23505') {
+      let mensagem: string;
       if (error.constraint === 'prontuario_cpf_key') {
-        msg = 'Este CPF já possui um acolhimento registrado.';
+        mensagem = 'Este CPF já possui um acolhimento registrado.';
       } else if (error.constraint === 'usuarios_email_key') {
-        msg = 'Este e-mail já está cadastrado por outro usuário.';
+        mensagem = 'Este e-mail já está cadastrado por outro usuário.';
       } else if (error.constraint === 'usuarios_matricula_key') {
-        msg = 'Esta matrícula/CPF já está cadastrada por outro usuário.';
+        mensagem = 'Esta matrícula/CPF já está cadastrada por outro usuário.';
       } else {
-        msg = 'Cadastro duplicado: um registro com estes dados já existe.';
+        mensagem = 'Cadastro duplicado: um registro com estes dados já existe.';
       }
+      res.status(400).json({ error: mensagem });
+      return;
     }
-    res.status(400).json({ error: msg });
+    res.status(400).json({
+      error: {
+        code: 'PRONT_004',
+        message: 'Não foi possível registrar o acolhimento.',
+        requestId: res.locals.requestId,
+      },
+    });
   }
 };
 
@@ -227,7 +235,10 @@ export const listarProntuario = async (req: AuthRequest, res: Response) => {
     `);
     res.status(200).json(result.rows.map(toCamel));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Erro ao listar prontuários:', error);
+    res.status(500).json({
+      error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId },
+    });
   }
 };
 
@@ -264,7 +275,10 @@ export const listarPorIdProntuario = async (req: AuthRequest, res: Response) => 
     // Sprint 2. Não improvise filtro por nome de clínica.
     res.json(toCamel(prontuario));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Erro ao listar prontuário por id:', error);
+    res.status(500).json({
+      error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId },
+    });
   }
 };
 
@@ -278,7 +292,10 @@ export const listarMeuProntuario = async (req: any, res: Response) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Prontuário não encontrado para este usuário.' });
     res.json(toCamel(result.rows[0]));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Erro ao listar o próprio prontuário:', error);
+    res.status(500).json({
+      error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId },
+    });
   }
 };
 
@@ -321,7 +338,10 @@ export const alterarStatusProntuario = async (req: AuthRequest, res: Response) =
     if (result.rows.length === 0) return res.status(404).json({ message: 'Nao encontrado' });
     res.json(toCamel(result.rows[0]));
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    console.error('Erro ao alterar status do prontuário:', error);
+    res.status(500).json({
+      error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId },
+    });
   }
 };
 
@@ -346,7 +366,10 @@ export const atualizarProntuarioPorId = async (req: Request, res: Response) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Nao encontrado' });
     res.json(toCamel(result.rows[0]));
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    console.error('Erro ao atualizar prontuário:', error);
+    res.status(500).json({
+      error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId },
+    });
   }
 };
 
@@ -363,7 +386,10 @@ export const validarProntuario = async (req: Request, res: Response) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Prontuário não encontrado.' });
     res.json(toCamel(result.rows[0]));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Erro ao validar prontuário:', error);
+    res.status(500).json({
+      error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId },
+    });
   }
 };
 
@@ -380,6 +406,9 @@ export const devolverProntuario = async (req: Request, res: Response) => {
     if (result.rows.length === 0) return res.status(404).json({ message: 'Prontuário não encontrado.' });
     res.json(toCamel(result.rows[0]));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Erro ao devolver prontuário:', error);
+    res.status(500).json({
+      error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId },
+    });
   }
 };
