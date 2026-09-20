@@ -7,7 +7,7 @@ import keyIcon from '../../../assets/key.svg';
 import greenCheckIcon from '../../../assets/green_check.svg';
 
 interface RecuperarFormData {
-  email: string;
+  identificador: string;
 }
 
 function RecuperarSenha() {
@@ -22,11 +22,16 @@ function RecuperarSenha() {
     setIsSubmitting(true);
 
     try {
-      await apiClient.post('/auth/recuperar-senha', { email: data.email });
+      // `email` é compatibilidade com a API atual, que ainda busca só por e-mail;
+      // o BE-07 passa a ler `identificador` (matrícula ou e-mail). Remover `email` depois dele.
+      await apiClient.post('/auth/recuperar-senha', {
+        identificador: data.identificador,
+        email: data.identificador,
+      });
       setEnviado(true);
     } catch (err: any) {
       const message =
-        err.response?.data?.error || 'Erro ao enviar e-mail. Tente novamente.';
+        err.response?.data?.error?.message || 'Erro ao enviar e-mail. Tente novamente.';
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -44,8 +49,7 @@ function RecuperarSenha() {
         <h1 className="auth-title">E-mail enviado!</h1>
 
         <p className="auth-confirmation-text">
-          Se o e-mail informado estiver cadastrado, você receberá um link em
-          instantes. Verifique também sua caixa de spam.
+          Se o identificador informado estiver cadastrado, você receberá um link no e-mail da conta em instantes. Verifique também a caixa de spam.
         </p>
 
         <div className="auth-actions">
@@ -74,35 +78,29 @@ function RecuperarSenha() {
 
       <h1 className="auth-title">Recuperar Senha</h1>
       <p className="auth-subtitle">
-        Informe seu e-mail institucional para receber um link de redefinição.
+        Informe sua matrícula ou e-mail institucional. O link de redefinição vai para o e-mail cadastrado na sua conta.
       </p>
 
-      {error && <div className="auth-error">{error}</div>}
+      {error && <div className="auth-error" role="alert" aria-live="assertive">{error}</div>}
 
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
         <div className="auth-field">
-          <label className="auth-label" htmlFor="email">
-            E-mail institucional
+          <label className="auth-label" htmlFor="identificador">
+            Matrícula ou e-mail
           </label>
           <div className="auth-input-wrapper">
             <input
-              id="email"
-              type="email"
+              id="identificador"
+              type="text"
               className="auth-input"
-              placeholder="exemplo@iesb.edu.br"
-              autoComplete="email"
-              {...register('email', {
-                required: 'E-mail é obrigatório',
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: 'E-mail inválido',
-                },
-              })}
+              placeholder="Sua matrícula ou e-mail institucional"
+              autoComplete="username"
+              {...register('identificador', { required: 'Informe sua matrícula ou e-mail' })}
             />
           </div>
-          {errors.email && (
+          {errors.identificador && (
             <span style={{ color: '#DC2626', fontSize: '13px' }}>
-              {errors.email.message}
+              {errors.identificador.message}
             </span>
           )}
         </div>

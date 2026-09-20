@@ -326,6 +326,13 @@
   animation: authShake 0.3s ease-out;
 }
 
+/* Aviso de bloqueio temporário (EP-01 US-01 RV-5): distinto do erro de credencial. */
+.auth-error.auth-error--bloqueio {
+  background: #FFFBEB;
+  border-color: #B45309;
+  color: #B45309;
+}
+
 @keyframes authShake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-4px); }

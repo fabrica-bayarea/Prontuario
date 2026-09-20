@@ -16,9 +16,14 @@ function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [bloqueado, setBloqueado] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<LoginFormData>({ mode: 'onChange' });
+  const matricula = watch('matricula');
+  const senha = watch('senha');
+  // EP-01 US-01 RI-4: botão só habilita com os dois campos preenchidos.
+  const camposPreenchidos = Boolean(matricula?.trim()) && Boolean(senha);
 
   async function onSubmit(data: LoginFormData) {
     setError('');
@@ -32,9 +37,15 @@ function Login() {
         navigate('/', { replace: true });
       }
     } catch (err: any) {
-      const message =
-        err.response?.data?.error?.message || 'Erro ao fazer login. Tente novamente.';
-      setError(message);
+      const status = err.response?.status;
+      // EP-01 US-01 RV-5: bloqueio (conta, IP ou limite de requisições) tem aviso próprio, distinto de credencial.
+      if (status === 429) {
+        setBloqueado(true);
+        setError('Acesso bloqueado temporariamente por excesso de tentativas. Aguarde 15 minutos e tente novamente.');
+      } else {
+        setBloqueado(false);
+        setError(err.response?.data?.error?.message || 'Não foi possível entrar. Tente novamente.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -52,7 +63,11 @@ function Login() {
         Acesse o sistema com suas credenciais institucionais
       </p>
 
-      {error && <div className="auth-error">{error}</div>}
+      {error && (
+        <div className={bloqueado ? 'auth-error auth-error--bloqueio' : 'auth-error'} role="alert" aria-live="assertive">
+          {error}
+        </div>
+      )}
 
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
         <div className="auth-field">
@@ -93,7 +108,7 @@ function Login() {
               type="button"
               className="auth-toggle-password"
               onClick={() => setShowPassword(!showPassword)}
-              tabIndex={-1}
+              aria-pressed={showPassword}
               aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -110,7 +125,7 @@ function Login() {
           Esqueceu sua senha?
         </Link>
 
-        <button type="submit" className="auth-btn" disabled={isSubmitting}>
+        <button type="submit" className="auth-btn" disabled={isSubmitting || !camposPreenchidos}>
           {isSubmitting ? 'Entrando...' : 'Entrar'}
         </button>
       </form>
