@@ -41,13 +41,11 @@ export const TELAS: readonly Telas[] = [
 ];
 
 // PROVISÓRIO até o BE-06 devolver `permissoes` e `rotaInicial` no login e no /me.
-// Montado a partir do card do BE-06 e do CLAUDE.md; conferir contra
-// docs/specs/sprint-1/contrato-permissoes-rbac.md quando o arquivo existir.
-// Incógnitas: rotaInicial do ATE e se COO tem novoAcolhimento.
+// Valores conforme o contrato de permissões (RBAC §2 e §5).
 export const PERMISSOES_POR_PERFIL: Record<Perfil, readonly ChaveTela[]> = {
-  ADM: ['painel', 'pacientes', 'triagem', 'validacao', 'novoAcolhimento', 'usuarios'],
-  COO: ['painel', 'pacientes', 'triagem', 'validacao', 'novoAcolhimento'],
-  PRO: ['painel', 'pacientes', 'validacao'],
+  ADM: ['painel', 'usuarios'],
+  COO: ['painel', 'pacientes', 'triagem'],
+  PRO: ['pacientes', 'validacao'],
   ATE: ['pacientes', 'triagem', 'novoAcolhimento'],
   COM: ['meusDados'],
 };
@@ -55,7 +53,7 @@ export const PERMISSOES_POR_PERFIL: Record<Perfil, readonly ChaveTela[]> = {
 export const ROTA_INICIAL_POR_PERFIL: Record<Perfil, string> = {
   ADM: '/',
   COO: '/',
-  PRO: '/',
+  PRO: '/validacao',
   ATE: '/pacientes',
   COM: '/meus-dados',
 };
