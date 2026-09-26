@@ -1,0 +1,59 @@
+.proibido {
+  max-width: 480px;
+  margin: 80px auto;
+  padding: 40px 32px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.proibido-icone {
+  color: #432dd7;
+}
+
+.proibido-codigo {
+  margin: 12px 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #6b7280;
+}
+
+.proibido h1 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  color: #111827;
+}
+
+.proibido-texto {
+  margin: 0 0 24px;
+  color: #4a5565;
+  line-height: 1.6;
+}
+
+.proibido-texto code {
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.95em;
+}
+
+.proibido-voltar {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #432dd7;
+  color: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.proibido-voltar:hover {
+  background: #3524b0;
+}
+
+.proibido-voltar:focus-visible {
+  outline: 2px solid #432dd7;
+  outline-offset: 2px;
+}

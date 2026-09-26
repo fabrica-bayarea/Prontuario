@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -14,6 +14,7 @@ interface LoginFormData {
 function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [bloqueado, setBloqueado] = useState(false);
@@ -31,10 +32,12 @@ function Login() {
 
     try {
       const resultado = await login(data.matricula, data.senha);
-      if (resultado.primeiroAcesso) {
+      // `=== true` em vez de truthiness: sem strictNullChecks o TS não estreita a união pelo discriminante.
+      if (resultado.primeiroAcesso === true) {
         navigate('/primeiro-acesso', { replace: true });
       } else {
-        navigate('/', { replace: true });
+        const destino = (location.state as { from?: { pathname: string } } | null)?.from?.pathname;
+        navigate(destino ?? resultado.rotaInicial, { replace: true });
       }
     } catch (err: any) {
       const status = err.response?.status;
