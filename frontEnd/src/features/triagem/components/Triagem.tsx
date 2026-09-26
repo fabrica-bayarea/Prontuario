@@ -14,6 +14,7 @@ import {
   UserX,
 } from 'lucide-react';
 import { apiClient } from '../../../libs/api-client';
+import { listarProntuarios } from '../../pacientes/api/api';
 import { useAuth } from '../../../contexts/AuthContext';
 import './Triagem.css';
 
@@ -59,8 +60,9 @@ export default function Triagem() {
   useEffect(() => {
     async function loadPatients() {
       try {
-        const data = (await apiClient.get('/prontuarios')) as Patient[];
-        if (data && data.length > 0) {
+        const { dados } = await listarProntuarios();
+        const data = dados as Patient[];
+        if (data.length > 0) {
           setPacientes(data);
           setSelectedPatientId(data[0].id);
         } else {
