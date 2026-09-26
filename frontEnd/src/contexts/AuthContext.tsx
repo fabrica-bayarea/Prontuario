@@ -42,7 +42,10 @@ interface AuthContextType {
   isLoading: boolean;
   mustChangePassword: boolean;
   tokenTemporario: string | null;
-  login: (identificador: string, senha: string) => Promise<{ primeiroAcesso: boolean }>;
+  login: (
+    identificador: string,
+    senha: string,
+  ) => Promise<{ primeiroAcesso: true } | { primeiroAcesso: false; rotaInicial: string }>;
   logout: () => void;
 }
 
@@ -90,6 +93,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     sessionStorage.removeItem('tokenTemporario');
   }, [token]);
 
+  // 401 em qualquer chamada autenticada: o api-client avisa por evento e o
+  // logout aqui faz o PrivateRoute levar ao login, sem recarregar a página.
+  useEffect(() => {
+    window.addEventListener('auth:unauthorized', logout);
+    return () => window.removeEventListener('auth:unauthorized', logout);
+  }, [logout]);
+
   // Verifica se o token armazenado ainda é válido ao carregar a app
   useEffect(() => {
     async function verificarToken() {
@@ -114,7 +124,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     verificarToken();
   }, [token, logout]);
 
-  async function login(identificador: string, senha: string): Promise<{ primeiroAcesso: boolean }> {
+  async function login(
+    identificador: string,
+    senha: string,
+  ): Promise<{ primeiroAcesso: true } | { primeiroAcesso: false; rotaInicial: string }> {
     const response: any = await apiClient.post('/auth/login', { matricula: identificador, senha });
 
     if (response.primeiroAcesso) {
@@ -142,7 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setMustChangePassword(false);
     sessionStorage.removeItem('tokenTemporario');
 
-    return { primeiroAcesso: false };
+    return { primeiroAcesso: false, rotaInicial: newUsuario!.rotaInicial! };
   }
 
   return (
