@@ -1,7 +1,15 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const BCRYPT_ROUNDS = 12;
 const SENHA_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+// Hash de custo equivalente ao de um usuário real, usado no login quando a
+// matrícula/e-mail informado não corresponde a ninguém. Comparar a senha
+// recebida contra este hash (em vez de pular a comparação) mantém o tempo de
+// resposta igual ao de um login com usuário existente, para a latência não
+// denunciar se a conta é válida.
+export const HASH_DESCARTAVEL = bcrypt.hashSync(crypto.randomBytes(32).toString('hex'), BCRYPT_ROUNDS);
 
 export function validarPoliticaSenha(senha: string): string | null {
   if (!SENHA_REGEX.test(senha)) {

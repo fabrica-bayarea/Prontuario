@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react';
-import { 
-  ShieldAlert, 
-  ShieldCheck, 
-  Activity, 
-  AlertCircle, 
-  CheckCircle2, 
-  Wallet, 
-  FileText, 
-  Calendar, 
-  Edit3, 
+import {
+  ShieldAlert,
+  ShieldCheck,
+  Activity,
+  AlertCircle,
+  CheckCircle2,
+  Wallet,
+  FileText,
+  Calendar,
+  Edit3,
   Check,
   Search,
-  UserX
+  UserX,
 } from 'lucide-react';
 import { apiClient } from '../../../libs/api-client';
+import { useAuth } from '../../../contexts/AuthContext';
 import './Triagem.css';
 
 export interface Patient {
@@ -45,6 +46,10 @@ interface CriterioItem {
 }
 
 export default function Triagem() {
+  const { usuario } = useAuth();
+  // Só o ATE muda status na triagem (PATCH /prontuarios/:id/status é rbacMiddleware(['ATE'])).
+  const podeAgirNaTriagem = usuario?.perfil === 'ATE';
+
   const [pacientes, setPacientes] = useState<Patient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -75,7 +80,7 @@ export default function Triagem() {
   };
 
   // Busca do paciente selecionado (Sem mock / sem demo)
-  const selectedPatientData = pacientes.find(p => p.id === selectedPatientId) || pacientes[0];
+  const selectedPatientData = pacientes.find((p) => p.id === selectedPatientId) || pacientes[0];
 
   // Cálculo da Triagem Dinâmico
   function calcularTriagem(p: Patient | undefined) {
@@ -88,7 +93,8 @@ export default function Triagem() {
 
     const renda = p.rendaFamiliar || 'Nenhuma';
     const pessoas = p.pessoasPorCasa || 1;
-    const rendaBaixa = renda === 'Nenhuma' || renda === 'MeioUm' || renda.includes('800') || renda.includes('600');
+    const rendaBaixa =
+      renda === 'Nenhuma' || renda === 'MeioUm' || renda.includes('800') || renda.includes('600');
     const rendaMedia = renda === 'DeUmAteTres' || renda === 'DeUmAteDois';
 
     if (rendaBaixa) {
@@ -96,52 +102,62 @@ export default function Triagem() {
       criterios.push({
         type: 'alert',
         title: 'Renda per capita < 1 salário mínimo',
-        description: `A renda declarada (${renda}) dividida pelos ${pessoas} membro(s) da família indica vulnerabilidade econômica crítica.`
+        description: `A renda declarada (${renda}) dividida pelos ${pessoas} membro(s) da família indica vulnerabilidade econômica crítica.`,
       });
     } else if (rendaMedia) {
       pontos += 2;
       criterios.push({
         type: 'alert',
         title: 'Renda em faixa de atenção (1 a 3 Salários Mínimos)',
-        description: `Renda declarada (${renda}) requer acompanhamento de prioridade moderada.`
+        description: `Renda declarada (${renda}) requer acompanhamento de prioridade moderada.`,
       });
     } else {
       criterios.push({
         type: 'neutral',
-        title: 'Renda familiar acima de 3 salários mínimos'
+        title: 'Renda familiar acima de 3 salários mínimos',
       });
     }
 
-    const temBeneficio = (p.quaisBeneficios && p.quaisBeneficios.length > 0) || p.beneficioSocial === 'Sim';
+    const temBeneficio =
+      (p.quaisBeneficios && p.quaisBeneficios.length > 0) || p.beneficioSocial === 'Sim';
     const temCadUnico = Boolean(p.cadUnico || p.CADUnico);
     const casaVulneravel = p.suaCasaE === 'Alugada' || p.suaCasaE === 'Cedida';
 
     if (temBeneficio || temCadUnico) {
       pontos += 2;
-      const benefs = (p.quaisBeneficios && p.quaisBeneficios.length > 0) ? p.quaisBeneficios.join(', ') : 'Benefício Social';
+      const benefs =
+        p.quaisBeneficios && p.quaisBeneficios.length > 0
+          ? p.quaisBeneficios.join(', ')
+          : 'Benefício Social';
       criterios.push({
         type: 'alert',
         title: 'Vulnerabilidade Social Detectada',
-        description: `Participante de programas de transferência de renda (${benefs}) ${temCadUnico ? 'e cadastrado no CadÚnico' : ''}.`
+        description: `Participante de programas de transferência de renda (${benefs}) ${temCadUnico ? 'e cadastrado no CadÚnico' : ''}.`,
       });
     } else if (casaVulneravel) {
       pontos += 1;
       criterios.push({
         type: 'alert',
         title: 'Moradia Alugada / Cedida',
-        description: `Residência ${p.suaCasaE.toLowerCase()} com comprometimento financeiro mensal constante.`
+        description: `Residência ${p.suaCasaE.toLowerCase()} com comprometimento financeiro mensal constante.`,
       });
     } else {
       criterios.push({
         type: 'neutral',
-        title: 'Sem benefícios sociais ativos cadastrados'
+        title: 'Sem benefícios sociais ativos cadastrados',
       });
     }
 
-    const temDeficiencia = p.residenciaDeficiencia === 'Sim' || (p.quaisDeficiencia && p.quaisDeficiencia.length > 0);
-    const doencas = (p.residenciaDoencaCronica || []).filter(d => d !== 'nenhumaDoenca');
-    const gruposRisco = (p.residemSuaCasa || []).filter(r => ['idoso', 'gestante', 'pcd'].includes(r));
-    const ehUrgente = (p.classAtendimento || '').toLowerCase().includes('urgente') || (p.classAtendimento || '').includes('3') || (p.classAtendimento || '').includes('4');
+    const temDeficiencia =
+      p.residenciaDeficiencia === 'Sim' || (p.quaisDeficiencia && p.quaisDeficiencia.length > 0);
+    const doencas = (p.residenciaDoencaCronica || []).filter((d) => d !== 'nenhumaDoenca');
+    const gruposRisco = (p.residemSuaCasa || []).filter((r) =>
+      ['idoso', 'gestante', 'pcd'].includes(r)
+    );
+    const ehUrgente =
+      (p.classAtendimento || '').toLowerCase().includes('urgente') ||
+      (p.classAtendimento || '').includes('3') ||
+      (p.classAtendimento || '').includes('4');
 
     if (temDeficiencia || doencas.length > 0 || gruposRisco.length > 0 || ehUrgente) {
       pontos += 2;
@@ -149,19 +165,21 @@ export default function Triagem() {
         temDeficiencia ? 'Deficiência' : '',
         doencas.length > 0 ? `Doenças crônicas (${doencas.join(', ')})` : '',
         gruposRisco.length > 0 ? `Moradores em grupo de risco (${gruposRisco.join(', ')})` : '',
-        ehUrgente ? 'Classificação de urgência' : ''
-      ].filter(Boolean).join(' • ');
+        ehUrgente ? 'Classificação de urgência' : '',
+      ]
+        .filter(Boolean)
+        .join(' • ');
 
       criterios.push({
         type: 'alert',
         title: 'Necessidade Especial / Saúde / Risco',
-        description: itensRisco || 'Presença de fatores de risco de saúde na residência.'
+        description: itensRisco || 'Presença de fatores de risco de saúde na residência.',
       });
     }
 
     criterios.push({
       type: 'neutral',
-      title: 'Documentação completa'
+      title: 'Documentação completa',
     });
 
     let prioCalculada: 'baixa' | 'media' | 'alta' = 'alta';
@@ -222,10 +240,11 @@ export default function Triagem() {
   };
 
   // Filtragem da barra de busca da sidebar
-  const filteredList = pacientes.filter(item => 
-    item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.cpf.includes(searchTerm) ||
-    (item.status || '').toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredList = pacientes.filter(
+    (item) =>
+      item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.cpf.includes(searchTerm) ||
+      (item.status || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Ações Backend
@@ -242,11 +261,17 @@ export default function Triagem() {
     if (!selectedPatientData) return;
 
     try {
-      await apiClient.patch(`/prontuarios/${selectedPatientData.id}/status`, { status: 'Agendado' });
-      setPacientes(prev => prev.map(p => p.id === selectedPatientData.id ? { ...p, status: 'Agendado' } : p));
+      await apiClient.patch(`/prontuarios/${selectedPatientData.id}/status`, {
+        status: 'Agendado',
+      });
+      setPacientes((prev) =>
+        prev.map((p) => (p.id === selectedPatientData.id ? { ...p, status: 'Agendado' } : p))
+      );
       showToast(`📅 ${selectedPatientData.nome} encaminhado para Agendamento com sucesso!`);
     } catch {
-      showToast(`Não foi possível atualizar o status de ${selectedPatientData.nome}. Tente novamente.`);
+      showToast(
+        `Não foi possível atualizar o status de ${selectedPatientData.nome}. Tente novamente.`
+      );
     }
   };
 
@@ -269,11 +294,11 @@ export default function Triagem() {
               <span>Acolhimentos Existentes</span>
               <span className="sidebar-count-badge">{filteredList.length}</span>
             </div>
-            
+
             <div className="search-input-box">
               <Search size={16} />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Buscar por paciente ou CPF..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -287,14 +312,12 @@ export default function Triagem() {
               const subtext = `${item.areaAtendimento || 'Geral'} • ${item.clinicaAtendimento || 'Atendimento'}`;
 
               return (
-                <div 
+                <div
                   key={item.id}
                   className={`acolhimento-card ${isSelected ? 'selected' : ''}`}
                   onClick={() => setSelectedPatientId(item.id)}
                 >
-                  <div className="card-avatar">
-                    {getInitials(item.nome)}
-                  </div>
+                  <div className="card-avatar">{getInitials(item.nome)}</div>
                   <div className="card-info">
                     <span className="card-name">{item.nome}</span>
                     <span className="card-subtext">{subtext}</span>
@@ -307,7 +330,14 @@ export default function Triagem() {
             })}
 
             {filteredList.length === 0 && (
-              <div style={{ padding: '24px 16px', textAlign: 'center', color: '#6b7280', fontSize: '13px' }}>
+              <div
+                style={{
+                  padding: '24px 16px',
+                  textAlign: 'center',
+                  color: '#6b7280',
+                  fontSize: '13px',
+                }}
+              >
                 Nenhum acolhimento cadastrado no banco de dados.
               </div>
             )}
@@ -321,9 +351,7 @@ export default function Triagem() {
               {/* Card Superior: Dados Resumidos do Paciente */}
               <div className="patient-summary-card">
                 <div className="patient-profile-section">
-                  <div className="avatar-circle">
-                    {getInitials(selectedPatientData.nome)}
-                  </div>
+                  <div className="avatar-circle">{getInitials(selectedPatientData.nome)}</div>
                   <div className="patient-name-info">
                     <h2>{selectedPatientData.nome}</h2>
                     <span className="patient-cpf">CPF: {maskedCpf}</span>
@@ -337,7 +365,9 @@ export default function Triagem() {
                     </div>
                     <div className="metric-text">
                       <span className="metric-label">RENDA FAMILIAR</span>
-                      <span className="metric-value">{selectedPatientData.rendaFamiliar || 'Não informada'}</span>
+                      <span className="metric-value">
+                        {selectedPatientData.rendaFamiliar || 'Não informada'}
+                      </span>
                     </div>
                   </div>
 
@@ -400,14 +430,22 @@ export default function Triagem() {
                     <div className="criterios-header-icon">
                       <Activity size={20} />
                     </div>
-                    <h3>Critérios Aplicados ({resultCalculo.criterios.filter(c => c.type === 'alert').length} Alertas Detectados)</h3>
+                    <h3>
+                      Critérios Aplicados (
+                      {resultCalculo.criterios.filter((c) => c.type === 'alert').length} Alertas
+                      Detectados)
+                    </h3>
                   </div>
 
                   <div className="criterios-list">
                     {resultCalculo.criterios.map((crit, index) => (
                       <div key={index} className={`criterio-card ${crit.type}`}>
                         <div className={`criterio-icon ${crit.type}`}>
-                          {crit.type === 'alert' ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
+                          {crit.type === 'alert' ? (
+                            <AlertCircle size={20} />
+                          ) : (
+                            <CheckCircle2 size={20} />
+                          )}
                         </div>
                         <div className="criterio-text-content">
                           <h4 className={`criterio-title ${crit.type}`}>{crit.title}</h4>
@@ -421,43 +459,52 @@ export default function Triagem() {
                 </div>
               </div>
 
-              {/* Botões de Ação Inferiores */}
-              <div className="triagem-actions-group">
-                <div className="action-buttons-row">
-                  <button className="btn-validar-modelo" onClick={handleValidarModelo}>
-                    <Check size={20} />
-                    <span>Validar modelo</span>
-                  </button>
+              {podeAgirNaTriagem && (
+                <div className="triagem-actions-group">
+                  <div className="action-buttons-row">
+                    <button className="btn-validar-modelo" onClick={handleValidarModelo}>
+                      <Check size={20} />
+                      <span>Validar modelo</span>
+                    </button>
 
-                  <button className="btn-agendamento" onClick={handleAgendamento}>
-                    <Calendar size={20} />
-                    <span>Prosseguir para Agendamento</span>
+                    <button className="btn-agendamento" onClick={handleAgendamento}>
+                      <Calendar size={20} />
+                      <span>Prosseguir para Agendamento</span>
+                    </button>
+                  </div>
+
+                  <button
+                    className="btn-corrigir-manual"
+                    onClick={() => showToast('Modo de edição manual ativado.')}
+                  >
+                    <Edit3 size={16} />
+                    <span>Corrigir Manualmente</span>
                   </button>
                 </div>
-
-                <button className="btn-corrigir-manual" onClick={() => showToast('Modo de edição manual ativado.')}>
-                  <Edit3 size={16} />
-                  <span>Corrigir Manualmente</span>
-                </button>
-              </div>
+              )}
             </>
           ) : (
-            <div style={{ 
-              background: '#ffffff', 
-              borderRadius: '16px', 
-              padding: '60px 24px', 
-              textAlign: 'center', 
-              border: '1px solid #e5e7eb',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '12px'
-            }}>
+            <div
+              style={{
+                background: '#ffffff',
+                borderRadius: '16px',
+                padding: '60px 24px',
+                textAlign: 'center',
+                border: '1px solid #e5e7eb',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+              }}
+            >
               <UserX size={48} color="#9ca3af" />
-              <h3 style={{ margin: 0, color: '#111827', fontSize: '18px' }}>Nenhum acolhimento disponível</h3>
+              <h3 style={{ margin: 0, color: '#111827', fontSize: '18px' }}>
+                Nenhum acolhimento disponível
+              </h3>
               <p style={{ margin: 0, color: '#6b7280', fontSize: '14px', maxWidth: '400px' }}>
-                Não existem formulários de acolhimento cadastrados no banco de dados. Cadastre um novo acolhimento para visualizar a análise socioeconômica.
+                Não existem formulários de acolhimento cadastrados no banco de dados. Cadastre um
+                novo acolhimento para visualizar a análise socioeconômica.
               </p>
             </div>
           )}
@@ -465,11 +512,7 @@ export default function Triagem() {
       </div>
 
       {/* Mensagem de Feedback Toast */}
-      {toastMessage && (
-        <div className="triagem-toast">
-          {toastMessage}
-        </div>
-      )}
+      {toastMessage && <div className="triagem-toast">{toastMessage}</div>}
     </div>
   );
 }

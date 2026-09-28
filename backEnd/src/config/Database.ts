@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+import { env } from './env';
 
 const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
@@ -7,6 +8,7 @@ const pool = new Pool({
   user: process.env.DB_USER || 'prontuario_app',
   password: process.env.DB_PASSWORD || '',
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  max: env.poolMax,
 });
 
 class Database {
@@ -17,7 +19,7 @@ class Database {
       client.release();
     } catch (error: any) {
       console.error('Erro ao conectar ao PostgreSQL:', error.message);
-      console.warn('Servidor continuará sem banco de dados');
+      throw error;
     }
   }
 

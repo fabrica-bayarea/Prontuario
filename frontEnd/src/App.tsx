@@ -1,5 +1,5 @@
 import './App.css';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Questionario from './features/questionario/components/Questionario';
 import Pacientes from './features/pacientes/components/Pacientes';
 import GestaoUsuarios from './features/usuarios/components/GestaoUsuarios';
@@ -12,11 +12,9 @@ import RecuperarSenha from './features/auth/components/RecuperarSenha';
 import RedefinirSenha from './features/auth/components/RedefinirSenha';
 import PrimeiroAcesso from './features/auth/components/PrimeiroAcesso';
 import PrivateRoute from './components/PrivateRoute';
-import { useAuth } from './contexts/AuthContext';
+import RotaProtegida from './components/RotaProtegida';
 
 function App() {
-  const { usuario } = useAuth();
-
   return (
     <Routes>
       {/* Rotas públicas (autenticação) */}
@@ -25,37 +23,29 @@ function App() {
       <Route path="/redefinir-senha" element={<RedefinirSenha />} />
       <Route path="/primeiro-acesso" element={<PrimeiroAcesso />} />
 
-      {/* Rotas protegidas (com Sidebar) */}
+      {/* Rotas protegidas: PrivateRoute cuida da sessão, RotaProtegida da permissão */}
       <Route element={<PrivateRoute />}>
-        <Route 
-          path="/" 
-          element={usuario?.perfil === 'COM' ? <MeusDados /> : <Painel />} 
-        />
-        
-        <Route 
-          path="/pacientes" 
-          element={['ADM', 'COO', 'PRO', 'ATE'].includes(usuario?.perfil || '') ? <Pacientes /> : <Navigate to="/" replace />} 
-        />
-        
-        <Route 
-          path="/triagem" 
-          element={['ADM', 'COO', 'ATE'].includes(usuario?.perfil || '') ? <Triagem /> : <Navigate to="/" replace />} 
-        />
-        
-        <Route 
-          path="/validacao" 
-          element={['ADM', 'COO', 'PRO'].includes(usuario?.perfil || '') ? <Validacao /> : <Navigate to="/" replace />} 
-        />
-        
-        <Route 
-          path="/novoAcolhimento" 
-          element={['ADM', 'COO', 'ATE'].includes(usuario?.perfil || '') ? <Questionario /> : <Navigate to="/" replace />} 
-        />
-        
-        <Route 
-          path="/usuarios" 
-          element={usuario?.perfil === 'ADM' ? <GestaoUsuarios /> : <Navigate to="/" replace />} 
-        />
+        <Route element={<RotaProtegida chave="painel" aoNegar="rotaInicial" />}>
+          <Route path="/" element={<Painel />} />
+        </Route>
+        <Route element={<RotaProtegida chave="meusDados" />}>
+          <Route path="/meus-dados" element={<MeusDados />} />
+        </Route>
+        <Route element={<RotaProtegida chave="pacientes" />}>
+          <Route path="/pacientes" element={<Pacientes />} />
+        </Route>
+        <Route element={<RotaProtegida chave="triagem" />}>
+          <Route path="/triagem" element={<Triagem />} />
+        </Route>
+        <Route element={<RotaProtegida chave="validacao" />}>
+          <Route path="/validacao" element={<Validacao />} />
+        </Route>
+        <Route element={<RotaProtegida chave="novoAcolhimento" />}>
+          <Route path="/novoAcolhimento" element={<Questionario />} />
+        </Route>
+        <Route element={<RotaProtegida chave="usuarios" />}>
+          <Route path="/usuarios" element={<GestaoUsuarios />} />
+        </Route>
       </Route>
     </Routes>
   );

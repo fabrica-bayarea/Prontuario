@@ -4,7 +4,12 @@ import database from '../config/Database';
 type TipoLog =
   | 'LOGIN_SUCESSO' | 'LOGIN_FALHA' | 'LOGOUT'
   | 'TOKEN_EXPIRADO' | 'SENHA_RECUPERADA' | 'SENHA_REDEFINIDA'
-  | 'PRIMEIRO_ACESSO' | 'CONTA_BLOQUEADA' | 'CONTA_DESBLOQUEADA';
+  | 'PRIMEIRO_ACESSO' | 'CONTA_BLOQUEADA' | 'CONTA_DESBLOQUEADA'
+  | 'ACESSO_NEGADO' | 'LOGIN_BLOQUEADO';
+
+export function obterIpRequisicao(req: Request): string {
+  return (req.headers['x-forwarded-for'] as string) || req.socket?.remoteAddress || 'unknown';
+}
 
 export async function registrarLog(
   tipo: TipoLog,
@@ -13,7 +18,7 @@ export async function registrarLog(
   detalhes?: Record<string, unknown>
 ): Promise<void> {
   try {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.socket?.remoteAddress || 'unknown';
+    const ip = obterIpRequisicao(req);
     const userAgent = req.headers['user-agent'] || 'unknown';
     const pool = database.getPool();
     await pool.query(
