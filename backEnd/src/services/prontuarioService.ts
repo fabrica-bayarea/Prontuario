@@ -3,6 +3,7 @@ import { enviarEmailBoasVindas } from '../helpers/emailHelper';
 import { hashSenha } from '../helpers/senhaHelper';
 import * as prontuarioRepository from '../repositories/prontuarioRepository';
 import { existePorMatriculaOuEmail, inserir as inserirUsuario } from '../repositories/usuarioRepository';
+import * as triagemService from './triagemService';
 
 // Status que cada perfil pode gravar via PATCH /:id/status.
 // 'Aprovado' e 'Ajuste Necessário' ficam de fora de propósito: quem valida é o
@@ -53,9 +54,14 @@ export async function criarProntuario(
       clinicaAtendimento: (bodyCamel as any).clinicaAtendimento || 'Clínica Escola IESB',
     };
 
+    // Triagem calculada e gravada pelo servidor (EP-02): roda antes do INSERT,
+    // com os mesmos dados do corpo — o prontuário já nasce classificado.
+    const resultadoTriagem = triagemService.classificar(body);
+
     const novoProntuario = await prontuarioRepository.inserir(body, {
       status: 'Aguardando Validação',
       alunoId: alunoIdSolicitante,
+      triagem: resultadoTriagem,
     });
 
     // Cria acesso COM (Comunidade) automaticamente, se não existir
