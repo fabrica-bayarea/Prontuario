@@ -81,8 +81,8 @@ export async function criarProntuario(
     return novoProntuario;
   } catch (error: any) {
     console.error('Erro ao criar prontuário:', error);
-    let msg = error.message;
     if (error.code === '23505') {
+      let msg: string;
       if (error.constraint === 'prontuario_cpf_key') {
         msg = 'Este CPF já possui um acolhimento registrado.';
       } else if (error.constraint === 'usuarios_email_key') {
@@ -92,8 +92,12 @@ export async function criarProntuario(
       } else {
         msg = 'Cadastro duplicado: um registro com estes dados já existe.';
       }
+      throw new ErroDeNegocio(400, { error: msg });
     }
-    throw new ErroDeNegocio(400, { error: msg });
+    // Qualquer outro erro: nunca repassar o texto cru do Postgres pro cliente (RNF-04).
+    throw new ErroDeNegocio(400, {
+      error: { code: 'PRONT_004', message: 'Não foi possível registrar o acolhimento.' },
+    });
   }
 }
 
