@@ -13,7 +13,8 @@ class ProntuarioController {
         res.status(error.status).json(error.payload);
         return;
       }
-      res.status(400).json({ error: (error as Error).message });
+      console.error('Erro ao criar prontuário:', error);
+      res.status(500).json({ error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId } });
     }
   }
 
@@ -31,7 +32,8 @@ class ProntuarioController {
         res.status(error.status).json(error.payload);
         return;
       }
-      res.status(500).json({ error: (error as Error).message });
+      console.error('Erro ao listar prontuários:', error);
+      res.status(500).json({ error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId } });
     }
   }
 
@@ -49,7 +51,8 @@ class ProntuarioController {
         res.status(error.status).json(error.payload);
         return;
       }
-      res.status(500).json({ error: (error as Error).message });
+      console.error('Erro ao listar prontuário por id:', error);
+      res.status(500).json({ error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId } });
     }
   }
 
@@ -62,7 +65,8 @@ class ProntuarioController {
         res.status(error.status).json(error.payload);
         return;
       }
-      res.status(500).json({ error: (error as Error).message });
+      console.error('Erro ao listar o próprio prontuário:', error);
+      res.status(500).json({ error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId } });
     }
   }
 
@@ -80,7 +84,8 @@ class ProntuarioController {
         res.status(error.status).json(error.payload);
         return;
       }
-      res.status(400).json({ error: (error as Error).message });
+      console.error('Erro ao alterar status do prontuário:', error);
+      res.status(500).json({ error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId } });
     }
   }
 
@@ -93,7 +98,8 @@ class ProntuarioController {
         res.status(error.status).json(error.payload);
         return;
       }
-      res.status(400).json({ error: (error as Error).message });
+      console.error('Erro ao atualizar prontuário:', error);
+      res.status(500).json({ error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId } });
     }
   }
 
@@ -106,7 +112,8 @@ class ProntuarioController {
         res.status(error.status).json(error.payload);
         return;
       }
-      res.status(500).json({ error: (error as Error).message });
+      console.error('Erro ao validar prontuário:', error);
+      res.status(500).json({ error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId } });
     }
   }
 
@@ -119,7 +126,8 @@ class ProntuarioController {
         res.status(error.status).json(error.payload);
         return;
       }
-      res.status(500).json({ error: (error as Error).message });
+      console.error('Erro ao devolver prontuário:', error);
+      res.status(500).json({ error: { code: 'SRV_500', message: 'Erro interno do servidor.', requestId: res.locals.requestId } });
     }
   }
 }
