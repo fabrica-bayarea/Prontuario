@@ -197,6 +197,15 @@ CREATE TABLE IF NOT EXISTS prontuario (
     feedback_professor          TEXT,
 
     -- ========================================================
+    -- Triagem (EP-02) — calculada e gravada pelo servidor em criarProntuario.
+    -- Fora da allowlist de gravação: nem ATE nem ADM escrevem por PUT.
+    -- ========================================================
+    prioridade_triagem          VARCHAR(10),                   -- baixa / media / alta; null = não classificado (dados incompletos)
+    pontuacao_triagem           INTEGER,                       -- soma dos critérios; null junto com prioridade_triagem
+    criterios_triagem           JSONB,                         -- lista que justificou a nota (ou o motivo de não ter classificado)
+    triagem_calculada_em        TIMESTAMPTZ,                   -- null quando não classificado
+
+    -- ========================================================
     -- Campos legados (existem no controller mas não no frontend atual)
     -- ========================================================
     nome_outra_pessoa           VARCHAR(255),

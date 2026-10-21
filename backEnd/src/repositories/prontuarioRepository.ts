@@ -59,6 +59,10 @@ const MAPA_CAMEL_PARA_SNAKE: Record<string, string> = {
   servicoIESB: 'servico_iesb', antesIESB: 'antes_iesb', encaminhamentoMedico: 'encaminhamento_medico',
   nomeOutraPessoa: 'nome_outra_pessoa', createdAt: 'created_at', updatedAt: 'updated_at',
   alunoId: 'aluno_id', feedbackProfessor: 'feedback_professor', alunoNome: 'aluno_nome',
+  // Triagem (EP-02): calculada e gravada pelo servidor em criarProntuario, nunca
+  // a partir do corpo do cliente — por isso NÃO entram em COLUNAS_GRAVAVEIS.
+  prioridadeTriagem: 'prioridade_triagem', pontuacaoTriagem: 'pontuacao_triagem',
+  criteriosTriagem: 'criterios_triagem', triagemCalculadaEm: 'triagem_calculada_em',
 };
 
 const MAPA_SNAKE_PARA_CAMEL: Record<string, string> = Object.fromEntries(
@@ -107,9 +111,17 @@ function toCamel(row: any): any {
   return out;
 }
 
+export interface ResultadoTriagemParaGravar {
+  prioridade: string | null;
+  pontuacao: number | null;
+  criterios: unknown[];
+  calculadaEm: Date | null;
+}
+
 export interface CamposServidorProntuario {
   status: string;
   alunoId: number | null;
+  triagem: ResultadoTriagemParaGravar;
 }
 
 export interface OpcoesListagem {
@@ -134,6 +146,10 @@ export async function inserir(
   if (dadosServidor.alunoId !== null) {
     data.aluno_id = dadosServidor.alunoId;
   }
+  data.prioridade_triagem = dadosServidor.triagem.prioridade;
+  data.pontuacao_triagem = dadosServidor.triagem.pontuacao;
+  data.criterios_triagem = JSON.stringify(dadosServidor.triagem.criterios);
+  data.triagem_calculada_em = dadosServidor.triagem.calculadaEm;
 
   const cols = Object.keys(data);
   const vals = Object.values(data);
