@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../../libs/api-client';
+import { listarProntuarios } from '../../pacientes/api/api';
 
 export interface ProntuarioValidacao {
   id: number;
@@ -17,10 +18,9 @@ export interface ProntuarioValidacao {
 
 export const ValidacaoService = {
   listarPendentes: async (): Promise<ProntuarioValidacao[]> => {
-    // Busca todos os prontuários e filtra no frontend ou usa endpoint específico (aqui vamos filtrar)
-    const dados = (await apiClient.get('/prontuarios')) as any[];
-    // Filtrar os que estão Aguardando Validação
-    return dados.filter((p: any) => p.status === 'Aguardando Validação');
+    // Busca a página (até 100) e filtra no frontend; ver EP-07 para filtro no servidor.
+    const { dados } = await listarProntuarios();
+    return dados.filter((p) => p.status === 'Aguardando Validação') as ProntuarioValidacao[];
   },
 
   validar: async ({ id, feedback }: { id: number; feedback: string }): Promise<any> => {

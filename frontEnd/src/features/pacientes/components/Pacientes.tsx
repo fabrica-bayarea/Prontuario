@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, FileText, Calendar, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../../../libs/api-client';
+import { listarProntuarios } from '../api/api';
 import PacientesModal from './PacientesModal';
 import './Pacientes.css';
 
@@ -27,10 +27,12 @@ function Pacientes() {
   const [statusFilter, setStatusFilter] = useState('');
   const [clinicaFilter, setClinicaFilter] = useState('');
 
-  const { data: pacientes = [], isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['pacientes'],
-    queryFn: () => apiClient.get('/prontuarios'),
+    queryFn: () => listarProntuarios(),
   });
+  // Filtros de status, clínica e busca atuam sobre a página atual (até 100); ver EP-07.
+  const pacientes = data?.dados ?? [];
 
   const pacientesFiltrados = pacientes.filter((paciente: any) => {
     const query = searchQuery.toLowerCase();

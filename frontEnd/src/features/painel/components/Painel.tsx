@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Plus, Search, User, CheckCircle, Clock, ChevronRight } from 'lucide-react';
-import { apiClient } from '../../../libs/api-client';
+import { listarProntuarios } from '../../pacientes/api/api';
 import PacientesModal from '../../pacientes/components/PacientesModal';
 import './Painel.css';
 
@@ -11,13 +11,16 @@ export default function Painel() {
   const [pacienteSelecionado, setPacienteSelecionado] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: pacientes = [], isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['pacientes'],
-    queryFn: () => apiClient.get('/prontuarios'),
+    queryFn: () => listarProntuarios(),
   });
+  const pacientes = data?.dados ?? [];
 
   // Cálculo das métricas
-  const totalVidas = pacientes.length;
+  // "Total de Vidas" usa o total do servidor. "No mês" e "aguardando" contam só a
+  // página atual (até 100); contadores calculados no servidor são card do EP-07.
+  const totalVidas = data?.paginacao.total ?? 0;
   
   const mesAtual = new Date().getMonth();
   const anoAtual = new Date().getFullYear();
