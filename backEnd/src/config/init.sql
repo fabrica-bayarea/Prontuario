@@ -80,6 +80,55 @@ CREATE INDEX IF NOT EXISTS idx_logs_acesso_created_at ON logs_acesso (created_at
 -- Apenas INSERT e SELECT (tabela imutável — LGPD)
 GRANT INSERT, SELECT ON TABLE logs_acesso TO prontuario_app;
 GRANT USAGE, SELECT ON SEQUENCE logs_acesso_id_seq TO prontuario_app;
+
+-- ============================================================
+-- Tabela de Critérios de Triagem (EP-02/EP-08) — versionada, por clínica
+-- ============================================================
+-- clinica_id fica sem FK por enquanto: a tabela `clinicas` é do BE-08 (#152),
+-- ainda não implementada. NULL em clinica_id = configuração global.
+CREATE TABLE IF NOT EXISTS criterios_triagem (
+    id          SERIAL PRIMARY KEY,
+    clinica_id  INTEGER,
+    versao      INTEGER NOT NULL,
+    pesos       JSONB NOT NULL,
+    ativa       BOOLEAN NOT NULL DEFAULT true,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_criterios_triagem_clinica_versao
+  ON criterios_triagem (COALESCE(clinica_id, -1), versao);
+
+-- No máximo uma linha ATIVA por clínica (e no máximo uma global ativa).
+CREATE UNIQUE INDEX IF NOT EXISTS idx_criterios_triagem_ativa_unica
+  ON criterios_triagem (COALESCE(clinica_id, -1))
+  WHERE ativa = true;
+
+CREATE INDEX IF NOT EXISTS idx_criterios_triagem_clinica_id ON criterios_triagem (clinica_id);
+
+-- Apenas INSERT e SELECT: mudar peso é INSERT de versão nova, nunca UPDATE.
+GRANT INSERT, SELECT ON TABLE criterios_triagem TO prontuario_app;
+GRANT USAGE, SELECT ON SEQUENCE criterios_triagem_id_seq TO prontuario_app;
+
+COMMENT ON TABLE criterios_triagem IS 'Versões dos pesos de triagem, globais ou por clínica (EP-02/EP-08). Mudar peso = INSERT de versão nova; nunca recalcula o passado.';
+
+-- Seed: versão 1 global, com os pesos que BE-09 (#150) codificou como constantes.
+INSERT INTO criterios_triagem (clinica_id, versao, pesos, ativa)
+VALUES (
+  NULL,
+  1,
+  '{
+    "rendaBaixa": 3,
+    "rendaMedia": 2,
+    "vulnerabilidadeSocial": 2,
+    "moradiaVulneravel": 1,
+    "riscoSaude": 2,
+    "limiarAlta": 4,
+    "limiarMedia": 2
+  }'::jsonb,
+  true
+)
+ON CONFLICT DO NOTHING;
+
 -- ============================================================
 -- Tabela principal: prontuario
 -- ============================================================
@@ -204,6 +253,7 @@ CREATE TABLE IF NOT EXISTS prontuario (
     pontuacao_triagem           INTEGER,                       -- soma dos critérios; null junto com prioridade_triagem
     criterios_triagem           JSONB,                         -- lista que justificou a nota (ou o motivo de não ter classificado)
     triagem_calculada_em        TIMESTAMPTZ,                   -- null quando não classificado
+    criterios_triagem_id        INTEGER REFERENCES criterios_triagem(id) ON DELETE SET NULL, -- versão de critérios usada (EP-08, issue #154)
 
     -- ========================================================
     -- Campos legados (existem no controller mas não no frontend atual)
@@ -226,6 +276,7 @@ CREATE INDEX IF NOT EXISTS idx_prontuario_created_at ON prontuario (created_at D
 -- Suporta o filtro de escopo do perfil ATE (WHERE aluno_id = $1 OR aluno_id IS NULL)
 -- na listagem paginada de GET /api/prontuarios.
 CREATE INDEX IF NOT EXISTS idx_prontuario_aluno_id ON prontuario (aluno_id);
+CREATE INDEX IF NOT EXISTS idx_prontuario_criterios_triagem_id ON prontuario (criterios_triagem_id);
 
 -- ============================================================
 -- Conceder permissões ao usuário da aplicação

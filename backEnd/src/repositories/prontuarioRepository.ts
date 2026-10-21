@@ -63,6 +63,9 @@ const MAPA_CAMEL_PARA_SNAKE: Record<string, string> = {
   // a partir do corpo do cliente — por isso NÃO entram em COLUNAS_GRAVAVEIS.
   prioridadeTriagem: 'prioridade_triagem', pontuacaoTriagem: 'pontuacao_triagem',
   criteriosTriagem: 'criterios_triagem', triagemCalculadaEm: 'triagem_calculada_em',
+  // Versão de critérios usada (EP-08, issue #154) — mesma regra: fora de
+  // COLUNAS_GRAVAVEIS, só o servidor grava.
+  criteriosTriagemId: 'criterios_triagem_id',
 };
 
 const MAPA_SNAKE_PARA_CAMEL: Record<string, string> = Object.fromEntries(
@@ -122,6 +125,8 @@ export interface CamposServidorProntuario {
   status: string;
   alunoId: number | null;
   triagem: ResultadoTriagemParaGravar;
+  /** Versão de criterios_triagem usada pra classificar (EP-08, issue #154); null se não classificado. */
+  criteriosTriagemId: number | null;
 }
 
 export interface OpcoesListagem {
@@ -150,6 +155,7 @@ export async function inserir(
   data.pontuacao_triagem = dadosServidor.triagem.pontuacao;
   data.criterios_triagem = JSON.stringify(dadosServidor.triagem.criterios);
   data.triagem_calculada_em = dadosServidor.triagem.calculadaEm;
+  data.criterios_triagem_id = dadosServidor.criteriosTriagemId;
 
   const cols = Object.keys(data);
   const vals = Object.values(data);

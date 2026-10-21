@@ -3,6 +3,7 @@ import { enviarEmailBoasVindas } from '../helpers/emailHelper';
 import { hashSenha } from '../helpers/senhaHelper';
 import * as prontuarioRepository from '../repositories/prontuarioRepository';
 import { existePorMatriculaOuEmail, inserir as inserirUsuario } from '../repositories/usuarioRepository';
+import * as criteriosTriagemRepository from '../repositories/criteriosTriagemRepository';
 import * as triagemService from './triagemService';
 
 // Status que cada perfil pode gravar via PATCH /:id/status.
@@ -54,14 +55,23 @@ export async function criarProntuario(
       clinicaAtendimento: (bodyCamel as any).clinicaAtendimento || 'Clínica Escola IESB',
     };
 
+    // Critérios de triagem configuráveis por clínica (EP-08, issue #154).
+    // TODO(#152 - BE-08): trocar `null` pelo clinica_id do prontuário assim que
+    // a coluna existir — hoje toda clínica cai na global de qualquer forma,
+    // então isso já é o comportamento correto (critério de aceite "clínica sem
+    // configuração usa a global"), só não resolve por clínica de verdade ainda.
+    const versaoCriterios = await criteriosTriagemRepository.buscarAtivaPorClinica(null);
+    const pesos = versaoCriterios?.pesos ?? triagemService.PESOS_PADRAO;
+
     // Triagem calculada e gravada pelo servidor (EP-02): roda antes do INSERT,
     // com os mesmos dados do corpo — o prontuário já nasce classificado.
-    const resultadoTriagem = triagemService.classificar(body);
+    const resultadoTriagem = triagemService.classificar(body, pesos as triagemService.PesosTriagem);
 
     const novoProntuario = await prontuarioRepository.inserir(body, {
       status: 'Aguardando Validação',
       alunoId: alunoIdSolicitante,
       triagem: resultadoTriagem,
+      criteriosTriagemId: versaoCriterios?.id ?? null,
     });
 
     // Cria acesso COM (Comunidade) automaticamente, se não existir
