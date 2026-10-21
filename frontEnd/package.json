@@ -8,7 +8,11 @@
     "build": "vite build",
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,html}\"",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.testes.json",
+    "test": "vitest run tests/listagem-prontuarios.test.ts",
+    "test:browser": "playwright test",
+    "test:integracao": "node tests/integracao-api.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -25,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^25.9.2",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
@@ -37,6 +42,7 @@
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.4",
-    "vite": "^7.1.12"
+    "vite": "^7.1.12",
+    "vitest": "^4.1.12"
   }
 }

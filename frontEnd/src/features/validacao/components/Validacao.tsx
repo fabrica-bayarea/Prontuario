@@ -7,7 +7,8 @@ import {
 import './Validacao.css';
 
 export default function Validacao() {
-  const { data: pendentes, isLoading, isError } = useProntuariosPendentes();
+  const { data, isLoading, isError, refetch } = useProntuariosPendentes();
+  const pendentes = isError ? undefined : data;
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,7 +51,7 @@ export default function Validacao() {
         </div>
         <div className="header-badge">
           <span className="badge-icon">!</span>
-          <span>{pendentes?.length || 0} Aguardando Validação</span>
+          <span>{isLoading ? '...' : isError ? '—' : (pendentes?.length ?? 0)} Aguardando Validação</span>
         </div>
       </header>
 
@@ -71,8 +72,13 @@ export default function Validacao() {
           
           <div className="prontuarios-list">
             {isLoading && <p className="loading-msg">Carregando pendências...</p>}
-            {isError && <p className="error-msg">Erro ao carregar prontuários.</p>}
-            {filteredList?.length === 0 && !isLoading && <p className="empty-msg">Nenhum prontuário encontrado.</p>}
+            {isError && (
+              <div className="error-msg" role="alert">
+                Não foi possível carregar a lista completa.
+                <button type="button" className="btn-filter" onClick={() => void refetch()}>Tentar novamente</button>
+              </div>
+            )}
+            {filteredList?.length === 0 && !isLoading && !isError && <p className="empty-msg">Nenhum prontuário encontrado.</p>}
             
             {filteredList?.map(prontuario => (
               <div 

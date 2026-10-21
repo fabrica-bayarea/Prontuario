@@ -14,7 +14,7 @@ import {
   UserX,
 } from 'lucide-react';
 import { apiClient } from '../../../libs/api-client';
-import { listarProntuarios } from '../../pacientes/api/api';
+import { useListaProntuarios } from '../../pacientes/api/useListaProntuarios';
 import { useAuth } from '../../../contexts/AuthContext';
 import './Triagem.css';
 
@@ -51,30 +51,12 @@ export default function Triagem() {
   // Só o ATE muda status na triagem (PATCH /prontuarios/:id/status é rbacMiddleware(['ATE'])).
   const podeAgirNaTriagem = usuario?.perfil === 'ATE';
 
-  const [pacientes, setPacientes] = useState<Patient[]>([]);
+  const { data, isLoading, isError, refetch } = useListaProntuarios();
+  const pacientes: Patient[] = isError ? [] : (data?.dados ?? []);
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [priority, setPriority] = useState<'baixa' | 'media' | 'alta'>('alta');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function loadPatients() {
-      try {
-        const { dados } = await listarProntuarios();
-        const data = dados as Patient[];
-        if (data.length > 0) {
-          setPacientes(data);
-          setSelectedPatientId(data[0].id);
-        } else {
-          setPacientes([]);
-          setSelectedPatientId(null);
-        }
-      } catch {
-        console.warn('Erro ao carregar prontuários do banco de dados.');
-      }
-    }
-    loadPatients();
-  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -266,9 +248,7 @@ export default function Triagem() {
       await apiClient.patch(`/prontuarios/${selectedPatientData.id}/status`, {
         status: 'Agendado',
       });
-      setPacientes((prev) =>
-        prev.map((p) => (p.id === selectedPatientData.id ? { ...p, status: 'Agendado' } : p))
-      );
+      await refetch();
       showToast(`📅 ${selectedPatientData.nome} encaminhado para Agendamento com sucesso!`);
     } catch {
       showToast(
@@ -294,7 +274,7 @@ export default function Triagem() {
           <div className="sidebar-header-box">
             <div className="sidebar-title">
               <span>Acolhimentos Existentes</span>
-              <span className="sidebar-count-badge">{filteredList.length}</span>
+              <span className="sidebar-count-badge">{isLoading ? '...' : isError ? '—' : filteredList.length}</span>
             </div>
 
             <div className="search-input-box">
@@ -309,8 +289,15 @@ export default function Triagem() {
           </div>
 
           <div className="acolhimentos-list">
+            {isLoading && <p role="status">Carregando acolhimentos...</p>}
+            {isError && (
+              <div role="alert">
+                Não foi possível carregar a lista completa.
+                <button type="button" className="btn-filter" onClick={() => void refetch()}>Tentar novamente</button>
+              </div>
+            )}
             {filteredList.map((item) => {
-              const isSelected = item.id === selectedPatientId;
+              const isSelected = item.id === selectedPatientData?.id;
               const subtext = `${item.areaAtendimento || 'Geral'} • ${item.clinicaAtendimento || 'Atendimento'}`;
 
               return (
@@ -331,7 +318,7 @@ export default function Triagem() {
               );
             })}
 
-            {filteredList.length === 0 && (
+            {!isLoading && !isError && filteredList.length === 0 && (
               <div
                 style={{
                   padding: '24px 16px',

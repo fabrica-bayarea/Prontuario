@@ -1,26 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../../libs/api-client';
-import { listarProntuarios } from '../../pacientes/api/api';
+import { listarProntuarios, type ListaProntuarios, type Prontuario } from '../../pacientes/api/api';
+import { useOpcoesListaProntuarios } from '../../pacientes/api/useListaProntuarios';
 
-export interface ProntuarioValidacao {
-  id: number;
-  nome: string;
-  cpf: string;
-  alunoNome?: string;
-  clinicaAtendimento: string;
-  areaAtendimento: string;
-  status: string;
-  createdAt: string;
-  // Outros campos relevantes
-  atendimentoParaQuem?: string;
-  nomeOutraPessoa?: string;
+export type ProntuarioValidacao = Prontuario;
+
+function filtrarPendentes({ dados }: ListaProntuarios): ProntuarioValidacao[] {
+  return dados.filter((prontuario) => prontuario.status === 'Aguardando Validação');
 }
 
 export const ValidacaoService = {
-  listarPendentes: async (): Promise<ProntuarioValidacao[]> => {
-    // Busca a página (até 100) e filtra no frontend; ver EP-07 para filtro no servidor.
-    const { dados } = await listarProntuarios();
-    return dados.filter((p) => p.status === 'Aguardando Validação') as ProntuarioValidacao[];
+  listarPendentes: async (signal?: AbortSignal): Promise<ProntuarioValidacao[]> => {
+    return filtrarPendentes(await listarProntuarios(100, signal));
   },
 
   validar: async ({ id, feedback }: { id: number; feedback: string }): Promise<any> => {
@@ -34,8 +25,8 @@ export const ValidacaoService = {
 
 export const useProntuariosPendentes = () => {
   return useQuery({
-    queryKey: ['prontuariosPendentes'],
-    queryFn: ValidacaoService.listarPendentes,
+    ...useOpcoesListaProntuarios(),
+    select: filtrarPendentes,
   });
 };
 
@@ -44,7 +35,7 @@ export const useValidarProntuario = () => {
   return useMutation({
     mutationFn: ValidacaoService.validar,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['prontuariosPendentes'] });
+      queryClient.invalidateQueries({ queryKey: ['pacientes'] });
     },
   });
 };
@@ -54,7 +45,7 @@ export const useDevolverProntuario = () => {
   return useMutation({
     mutationFn: ValidacaoService.devolver,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['prontuariosPendentes'] });
+      queryClient.invalidateQueries({ queryKey: ['pacientes'] });
     },
   });
 };

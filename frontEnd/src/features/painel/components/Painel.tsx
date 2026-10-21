@@ -1,25 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { Plus, Search, User, CheckCircle, Clock, ChevronRight } from 'lucide-react';
-import { listarProntuarios } from '../../pacientes/api/api';
+import { useListaProntuarios } from '../../pacientes/api/useListaProntuarios';
 import PacientesModal from '../../pacientes/components/PacientesModal';
 import './Painel.css';
 
 export default function Painel() {
   const navigate = useNavigate();
-  const [pacienteSelecionado, setPacienteSelecionado] = useState<any>(null);
+  const [pacienteSelecionadoId, setPacienteSelecionadoId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['pacientes'],
-    queryFn: () => listarProntuarios(),
-  });
-  const pacientes = data?.dados ?? [];
+  const { data, isLoading, isError, refetch } = useListaProntuarios();
+  const pacientes = isError ? [] : (data?.dados ?? []);
 
   // Cálculo das métricas
-  // "Total de Vidas" usa o total do servidor. "No mês" e "aguardando" contam só a
-  // página atual (até 100); contadores calculados no servidor são card do EP-07.
+  // As métricas e a busca usam a coleção completa, após carregar todas as páginas.
   const totalVidas = data?.paginacao.total ?? 0;
   
   const mesAtual = new Date().getMonth();
@@ -128,7 +123,7 @@ export default function Painel() {
           </div>
           <div className="kpi-content">
             <span className="kpi-label">Total de Vidas Apoiadas</span>
-            <span className="kpi-value">{isLoading ? '...' : totalVidas}</span>
+            <span className="kpi-value">{isLoading ? '...' : isError ? '—' : totalVidas}</span>
           </div>
         </div>
 
@@ -138,7 +133,7 @@ export default function Painel() {
           </div>
           <div className="kpi-content">
             <span className="kpi-label">Acolhimentos no Mês</span>
-            <span className="kpi-value">{isLoading ? '...' : noMes}</span>
+            <span className="kpi-value">{isLoading ? '...' : isError ? '—' : noMes}</span>
           </div>
         </div>
 
@@ -148,7 +143,7 @@ export default function Painel() {
           </div>
           <div className="kpi-content">
             <span className="kpi-label">Aguardando Triagem</span>
-            <span className="kpi-value">{isLoading ? '...' : aguardandoTriagem}</span>
+            <span className="kpi-value">{isLoading ? '...' : isError ? '—' : aguardandoTriagem}</span>
           </div>
         </div>
       </div>
@@ -162,13 +157,18 @@ export default function Painel() {
         
         <div className="recentes-list">
           {isLoading && <div style={{ padding: '24px', textAlign: 'center' }}>Carregando recentes...</div>}
-          {isError && <div style={{ padding: '24px', textAlign: 'center', color: 'red' }}>Erro ao carregar dados.</div>}
-          {!isLoading && recentes.length === 0 && (
+          {isError && (
+            <div style={{ padding: '24px', textAlign: 'center', color: 'red' }} role="alert">
+              Não foi possível carregar a lista completa.
+              <button type="button" className="btn-filter" onClick={() => void refetch()}>Tentar novamente</button>
+            </div>
+          )}
+          {!isLoading && !isError && recentes.length === 0 && (
             <div style={{ padding: '24px', textAlign: 'center', color: '#6b7280' }}>Nenhum acolhimento encontrado.</div>
           )}
           
           {recentes.map((p: any) => (
-            <div key={p.id} className="recente-item" onClick={() => setPacienteSelecionado(p)}>
+            <div key={p.id} className="recente-item" onClick={() => setPacienteSelecionadoId(p.id)}>
               <div className="recente-info-group">
                 <div className="recente-avatar">{getIniciais(p.nome)}</div>
                 <div className="recente-details">
@@ -193,8 +193,8 @@ export default function Painel() {
       </div>
 
       <PacientesModal 
-        paciente={pacienteSelecionado} 
-        onClose={() => setPacienteSelecionado(null)} 
+        paciente={pacientes.find((paciente) => paciente.id === pacienteSelecionadoId) ?? null}
+        onClose={() => setPacienteSelecionadoId(null)}
       />
     </div>
   );
