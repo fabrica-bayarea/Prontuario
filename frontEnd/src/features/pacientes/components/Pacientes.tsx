@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Search, FileText, Calendar, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { listarProntuarios } from '../api/api';
+import { useListaProntuarios } from '../api/useListaProntuarios';
 import PacientesModal from './PacientesModal';
 import './Pacientes.css';
 
@@ -22,17 +21,14 @@ const CLINICA_OPCOES = {
 
 function Pacientes() {
   const navigate = useNavigate();
-  const [pacienteSelecionado, setPacienteSelecionado] = useState<any>(null);
+  const [pacienteSelecionadoId, setPacienteSelecionadoId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [clinicaFilter, setClinicaFilter] = useState('');
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['pacientes'],
-    queryFn: () => listarProntuarios(),
-  });
-  // Filtros de status, clínica e busca atuam sobre a página atual (até 100); ver EP-07.
-  const pacientes = data?.dados ?? [];
+  const { data, isLoading, isError, refetch } = useListaProntuarios();
+  // Filtros de status, clínica e busca atuam sobre a coleção completa.
+  const pacientes = isError ? [] : (data?.dados ?? []);
 
   const pacientesFiltrados = pacientes.filter((paciente: any) => {
     const query = searchQuery.toLowerCase();
@@ -119,7 +115,10 @@ function Pacientes() {
         {isLoading ? (
           <div style={{ padding: '32px', textAlign: 'center', color: '#555' }}>Carregando pacientes...</div>
         ) : isError ? (
-          <div style={{ padding: '32px', textAlign: 'center', color: 'red' }}>Erro ao carregar dados.</div>
+          <div style={{ padding: '32px', textAlign: 'center', color: 'red' }} role="alert">
+            Não foi possível carregar a lista completa.
+            <button type="button" className="btn-filter" onClick={() => void refetch()}>Tentar novamente</button>
+          </div>
         ) : (
           <table className="pacientes-table">
             <thead>
@@ -158,7 +157,7 @@ function Pacientes() {
                     <div className="acoes-container">
                       <button 
                         className="btn-icon text-purple" 
-                        onClick={() => setPacienteSelecionado(paciente)}
+                        onClick={() => setPacienteSelecionadoId(paciente.id)}
                         title="Ver detalhes"
                       >
                         <FileText size={18} />
@@ -184,8 +183,8 @@ function Pacientes() {
       </div>
 
       <PacientesModal 
-        paciente={pacienteSelecionado} 
-        onClose={() => setPacienteSelecionado(null)} 
+        paciente={pacientes.find((paciente) => paciente.id === pacienteSelecionadoId) ?? null}
+        onClose={() => setPacienteSelecionadoId(null)}
       />
     </div>
   );
