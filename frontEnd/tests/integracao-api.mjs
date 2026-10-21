@@ -18,9 +18,10 @@ const temporario = mkdtempSync(join(tmpdir(), 'prontuario-compatibilidade-'));
 const container = `prontuario-paginacao-${randomUUID()}`;
 const senha = randomUUID();
 const segredo = randomUUID();
+const COMMIT_GIT_PR142 = '4b12ebf22e5cb3e420baef98976d2e4ea59d7c70';
 const bases = [
   { nome: 'antiga', sha: process.env.TEST_BASE_SHA || '8531deef310c837cb3b0f346ad81e1dd4fe16ad1', formato: 'array' },
-  { nome: 'pr142', sha: process.env.TEST_API142_SHA || '4b12ebf22e5cb3e420baef98976d2e4ea59d7c70', formato: 'envelope' },
+  { nome: 'pr142', sha: process.env.TEST_API142_SHA || COMMIT_GIT_PR142, formato: 'envelope' },
 ];
 const worktrees = [];
 const servidores = [];
